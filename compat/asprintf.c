@@ -48,7 +48,7 @@ vasprintf(char **ret, const char *fmt, va_list ap)
 	if ((n = vsnprintf(NULL, 0, fmt, ap)) < 0)
 		goto error;
 
-	*ret = xmalloc(n + 1);
+	*ret = xcalloc(n + 1, 1);
 	if ((n = vsnprintf(*ret, n + 1, fmt, ap2)) < 0) {
 		free(*ret);
 		goto error;
