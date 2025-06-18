@@ -1,2 +1,2 @@
 # Purpose
-This file is a comment header, likely from a README or documentation file, providing a brief description of a project named "spam-detection." It indicates that the project serves as an example for detecting emails that are likely to be spam.
+This is a comment header from a file, likely serving as a brief description or documentation for a project named "spam-detection." It indicates that the project is an example implementation focused on identifying emails that are likely to be spam.
