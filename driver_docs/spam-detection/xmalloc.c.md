@@ -6,9 +6,9 @@
 The `xmalloc.c` file in the `spam-detection` codebase provides custom memory allocation functions that ensure successful memory allocation by terminating the program with an error message if allocation fails.
 
 # Purpose
-This C source code file provides a set of memory allocation and string manipulation functions that enhance the standard C library functions by incorporating error checking and handling. The functions defined in this file, such as [`xmalloc`](#xmalloc), [`xcalloc`](#xcalloc), [`xrealloc`](#xrealloc), and [`xstrdup`](#xstrdup), are designed to ensure that memory allocation operations do not fail silently. Instead of returning `NULL` on failure, these functions call a `fatalx` function, which is presumably defined elsewhere, to handle errors in a more controlled manner. This approach prevents the program from continuing execution with invalid memory pointers, thereby enhancing robustness and reliability.
+This C source code file provides a set of memory allocation and string manipulation functions that enhance standard library functions by incorporating error checking and handling. The functions defined in this file, such as [`xmalloc`](<#xmalloc>), [`xcalloc`](<#xcalloc>), [`xrealloc`](<#xrealloc>), and [`xstrdup`](<#xstrdup>), are designed to ensure that memory allocation operations do not fail silently. Instead of returning `NULL` on failure, these functions call a `fatalx` function, which is presumably defined elsewhere, to handle errors in a more controlled manner. This approach ensures that any issues with memory allocation are immediately addressed, preventing potential undefined behavior or crashes due to unhandled `NULL` pointers.
 
-The file is part of a larger project, as indicated by the inclusion of "tmux.h", suggesting it is likely a component of the tmux terminal multiplexer. The functions provided are not intended to be standalone but are meant to be integrated into a larger codebase, offering a safer alternative to standard memory and string handling functions. The file does not define a public API or external interface but rather serves as an internal utility to ensure that memory operations within the project are handled safely and consistently. The use of these functions can help prevent common programming errors related to memory management, such as buffer overflows and memory leaks.
+The file also includes functions for formatted string operations, such as [`xasprintf`](<#xasprintf>) and [`xsnprintf`](<#xsnprintf>), which similarly incorporate error checking to prevent buffer overflows and other common pitfalls associated with string formatting in C. By wrapping standard functions like `malloc`, `calloc`, `realloc`, `strdup`, and `snprintf`, this file provides a robust interface for memory and string operations, enhancing the reliability and safety of the code that utilizes these functions. The inclusion of these functions suggests that the file is part of a larger codebase, likely intended to be used as a utility library within a project, ensuring consistent error handling across various components.
 # Imports and Dependencies
 
 ---
@@ -31,9 +31,9 @@ The `xmalloc` function allocates memory of a specified size and terminates the p
 - **Control Flow**:
     - Check if the requested size is zero; if so, call `fatalx` to terminate the program with an error message.
     - Attempt to allocate memory using `malloc` with the specified size.
-    - Check if the allocation was successful; if not, call `fatalx` to terminate the program with an error message including the size and error description.
+    - Check if the memory allocation failed (i.e., `malloc` returned NULL); if so, call `fatalx` to terminate the program with an error message including the error string from `strerror(errno)`.
     - Return the pointer to the allocated memory.
-- **Output**: A pointer to the allocated memory block, or the program is terminated if allocation fails.
+- **Output**: A pointer to the allocated memory block, or the program is terminated if allocation fails or size is zero.
 
 
 ---
@@ -43,9 +43,9 @@ The `xcalloc` function allocates memory for an array of elements, ensuring that 
     - `nmemb`: The number of elements to allocate memory for.
     - `size`: The size of each element to allocate.
 - **Control Flow**:
-    - Check if either `nmemb` or `size` is zero; if so, call `fatalx` to terminate the program with an error message.
-    - Attempt to allocate memory using `calloc` for `nmemb` elements each of `size` bytes.
-    - If `calloc` returns `NULL`, indicating a failure to allocate memory, call `fatalx` to terminate the program with an error message including the number of bytes requested and the error string from `strerror(errno)`.
+    - Check if either 'nmemb' or 'size' is zero; if so, call 'fatalx' to terminate the program with an error message.
+    - Attempt to allocate memory using 'calloc' for 'nmemb' elements each of 'size' bytes.
+    - If 'calloc' returns NULL, indicating a failure to allocate memory, call 'fatalx' to terminate the program with an error message including the error details.
     - Return the pointer to the allocated memory.
 - **Output**: A pointer to the allocated memory block, or the program is terminated if allocation fails.
 
@@ -57,25 +57,25 @@ The `xrealloc` function reallocates memory for a given pointer to a specified si
     - `ptr`: A pointer to the memory block that needs to be reallocated.
     - `size`: The new size in bytes for the memory block.
 - **Control Flow**:
-    - The function calls [`xreallocarray`](#xreallocarray) with the provided pointer, a fixed number of elements (1), and the specified size.
-    - The [`xreallocarray`](#xreallocarray) function handles the actual reallocation and error checking.
-- **Output**: A pointer to the newly allocated memory block, or the function will terminate the program if reallocation fails.
-- **Functions called**:
-    - [`xreallocarray`](#xreallocarray)
+    - The function calls [`xreallocarray`](<#xreallocarray>) with the given pointer, a count of 1, and the specified size.
+    - [`xreallocarray`](<#xreallocarray>) handles the actual reallocation and error checking.
+- **Output**: A pointer to the newly allocated memory block, or it terminates the program if reallocation fails.
+- **Functions Called**:
+    - [`xreallocarray`](<#xreallocarray>)
 
 
 ---
 ### xreallocarray<!-- {{#callable:xreallocarray}} -->
-The `xreallocarray` function reallocates memory for an array, ensuring that the operation does not fail by terminating the program if an error occurs.
+The `xreallocarray` function reallocates memory for an array, ensuring that the operation does not fail silently by terminating the program on error.
 - **Inputs**:
     - `ptr`: A pointer to the previously allocated memory block that needs to be reallocated.
     - `nmemb`: The number of elements in the array to be allocated.
     - `size`: The size of each element in the array.
 - **Control Flow**:
     - Check if either `nmemb` or `size` is zero; if so, call `fatalx` to terminate the program with an error message indicating zero size.
-    - Call `reallocarray` to attempt to reallocate the memory block pointed to by `ptr` to accommodate `nmemb` elements of `size` bytes each.
-    - Check if `reallocarray` returns `NULL`, indicating a failure to allocate memory; if so, call `fatalx` to terminate the program with an error message including the attempted allocation size and the error string from `strerror(errno)`.
-    - Return the pointer to the newly allocated memory block.
+    - Attempt to reallocate memory using `reallocarray` with the given `ptr`, `nmemb`, and `size`.
+    - If `reallocarray` returns `NULL`, indicating a failure to allocate memory, call `fatalx` to terminate the program with an error message including the attempted allocation size and the error string from `strerror(errno)`.
+    - Return the newly allocated memory pointer `new_ptr`.
 - **Output**: A pointer to the newly allocated memory block, or the program terminates if allocation fails.
 
 
@@ -88,9 +88,9 @@ The `xrecallocarray` function reallocates memory for an array, ensuring the new 
     - `nmemb`: The number of elements in the new memory block.
     - `size`: The size of each element in bytes.
 - **Control Flow**:
-    - Check if either `nmemb` or `size` is zero; if so, call `fatalx` to terminate the program with an error message.
+    - Check if either `nmemb` or `size` is zero, and if so, call `fatalx` to terminate the program with an error message.
     - Call `recallocarray` to attempt to reallocate the memory block pointed to by `ptr` to accommodate `nmemb` elements of `size` bytes each, while zeroing the new memory.
-    - Check if `recallocarray` returns `NULL`, indicating a failure to allocate memory; if so, call `fatalx` to terminate the program with an error message.
+    - Check if `recallocarray` returns `NULL`, indicating a failure to allocate memory, and if so, call `fatalx` to terminate the program with an error message.
     - Return the pointer to the newly allocated memory block.
 - **Output**: A pointer to the newly allocated memory block, or the program terminates if allocation fails.
 
@@ -101,16 +101,16 @@ The `xstrdup` function duplicates a string and terminates the program if memory 
 - **Inputs**:
     - `str`: A pointer to the null-terminated string to be duplicated.
 - **Control Flow**:
-    - Attempt to duplicate the string `str` using `strdup` and assign the result to `cp`.
-    - Check if `cp` is `NULL`, indicating a failure in memory allocation.
+    - Attempt to duplicate the input string using `strdup` and assign the result to `cp`.
+    - Check if `cp` is `NULL`, indicating a memory allocation failure.
     - If `cp` is `NULL`, call `fatalx` with an error message, which will terminate the program.
-    - Return the duplicated string `cp`.
-- **Output**: A pointer to the newly allocated duplicate of the input string `str`.
+    - Return the duplicated string pointer `cp`.
+- **Output**: A pointer to the newly allocated duplicate of the input string, or the program terminates if allocation fails.
 
 
 ---
 ### xstrndup<!-- {{#callable:xstrndup}} -->
-The `xstrndup` function duplicates a string up to a specified maximum length, ensuring that memory allocation errors are handled by terminating the program with an error message.
+The `xstrndup` function duplicates a string up to a specified maximum length, ensuring that memory allocation errors are handled by terminating the program.
 - **Inputs**:
     - `str`: A pointer to the null-terminated string to be duplicated.
     - `maxlen`: The maximum number of characters to duplicate from the string, including the null terminator.
@@ -118,7 +118,7 @@ The `xstrndup` function duplicates a string up to a specified maximum length, en
     - Call the standard library function `strndup` to duplicate the string `str` up to `maxlen` characters.
     - Check if the result of `strndup` is `NULL`, indicating a memory allocation failure.
     - If `strndup` returns `NULL`, call `fatalx` to terminate the program with an error message.
-    - Return the pointer to the newly allocated and duplicated string.
+    - Return the duplicated string pointer `cp`.
 - **Output**: A pointer to the newly allocated string that is a duplicate of the input string up to `maxlen` characters, or the program terminates if memory allocation fails.
 
 
@@ -131,27 +131,27 @@ The `xasprintf` function formats a string and allocates memory for it, ensuring 
     - `...`: A variable number of arguments that are formatted according to the format string.
 - **Control Flow**:
     - Initialize a variable argument list using `va_start` with the format string `fmt`.
-    - Call [`xvasprintf`](#xvasprintf) with the argument list to perform the formatted string allocation and store the result in `i`.
-    - Clean up the variable argument list using `va_end`.
-    - Return the result `i` from [`xvasprintf`](#xvasprintf).
-- **Output**: The function returns an integer which is the number of characters printed (excluding the null byte used to end output to strings), or a negative value if an error occurs.
-- **Functions called**:
-    - [`xvasprintf`](#xvasprintf)
+    - Call [`xvasprintf`](<#xvasprintf>) with the argument list to perform the formatted string allocation and capture the return value.
+    - End the variable argument list using `va_end`.
+    - Return the result of [`xvasprintf`](<#xvasprintf>), which is the number of characters printed or a negative value if an error occurred.
+- **Output**: The function returns the number of characters printed (excluding the null byte used to end output to strings) or a negative value if an error occurs.
+- **Functions Called**:
+    - [`xvasprintf`](<#xvasprintf>)
 
 
 ---
 ### xvasprintf<!-- {{#callable:xvasprintf}} -->
-The `xvasprintf` function attempts to format a string and store it in a dynamically allocated buffer, terminating the program if the allocation fails.
+The `xvasprintf` function formats a string and allocates memory for it, ensuring that any allocation failure results in program termination.
 - **Inputs**:
-    - `ret`: A pointer to a char pointer where the address of the allocated buffer will be stored.
-    - `fmt`: A format string that specifies how to format the data.
+    - `ret`: A pointer to a char pointer where the address of the allocated formatted string will be stored.
+    - `fmt`: A format string that specifies how to format the output.
     - `ap`: A `va_list` object that contains the variable arguments to be formatted according to the format string.
 - **Control Flow**:
-    - Call the standard library function `vasprintf` to format the string and allocate memory for it, storing the result in `ret` and the return value in `i`.
-    - Check if `vasprintf` returned -1, indicating a failure to allocate memory.
-    - If `vasprintf` failed, call `fatalx` to terminate the program with an error message.
-    - Return the value of `i`, which is the number of characters printed (excluding the null byte) or -1 if an error occurred.
-- **Output**: The function returns the number of characters printed (excluding the null byte) or -1 if an error occurred, but it will terminate the program if memory allocation fails.
+    - Call the standard library function `vasprintf` to format the string and allocate memory for it, storing the result in `ret` and returning the number of characters printed.
+    - Check if the return value `i` from `vasprintf` is -1, indicating an error in memory allocation.
+    - If an error occurred, call `fatalx` with an error message to terminate the program.
+    - Return the number of characters printed, as returned by `vasprintf`.
+- **Output**: The function returns the number of characters printed (excluding the null byte), or terminates the program if memory allocation fails.
 
 
 ---
@@ -164,13 +164,13 @@ The `xsnprintf` function formats a string and stores it in a buffer, ensuring th
     - `...`: A variable number of arguments to be formatted according to the format string.
 - **Control Flow**:
     - Initialize a variable argument list using `va_start` with the format string `fmt`.
-    - Call [`xvsnprintf`](#xvsnprintf) with the buffer `str`, its length `len`, the format string `fmt`, and the variable argument list `ap`.
-    - Store the result of [`xvsnprintf`](#xvsnprintf) in the integer `i`.
+    - Call [`xvsnprintf`](<#xvsnprintf>) with the buffer `str`, its length `len`, the format string `fmt`, and the initialized variable argument list `ap`.
+    - Store the result of [`xvsnprintf`](<#xvsnprintf>) in the integer `i`.
     - Clean up the variable argument list using `va_end`.
     - Return the integer `i`, which represents the number of characters written, excluding the null terminator.
 - **Output**: The function returns the number of characters written to the buffer, excluding the null terminator.
-- **Functions called**:
-    - [`xvsnprintf`](#xvsnprintf)
+- **Functions Called**:
+    - [`xvsnprintf`](<#xvsnprintf>)
 
 
 ---
@@ -183,9 +183,10 @@ The `xvsnprintf` function safely formats a string into a buffer, ensuring the bu
     - `ap`: A `va_list` of arguments to be formatted according to the format string.
 - **Control Flow**:
     - Check if the provided length `len` is greater than `INT_MAX`; if so, call `fatalx` to handle the error.
-    - Use `vsnprintf` to format the string according to `fmt` and `ap`, storing the result in `str` and returning the number of characters written.
-    - Check if the result of `vsnprintf` is negative or greater than or equal to `len`; if so, call `fatalx` to handle the overflow error.
-- **Output**: Returns the number of characters that would have been written if `len` had been sufficiently large, not counting the terminating null character.
+    - Use `vsnprintf` to format the string according to `fmt` and `ap`, storing the result in `str` and capturing the return value in `i`.
+    - Check if the return value `i` is negative or greater than or equal to `len`; if so, call `fatalx` to handle the overflow error.
+    - Return the number of characters that would have been written if `len` had been sufficiently large, not counting the terminating null byte.
+- **Output**: The function returns the number of characters that would have been written to the buffer, excluding the null terminator, or calls `fatalx` if an error occurs.
 
 
 

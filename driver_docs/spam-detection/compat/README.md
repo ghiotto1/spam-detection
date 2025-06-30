@@ -3,11 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `compat` folder in the `spam-detection` codebase contains the `asprintf.c` file, which provides implementations for the `asprintf` and `vasprintf` functions to facilitate string formatting with dynamic memory allocation.
+The `compat` folder in the `spam-detection` codebase contains the `asprintf.c` file, which provides implementations for the `asprintf` and `vasprintf` functions to support formatted string allocation.
 
 
 ## Files
-- **[asprintf.c](asprintf.c.md)**: The `asprintf.c` file in the `spam-detection` codebase provides implementations of the `asprintf` and `vasprintf` functions, which are used to format strings with dynamic memory allocation.
+- **[asprintf.c](asprintf.c.md)**: The `asprintf.c` file in the `spam-detection` codebase provides implementations of the `asprintf` and `vasprintf` functions for formatted string allocation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
