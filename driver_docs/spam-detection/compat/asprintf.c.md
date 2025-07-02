@@ -3,12 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `asprintf.c` file in the `spam-detection` codebase provides implementations of the `asprintf` and `vasprintf` functions, which are used to format strings with dynamic memory allocation.
+The `asprintf.c` file provides implementations of the `asprintf` and `vasprintf` functions, which format strings and allocate memory for them dynamically.
 
 # Purpose
-This C source code file provides implementations for the [`asprintf`](#asprintf) and [`vasprintf`](#vasprintf) functions, which are used to format strings with dynamic memory allocation. These functions are not part of the standard C library on all systems, so this file likely serves to provide compatibility for environments where they are missing. The [`asprintf`](#asprintf) function formats a string and allocates enough memory to hold the resulting string, returning the number of characters printed or a negative value if an error occurs. It uses [`vasprintf`](#vasprintf), which performs the same task but accepts a `va_list` argument, allowing it to handle variable argument lists. The [`vasprintf`](#vasprintf) function first calculates the required buffer size using `vsnprintf`, then allocates memory using `xcalloc` (a custom memory allocation function likely defined in "xmalloc.h"), and finally formats the string into the allocated buffer.
-
-The file includes standard headers such as `<stdarg.h>`, `<stdio.h>`, `<string.h>`, and `<stdlib.h>`, indicating its reliance on standard I/O and memory management functions. It also includes custom headers "compat.h" and "xmalloc.h", suggesting that these functions are part of a larger codebase that provides compatibility and custom memory management utilities. The code is designed to be robust, handling errors gracefully by freeing allocated memory and returning a negative value if formatting fails. This file is likely part of a library or utility collection intended to be imported and used in other C programs, providing a consistent interface for string formatting across different platforms.
+This C source code file provides implementations for the [`asprintf`](<#asprintf>) and [`vasprintf`](<#vasprintf>) functions, which are used to format strings dynamically and allocate memory for them. The [`asprintf`](<#asprintf>) function takes a format string and a variable number of arguments, using [`vasprintf`](<#vasprintf>) to handle the actual formatting and memory allocation. The [`vasprintf`](<#vasprintf>) function uses `vsnprintf` to determine the required buffer size, allocates memory using `xcalloc` (presumably a safer memory allocation function defined elsewhere), and then formats the string into the allocated memory. This file is likely part of a larger project, providing compatibility for systems that do not natively support these functions, as suggested by the inclusion of "compat.h". The code is distributed under a permissive license, allowing for free use and modification.
 # Imports and Dependencies
 
 ---
@@ -25,41 +23,45 @@ The file includes standard headers such as `<stdarg.h>`, `<stdio.h>`, `<string.h
 
 ---
 ### asprintf<!-- {{#callable:asprintf}} -->
+[🔗 View Source](<../../../compat/asprintf.c#L27>)
+
 The `asprintf` function formats a string and allocates memory for it, storing the result in a dynamically allocated buffer.
 - **Inputs**:
     - `ret`: A pointer to a char pointer where the address of the allocated buffer containing the formatted string will be stored.
-    - `fmt`: A format string that specifies how subsequent arguments are converted for output.
+    - `fmt`: A format string that specifies how subsequent arguments are converted for output, similar to printf.
     - `...`: A variable number of arguments that are formatted according to the format string.
 - **Control Flow**:
     - Initialize a variable argument list `ap` using `va_start` with the format string `fmt`.
-    - Call [`vasprintf`](#vasprintf) with the provided arguments to perform the actual formatted string allocation and assignment.
-    - End the variable argument list using `va_end`.
-    - Return the result of [`vasprintf`](#vasprintf), which is the number of characters printed or a negative value if an error occurs.
+    - Call [`vasprintf`](<#vasprintf>) with the provided arguments to perform the actual formatted string allocation and assignment.
+    - End the variable argument list `ap` using `va_end`.
+    - Return the result of the [`vasprintf`](<#vasprintf>) call, which is the number of characters printed or a negative value if an error occurs.
 - **Output**: The function returns the number of characters printed (excluding the null byte used to end output to strings) or a negative value if an error occurs.
-- **Functions called**:
-    - [`vasprintf`](#vasprintf)
+- **Functions Called**:
+    - [`vasprintf`](<#vasprintf>)
 
 
 ---
 ### vasprintf<!-- {{#callable:vasprintf}} -->
-The `vasprintf` function formats a string and allocates memory for it, storing the result in a dynamically allocated buffer.
+[🔗 View Source](<../../../compat/asprintf.c#L40>)
+
+The `vasprintf` function formats a string and allocates memory to store it, returning the formatted string length or -1 on error.
 - **Inputs**:
-    - `ret`: A pointer to a char pointer where the address of the allocated buffer containing the formatted string will be stored.
-    - `fmt`: A format string that specifies how subsequent arguments are converted for output.
-    - `ap`: A `va_list` object that represents a variable argument list, which contains the arguments to be formatted according to the format string.
+    - `ret`: A pointer to a char pointer where the address of the allocated formatted string will be stored.
+    - `fmt`: A format string that specifies how to format the data.
+    - `ap`: A `va_list` of arguments to be formatted according to the format string.
 - **Control Flow**:
-    - Create a copy of the `va_list` object `ap` into `ap2` using `va_copy` to preserve the original list for reuse.
-    - Use `vsnprintf` with a NULL buffer to calculate the size needed for the formatted string, storing the result in `n`.
+    - Create a copy of the `va_list` `ap` into `ap2` using `va_copy`.
+    - Use `vsnprintf` with a NULL buffer to calculate the required buffer size for the formatted string, storing the result in `n`.
     - If `vsnprintf` returns a negative value, indicating an error, jump to the error handling section.
-    - Allocate memory for the formatted string using [`xcalloc`](../xmalloc.c.md#xcalloc), which initializes the allocated memory to zero, and store the address in `*ret`.
-    - Use `vsnprintf` again to format the string into the allocated buffer `*ret` using the copied `va_list` `ap2`.
-    - If the second `vsnprintf` call fails, free the allocated memory and jump to the error handling section.
-    - End the use of the `va_list` object `ap2` with `va_end`.
-    - Return the number of characters written, excluding the null terminator, if successful.
-    - In the error handling section, end the use of `ap2`, set `*ret` to NULL, and return -1 to indicate failure.
-- **Output**: Returns the number of characters written to the allocated buffer, excluding the null terminator, or -1 if an error occurs.
-- **Functions called**:
-    - [`xcalloc`](../xmalloc.c.md#xcalloc)
+    - Allocate memory for the formatted string using [`xcalloc`](<../xmalloc.c.md#xcalloc>), with a size of `n + 1` to accommodate the null terminator.
+    - Use `vsnprintf` again to format the string into the allocated buffer, using `ap2`.
+    - If the second `vsnprintf` call returns a negative value, free the allocated memory and jump to the error handling section.
+    - End the use of `ap2` with `va_end`.
+    - Return the length of the formatted string `n`.
+    - In the error handling section, end the use of `ap2`, set `*ret` to NULL, and return -1.
+- **Output**: The function returns the length of the formatted string on success, or -1 on error, and stores the formatted string in the memory location pointed to by `ret`.
+- **Functions Called**:
+    - [`xcalloc`](<../xmalloc.c.md#xcalloc>)
 
 
 

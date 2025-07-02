@@ -3,19 +3,19 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `spam-detection` folder contains a mix of utility files for memory allocation, compatibility support, and simple Python scripts, along with a README that describes the project as an example for detecting probable spam emails.
+The `spam-detection` folder contains various Python scripts with simple print statements, a README file describing the project as an example for detecting spam emails, and C files for dynamic string formatting and custom memory allocation functions.
 
 ## Folders
-- **[compat](compat/README.md)**: The `compat` folder in the `spam-detection` codebase contains the `asprintf.c` file, which provides implementations for the `asprintf` and `vasprintf` functions to facilitate string formatting with dynamic memory allocation.
+- **[compat](compat/README.md)**: The `compat` folder in the `spam-detection` codebase contains the `asprintf.c` file, which provides implementations for dynamic string formatting and memory allocation functions.
 
 ## Files
-- **[dummy1.py](dummy1.py.md)**: The `dummy1.py` file in the `spam-detection` codebase contains a simple script that prints the message "new file".
+- **[dummy1.py](dummy1.py.md)**: The `dummy1.py` file in the `spam-detection` codebase contains a simple print statement that outputs "new file".
 - **[dummy2.py](dummy2.py.md)**: The `dummy2.py` file in the `spam-detection` codebase contains a simple print statement that outputs "this is a different new file".
-- **[dummy3.py](dummy3.py.md)**: The `dummy3.py` file in the `spam-detection` codebase contains a simple print statement that outputs 'new file'.
+- **[dummy3.py](dummy3.py.md)**: The `dummy3.py` file in the `spam-detection` codebase contains a single print statement that outputs the text 'new file'.
 - **[dummy4.py](dummy4.py.md)**: The `dummy4.py` file in the `spam-detection` codebase contains a simple print statement that outputs "new file 4".
 - **[README.md](README.md.md)**: The `README.md` file provides a brief description of the `spam-detection` project, which is an example project for detecting probable spam emails.
 - **[xmalloc.c](xmalloc.c.md)**: The `xmalloc.c` file in the `spam-detection` codebase provides custom memory allocation functions that ensure successful memory allocation by terminating the program with an error message if allocation fails.
-- **[xmalloc.h](xmalloc.h.md)**: The `xmalloc.h` file in the `spam-detection` codebase provides custom memory allocation functions that ensure error checking and never return failure, calling a fatal error handler instead.
+- **[xmalloc.h](xmalloc.h.md)**: The `xmalloc.h` file in the `spam-detection` codebase provides custom memory allocation functions that ensure successful allocation by checking results and handling errors.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
