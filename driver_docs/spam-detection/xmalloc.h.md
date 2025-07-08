@@ -3,137 +3,137 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `xmalloc.h` file in the `spam-detection` codebase provides custom memory allocation functions that ensure error checking and never return failure, calling a fatal error handler instead.
+Memory allocation functions that check results and call fatal on error, ensuring no failure returns.
 
 # Purpose
-This C header file, `xmalloc.h`, provides declarations for a set of memory management and string manipulation functions that enhance standard C library functions by incorporating error-checking mechanisms. The functions, such as [`xmalloc`](#xmalloc), [`xcalloc`](#xcalloc), [`xrealloc`](#xrealloc), and [`xstrdup`](#xstrdup), are designed to ensure that memory allocation operations do not fail silently; instead, they invoke a fatal error handler if an allocation error occurs. Additionally, the file includes safer versions of formatted output functions like [`xasprintf`](#xasprintf) and [`xsnprintf`](#xsnprintf), which include format string checking and non-null attribute specifications to prevent common errors. This header is part of a larger software project, likely related to secure communications, as indicated by the author's note on usage and naming conventions for derived works.
+This C header file, `xmalloc.h`, defines a set of memory allocation and string manipulation functions that enhance standard library functions by incorporating error checking. The functions [`xmalloc`](<#xmalloc>), [`xcalloc`](<#xcalloc>), [`xrealloc`](<#xrealloc>), [`xreallocarray`](<#xreallocarray>), and [`xrecallocarray`](<#xrecallocarray>) are designed to allocate memory and will call a fatal error handler if they encounter an error, ensuring that they never return a failure. Additionally, the file provides functions like [`xstrdup`](<#xstrdup>) and [`xstrndup`](<#xstrndup>) for duplicating strings, and formatted output functions [`xasprintf`](<#xasprintf>), [`xvasprintf`](<#xvasprintf>), [`xsnprintf`](<#xsnprintf>), and [`xvsnprintf`](<#xvsnprintf>), which include format and non-null attribute checks to ensure safe and correct usage. The header also includes a macro definition for `__bounded__` to support bounded attribute annotations, enhancing the safety and reliability of the functions.
 # Function Declarations (Public API)
 
 ---
 ### xmalloc<!-- {{#callable_declaration:xmalloc}} -->
-Allocate memory and ensure allocation success.
-- **Description**: This function allocates a block of memory of the specified size and guarantees that the allocation is successful. It should be used when you need to allocate memory and want to ensure that the program will not continue with a null pointer in case of allocation failure. If the requested size is zero or if the memory allocation fails, the function will terminate the program with an error message. This function is suitable for use in applications where memory allocation failures are considered fatal and should not be handled by the caller.
+Allocates memory and checks for allocation success.
+- **Description**: Use this function to allocate a specified amount of memory. It ensures that the allocation is successful by terminating the program if the allocation fails or if the requested size is zero. This function is useful in scenarios where memory allocation failures must be handled by stopping the program immediately, rather than attempting to recover or handle the error gracefully.
 - **Inputs**:
-    - `size`: The number of bytes to allocate. Must be greater than zero. If zero is passed, the function will terminate the program with an error message.
-- **Output**: A pointer to the allocated memory block. The function never returns a null pointer; it will terminate the program if allocation fails.
-- **See also**: [`xmalloc`](xmalloc.c.md#xmalloc)  (Implementation)
+    - `size`: The number of bytes to allocate. Must be greater than zero. If zero, the function will terminate the program.
+- **Output**: A pointer to the allocated memory block. The program terminates if allocation fails.
+- **See Also**: [`xmalloc`](<xmalloc.c.md#xmalloc>)  (Implementation)
 
 
 ---
 ### xcalloc<!-- {{#callable_declaration:xcalloc}} -->
-Allocates and zeroes memory for an array.
-- **Description**: This function allocates memory for an array of `nmemb` elements, each of `size` bytes, and initializes all bytes in the allocated storage to zero. It is designed to be used when you need a guaranteed allocation without having to handle allocation failures, as it will terminate the program if the allocation fails or if either `nmemb` or `size` is zero. This function is useful in scenarios where the program cannot continue without the requested memory, ensuring that the caller does not need to check for null pointers after allocation.
+Allocates memory for an array and checks for allocation errors.
+- **Description**: Use this function to allocate memory for an array with a specified number of elements and element size. It ensures that the allocation is successful by terminating the program if the allocation fails or if either dimension is zero. This function is useful when you want to ensure that memory allocation errors are handled immediately and do not propagate through the program.
 - **Inputs**:
     - `nmemb`: The number of elements to allocate. Must be greater than zero. If zero, the function will terminate the program.
     - `size`: The size of each element in bytes. Must be greater than zero. If zero, the function will terminate the program.
-- **Output**: A pointer to the allocated memory, which is initialized to zero. The program will terminate if the allocation fails.
-- **See also**: [`xcalloc`](xmalloc.c.md#xcalloc)  (Implementation)
+- **Output**: A pointer to the allocated memory block. The program terminates if allocation fails.
+- **See Also**: [`xcalloc`](<xmalloc.c.md#xcalloc>)  (Implementation)
 
 
 ---
 ### xrealloc<!-- {{#callable_declaration:xrealloc}} -->
-Reallocate memory to a new size, ensuring allocation success.
-- **Description**: This function reallocates a given memory block to a new size, ensuring that the operation never fails by terminating the program if an error occurs. It is used when you need to resize an existing memory allocation, typically to accommodate more data. The function should be called with a valid pointer to a previously allocated memory block or NULL if allocating a new block. It is important to note that this function will not return a null pointer; instead, it will handle any allocation failure internally, ensuring that the caller does not need to check for null returns.
+Reallocates memory to a new size.
+- **Description**: Use this function to change the size of a previously allocated memory block. It is similar to the standard `realloc` function but will not return a null pointer on failure. Instead, it will terminate the program if an error occurs. This function is useful when you need to ensure that memory allocation does not fail silently. Ensure that the pointer provided was obtained from a compatible memory allocation function.
 - **Inputs**:
-    - `ptr`: A pointer to the memory block to be reallocated. It can be NULL if a new memory block is to be allocated. The caller retains ownership of the memory.
-    - `size`: The new size for the memory block in bytes. It must be a non-zero value, and the function will handle any allocation errors internally.
+    - `ptr`: A pointer to the memory block to reallocate. It must be a valid pointer obtained from a compatible memory allocation function or null if allocating a new block.
+    - `size`: The new size for the memory block in bytes. It must be greater than zero.
 - **Output**: A pointer to the reallocated memory block, which is guaranteed to be non-null.
-- **See also**: [`xrealloc`](xmalloc.c.md#xrealloc)  (Implementation)
+- **See Also**: [`xrealloc`](<xmalloc.c.md#xrealloc>)  (Implementation)
 
 
 ---
 ### xreallocarray<!-- {{#callable_declaration:xreallocarray}} -->
-Reallocate memory for an array, ensuring allocation success.
-- **Description**: This function reallocates memory for an array with a specified number of elements and element size, ensuring that the allocation is successful. It should be used when you need to resize an existing memory block pointed to by `ptr` to accommodate `nmemb` elements of `size` bytes each. The function will terminate the program if the allocation fails or if either `nmemb` or `size` is zero, ensuring that the caller never receives a null pointer. This function is useful in scenarios where memory allocation failures are considered fatal and should be avoided.
+Reallocates memory for an array with error checking.
+- **Description**: Use this function to resize an existing memory block for an array, ensuring that the operation does not fail silently. It is suitable when you need to change the size of an array and want to handle errors by terminating the program if the allocation fails. This function checks if the number of elements or the size of each element is zero and will terminate the program if so. It also terminates the program if the memory allocation fails.
 - **Inputs**:
-    - `ptr`: A pointer to the memory block to be reallocated. It can be null, in which case the function behaves like `xmalloc` for the new size.
-    - `nmemb`: The number of elements to allocate. Must be greater than zero; otherwise, the function will terminate the program.
-    - `size`: The size of each element in bytes. Must be greater than zero; otherwise, the function will terminate the program.
-- **Output**: A pointer to the newly allocated memory block, which is never null.
-- **See also**: [`xreallocarray`](xmalloc.c.md#xreallocarray)  (Implementation)
+    - `ptr`: Pointer to the memory block to resize. Can be NULL, in which case it behaves like `malloc`.
+    - `nmemb`: Number of elements in the array. Must be greater than zero.
+    - `size`: Size of each element in the array. Must be greater than zero.
+- **Output**: Returns a pointer to the newly allocated memory block. The program terminates if allocation fails.
+- **See Also**: [`xreallocarray`](<xmalloc.c.md#xreallocarray>)  (Implementation)
 
 
 ---
 ### xrecallocarray<!-- {{#callable_declaration:xrecallocarray}} -->
-Reallocate and zero-initialize an array, ensuring allocation success.
-- **Description**: This function reallocates an array to a new size and ensures that any newly allocated memory is zero-initialized. It is designed to be used when you need to change the size of an existing memory block while ensuring that the operation never fails silently. If the reallocation fails or if the new size is zero, the function will terminate the program. This function is useful in scenarios where memory allocation failures must be handled by terminating the program to prevent undefined behavior.
+Reallocates memory for an array with error checking.
+- **Description**: Use this function to resize an existing memory block for an array while ensuring that the operation does not fail silently. It is suitable when you need to change the number of elements or the size of each element in an array. The function will terminate the program if the allocation fails or if either the number of elements or the size of each element is zero. This function is useful in scenarios where memory allocation failures must be handled by terminating the program to prevent undefined behavior.
 - **Inputs**:
-    - `ptr`: A pointer to the memory block to be reallocated. This can be NULL, in which case the function behaves like a call to xcalloc.
-    - `oldnmemb`: The number of elements in the current memory block. Must be greater than zero if ptr is not NULL.
-    - `nmemb`: The number of elements in the new memory block. Must be greater than zero; otherwise, the function will terminate the program.
-    - `size`: The size of each element in bytes. Must be greater than zero; otherwise, the function will terminate the program.
-- **Output**: Returns a pointer to the newly allocated and zero-initialized memory block. The program will terminate if allocation fails.
-- **See also**: [`xrecallocarray`](xmalloc.c.md#xrecallocarray)  (Implementation)
+    - `ptr`: Pointer to the existing memory block to be reallocated. Can be NULL if no memory is currently allocated.
+    - `oldnmemb`: Number of elements in the current memory block. Must be a positive integer.
+    - `nmemb`: New number of elements for the memory block. Must be a positive integer; zero will cause the program to terminate.
+    - `size`: Size of each element in bytes. Must be a positive integer; zero will cause the program to terminate.
+- **Output**: Returns a pointer to the newly allocated memory block. The program terminates if allocation fails.
+- **See Also**: [`xrecallocarray`](<xmalloc.c.md#xrecallocarray>)  (Implementation)
 
 
 ---
 ### xstrdup<!-- {{#callable_declaration:xstrdup}} -->
 Duplicates a string with error checking.
-- **Description**: This function creates a duplicate of the given string, ensuring that memory allocation is successful. It should be used when a copy of a string is needed and the program cannot continue if memory allocation fails. The function will terminate the program with an error message if it encounters an allocation failure, making it suitable for use in applications where such failures are considered fatal.
+- **Description**: Use this function to create a duplicate of a given string. It ensures that memory allocation for the new string is successful. If memory allocation fails, the function will terminate the program with an error message. This function is useful when you need a reliable way to duplicate strings without handling memory allocation errors manually.
 - **Inputs**:
-    - `str`: A pointer to a null-terminated string to be duplicated. Must not be null, as passing a null pointer will result in undefined behavior.
-- **Output**: Returns a pointer to the newly allocated string, which is a duplicate of the input string. The caller is responsible for freeing the allocated memory.
-- **See also**: [`xstrdup`](xmalloc.c.md#xstrdup)  (Implementation)
+    - `str`: A pointer to a null-terminated string to duplicate. Must not be null. The caller retains ownership of the original string.
+- **Output**: A pointer to the newly allocated duplicate string. The caller is responsible for freeing this memory.
+- **See Also**: [`xstrdup`](<xmalloc.c.md#xstrdup>)  (Implementation)
 
 
 ---
 ### xstrndup<!-- {{#callable_declaration:xstrndup}} -->
-Duplicates a string up to a specified maximum length, ensuring successful allocation.
-- **Description**: This function creates a duplicate of the input string, copying at most 'maxlen' characters, and ensures that memory allocation is successful. It is useful when you need a copy of a string with a limited length, and you want to ensure that the program terminates with an error message if memory allocation fails. This function should be used when you want to avoid handling memory allocation failures manually, as it will terminate the program if allocation is unsuccessful.
+Duplicates a string up to a specified maximum length.
+- **Description**: Use this function to create a duplicate of a string, but only up to a specified number of characters. It is useful when you need to ensure that the copied string does not exceed a certain length. The function will terminate the program if memory allocation fails, so it is guaranteed to return a valid pointer or not return at all. This function is suitable for use in environments where failure to allocate memory is considered a critical error.
 - **Inputs**:
-    - `str`: The input string to be duplicated. Must not be null, as the function does not handle null pointers.
-    - `maxlen`: The maximum number of characters to duplicate from the input string. Must be a non-negative value.
-- **Output**: Returns a pointer to the newly allocated string containing up to 'maxlen' characters from the input string. The program will terminate if memory allocation fails.
-- **See also**: [`xstrndup`](xmalloc.c.md#xstrndup)  (Implementation)
+    - `str`: The source string to duplicate. Must not be null. The caller retains ownership of the original string.
+    - `maxlen`: The maximum number of characters to duplicate from the source string. Must be a non-negative value.
+- **Output**: Returns a pointer to the newly allocated string, which is null-terminated and contains at most 'maxlen' characters from the source string. The caller is responsible for freeing the returned string.
+- **See Also**: [`xstrndup`](<xmalloc.c.md#xstrndup>)  (Implementation)
 
 
 ---
 ### xasprintf<!-- {{#callable_declaration:xasprintf}} -->
 Formats a string and allocates memory for it.
-- **Description**: This function formats a string according to the specified format and arguments, allocating memory to store the resulting string. It is useful when you need a formatted string but do not know the required buffer size in advance. The function must be called with a valid format string and a pointer to a char pointer, which will be set to point to the newly allocated string. The caller is responsible for freeing the allocated memory. The function will not return on memory allocation failure, as it is designed to handle such errors internally.
+- **Description**: Use this function to format a string with a variable number of arguments and allocate memory for the resulting string. It is similar to `asprintf`, but it never returns failure. Instead, it calls a fatal error handler if memory allocation fails. This function is useful when you need a formatted string and want to ensure that memory allocation errors are handled automatically. Ensure that the format string is not null, as this is a precondition for using the function.
 - **Inputs**:
-    - `ret`: A pointer to a char pointer where the address of the allocated string will be stored. Must not be null. The caller is responsible for freeing the allocated memory.
-    - `fmt`: A format string as in printf. Must not be null. Specifies how the subsequent arguments are converted for output.
-    - `...`: Additional arguments to be formatted according to the format string. The number and types of these arguments must match the format specifiers in the format string.
-- **Output**: Returns the number of characters printed (excluding the null byte used to end output to strings).
-- **See also**: [`xasprintf`](xmalloc.c.md#xasprintf)  (Implementation)
+    - `ret`: A pointer to a character pointer where the function will store the address of the allocated string. The caller must ensure that this pointer is valid and can be modified.
+    - `fmt`: A format string that specifies how to format the subsequent arguments. It must not be null. The format string follows the same specifications as `printf`.
+- **Output**: Returns the number of characters printed, excluding the null byte used to end output to strings. The function allocates memory for the formatted string and assigns its address to the pointer provided by `ret`.
+- **See Also**: [`xasprintf`](<xmalloc.c.md#xasprintf>)  (Implementation)
 
 
 ---
 ### xvasprintf<!-- {{#callable_declaration:xvasprintf}} -->
-Formats a string and allocates memory for it, ensuring successful allocation.
-- **Description**: This function formats a string according to the specified format and argument list, allocating memory for the resulting string. It is similar to `vasprintf`, but guarantees that memory allocation will not fail by terminating the program if an error occurs. This function should be used when you want to ensure that the formatted string is always successfully allocated, and you are prepared to handle program termination in case of allocation failure. It is important to note that the caller is responsible for freeing the allocated memory.
+Formats a string and allocates memory for it, ensuring no failure occurs.
+- **Description**: Use this function to format a string with variable arguments and allocate memory for the resulting string. It is similar to `vasprintf`, but it ensures that the function does not fail by terminating the program if memory allocation fails. This function is useful when you want to ensure that memory allocation errors do not occur silently. It must be called with a valid format string and a `va_list` of arguments.
 - **Inputs**:
-    - `ret`: A pointer to a char pointer where the address of the allocated string will be stored. Must not be null. The caller is responsible for freeing the allocated memory.
-    - `fmt`: A format string that specifies how to format the output. Must not be null.
-    - `ap`: A va_list of arguments to be formatted according to the format string. It should be initialized before calling this function.
-- **Output**: Returns the number of characters in the formatted string, excluding the null terminator. If memory allocation fails, the function does not return, as it terminates the program.
-- **See also**: [`xvasprintf`](xmalloc.c.md#xvasprintf)  (Implementation)
+    - `ret`: A pointer to a `char*` where the function will store the address of the allocated string. The caller must ensure this pointer is valid and writable. The caller is responsible for freeing the allocated memory.
+    - `fmt`: A format string that specifies how to format the output. It must not be null and must be a valid format string as per `printf` conventions.
+    - `ap`: A `va_list` of arguments to format according to the format string. It must be initialized before calling this function.
+- **Output**: Returns the number of characters printed (excluding the null byte used to end output to strings) or terminates the program if memory allocation fails.
+- **See Also**: [`xvasprintf`](<xmalloc.c.md#xvasprintf>)  (Implementation)
 
 
 ---
 ### xsnprintf<!-- {{#callable_declaration:xsnprintf}} -->
-Formats a string and stores it in a buffer with size constraints.
-- **Description**: This function is used to format a string according to a specified format and store the result in a provided buffer. It is similar to snprintf but includes additional safety checks. The function ensures that the formatted string does not exceed the specified buffer length, preventing buffer overflows. It must be called with a valid format string and a buffer that is large enough to hold the formatted output. The function is designed to handle variable argument lists, making it flexible for various formatting needs.
+Formats and stores a series of characters and values in a buffer.
+- **Description**: Use this function to format a string and store it in a buffer, ensuring that the output does not exceed the specified buffer length. It is similar to `snprintf` but includes additional safety checks. The function must be called with a valid format string and the corresponding arguments. It is important to ensure that the buffer is large enough to hold the formatted output to avoid truncation. The function returns the number of characters that would have been written if the buffer was sufficiently large, not including the terminating null byte. This function must be used when you need formatted output with bounds checking.
 - **Inputs**:
-    - `str`: A pointer to the buffer where the formatted string will be stored. The buffer must be large enough to hold the resulting string, including the null terminator. The caller retains ownership and must ensure it is not null.
-    - `len`: The size of the buffer pointed to by str. It defines the maximum number of characters to be written, including the null terminator.
-    - `fmt`: A format string that specifies how to format the subsequent arguments. It must not be null and should follow printf-style formatting.
-- **Output**: Returns the number of characters that would have been written if the buffer had been sufficiently large, not counting the terminating null character. If the return value is greater than or equal to len, the output was truncated.
-- **See also**: [`xsnprintf`](xmalloc.c.md#xsnprintf)  (Implementation)
+    - `str`: A pointer to the buffer where the formatted string will be stored. Must not be null, and the caller must ensure it points to a valid memory area.
+    - `len`: The size of the buffer pointed to by `str`. Must be large enough to store the formatted string and the null terminator.
+    - `fmt`: A format string that specifies how to format the subsequent arguments. Must not be null and must be a valid format string.
+    - `...`: A variable number of arguments that correspond to the format specifiers in `fmt`. The types and number of these arguments must match the format specifiers.
+- **Output**: Returns the number of characters that would have been written if the buffer was large enough, excluding the null terminator. If the return value is greater than or equal to `len`, the output was truncated.
+- **See Also**: [`xsnprintf`](<xmalloc.c.md#xsnprintf>)  (Implementation)
 
 
 ---
 ### xvsnprintf<!-- {{#callable_declaration:xvsnprintf}} -->
 Formats a string into a buffer using a variable argument list.
-- **Description**: This function formats a string according to the specified format string and variable argument list, writing the result into the provided buffer. It is used when you need to format a string with arguments that are passed as a `va_list`. The function ensures that the formatted string does not exceed the specified buffer length, and it will terminate the program if the buffer length exceeds `INT_MAX` or if the formatted string would overflow the buffer. This function should be used when you want to safely format strings without handling errors manually, as it will handle any potential overflow by terminating the program.
+- **Description**: Use this function to format a string into a buffer with a specified maximum length, using a format string and a variable argument list. It is important to ensure that the buffer length does not exceed `INT_MAX`, as this will cause the function to terminate the program. The function will also terminate the program if the formatted string length exceeds the buffer length. This function is useful when you need to safely format strings without risking buffer overflows.
 - **Inputs**:
-    - `str`: A pointer to the buffer where the formatted string will be written. The buffer must be large enough to hold the resulting string, including the null terminator.
+    - `str`: A pointer to the buffer where the formatted string will be stored. The buffer must be large enough to hold the resulting string, including the null terminator.
     - `len`: The maximum number of bytes to write to the buffer, including the null terminator. Must not exceed `INT_MAX`.
-    - `fmt`: A format string that specifies how to format the arguments. Must not be null.
-    - `ap`: A `va_list` containing the arguments to format according to the format string.
-- **Output**: Returns the number of characters that would have been written if the buffer had been large enough, not counting the null terminator. If the return value is negative or greater than or equal to `len`, the function will terminate the program.
-- **See also**: [`xvsnprintf`](xmalloc.c.md#xvsnprintf)  (Implementation)
+    - `fmt`: A format string that specifies how to format the variable arguments. Must not be null.
+    - `ap`: A `va_list` containing the variable arguments to format according to the format string.
+- **Output**: Returns the number of characters written, excluding the null terminator. If the return value is negative or greater than or equal to `len`, the function will terminate the program.
+- **See Also**: [`xvsnprintf`](<xmalloc.c.md#xvsnprintf>)  (Implementation)
 
 
 

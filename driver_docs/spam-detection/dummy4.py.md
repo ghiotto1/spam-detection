@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `dummy4.py` file in the `spam-detection` codebase contains a simple print statement that outputs "new file 4".
+Prints "new file 4" to the console.
 
 # Purpose
-This code is a simple script that outputs the string "new file 4" to the console. It provides very narrow functionality, serving primarily as a placeholder or a basic test to ensure that the Python environment is set up correctly and can execute a script. The script does not perform any complex operations or computations and does not include any variables, functions, or external dependencies. Its simplicity suggests it might be used for initial testing or as a starting point for further development.
+This code is a simple script that outputs the string "new file 4" to the standard output. It uses the `print` function to display the message. The script provides narrow functionality, as it only performs a single action of printing a specific message.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
