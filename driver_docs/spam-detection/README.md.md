@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `README.md` file provides a brief description of the `spam-detection` project, which is an example project for detecting probable spam emails.
+Example project for detecting probable spam emails.
 
 # Purpose
-This is a comment header from a file, likely serving as a brief description or documentation for a project named "spam-detection." It indicates that the project is an example implementation focused on identifying emails that are likely to be spam.
+The `# spam-detection` comment indicates the start of a section in a configuration or metadata file for an example project. This project is designed to detect probable spam emails.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
