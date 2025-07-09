@@ -6,7 +6,7 @@
 The `dummy1.py` file in the `spam-detection` codebase contains a simple script that prints the message "new file".
 
 # Purpose
-This code is a very simple script that outputs the string "new file" to the console. It provides extremely narrow functionality, serving primarily as a placeholder or a basic test to ensure that the Python environment is set up correctly and can execute a script. The script does not perform any complex operations or computations and does not include any variables, functions, or external dependencies. Its primary purpose is likely to verify that a new file can be created and run without errors.
+This code is a very simple script that outputs the string "new file" to the console. It provides extremely narrow functionality, serving primarily as a basic demonstration of the `print` function in Python. The script does not perform any complex operations or computations and does not include any variables, functions, or classes. It is likely intended for educational purposes, such as illustrating how to execute a Python script or verifying that a Python environment is correctly set up to run code.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
