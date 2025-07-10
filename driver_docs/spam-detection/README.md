@@ -3,19 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `spam-detection` folder contains a mix of utility files for memory allocation, compatibility support, and simple Python scripts, along with a README that describes the project as an example for detecting probable spam emails.
+Python scripts that print messages and C files for memory allocation and error handling.
 
-## Folders
-- **[compat](compat/README.md)**: The `compat` folder in the `spam-detection` codebase contains the `asprintf.c` file, which provides implementations for the `asprintf` and `vasprintf` functions to facilitate string formatting with dynamic memory allocation.
 
 ## Files
-- **[dummy1.py](dummy1.py.md)**: The `dummy1.py` file in the `spam-detection` codebase contains a simple script that prints the message "new file".
-- **[dummy2.py](dummy2.py.md)**: The `dummy2.py` file in the `spam-detection` codebase contains a simple print statement that outputs "this is a different new file".
-- **[dummy3.py](dummy3.py.md)**: The `dummy3.py` file in the `spam-detection` codebase contains a simple print statement that outputs 'new file'.
-- **[dummy4.py](dummy4.py.md)**: The `dummy4.py` file in the `spam-detection` codebase contains a simple print statement that outputs "new file 4".
-- **[README.md](README.md.md)**: The `README.md` file provides a brief description of the `spam-detection` project, which is an example project for detecting probable spam emails.
-- **[xmalloc.c](xmalloc.c.md)**: The `xmalloc.c` file in the `spam-detection` codebase provides custom memory allocation functions that ensure successful memory allocation by terminating the program with an error message if allocation fails.
-- **[xmalloc.h](xmalloc.h.md)**: The `xmalloc.h` file in the `spam-detection` codebase provides custom memory allocation functions that ensure error checking and never return failure, calling a fatal error handler instead.
+- **[dummy1.py](dummy1.py.md)**: Prints "new file".
+- **[dummy2.py](dummy2.py.md)**: Prints the message "this is a different new file".
+- **[dummy3.py](dummy3.py.md)**: Prints 'new file'.
+- **[dummy4.py](dummy4.py.md)**: Prints "new file 4".
+- **[xmalloc.c](xmalloc.c.md)**: Memory allocation and string manipulation functions that check for errors and call fatalx on failure.
+- **[xmalloc.h](xmalloc.h.md)**: Memory allocation functions that check results and call fatal on error.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

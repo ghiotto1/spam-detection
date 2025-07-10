@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-The `dummy2.py` file in the `spam-detection` codebase contains a simple print statement that outputs "this is a different new file".
+Prints the message "this is a different new file".
 
 # Purpose
-This code is a short script that outputs a single line of text to the console. It provides very narrow functionality, as its sole purpose is to print the string "this is a different new file" when executed. This type of script is often used for testing or demonstration purposes, such as verifying that a Python environment is set up correctly or serving as a placeholder for more complex functionality to be added later. The simplicity of the code suggests it is not intended for production use but rather for basic output or educational purposes.
+This code is a simple script that outputs the string "this is a different new file" to the standard output. It uses the `print` function to display the message on the console. The script provides narrow functionality, serving primarily as a demonstration or placeholder for outputting a specific message.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
