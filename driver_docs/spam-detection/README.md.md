@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints "new file 4".
+Example project for detecting probable spam emails.
 
 # Purpose
-This code is a simple script that outputs the string "new file 4" to the console. It uses the `print` function to display the message. The script provides narrow functionality, serving primarily as a placeholder or a basic test to confirm that the Python environment is functioning correctly.
+The `# spam-detection` comment indicates the start of a section in a configuration or metadata file for an example project. This project is designed to detect probable spam emails.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

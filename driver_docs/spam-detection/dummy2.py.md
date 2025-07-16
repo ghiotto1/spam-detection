@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints the message "this is a different new file".
+Prints a message indicating it is a different new file.
 
 # Purpose
-This code is a simple script that outputs the string "this is a different new file" to the standard output. It uses the `print` function to display the message on the console. The script provides narrow functionality, serving primarily as a demonstration or placeholder for outputting a specific message.
+This code is a simple script that outputs the string "this is a different new file" to the standard output. It uses the `print` function to display the message on the console. The script does not take any input or perform any other operations. It provides narrow functionality focused solely on printing a specific message.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
