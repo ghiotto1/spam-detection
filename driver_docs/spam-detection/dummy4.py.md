@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints "new file 4".
+Prints three lines of text to the console.
 
 # Purpose
-This code is a simple script that outputs the string "new file 4" to the standard output. It uses the `print` function to display the message. The script provides narrow functionality, serving primarily as a placeholder or a basic test to confirm that the Python environment is functioning correctly.
+This code is a simple script that outputs three lines of text to the console. It uses the `print` function to display the strings "new file 4", "another new line", and 'another new line'. The script demonstrates basic usage of the `print` function in Python to produce output. The use of both double and single quotes for string literals shows that Python supports both for defining strings. This script provides narrow functionality, primarily for testing or demonstration purposes.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
