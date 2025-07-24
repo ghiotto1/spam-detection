@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints "new file 4".
+Prints multiple lines of text to the console.
 
 # Purpose
-This code is a simple script that outputs the string "new file 4" to the standard output. It uses the `print` function to display the message. The script provides narrow functionality, serving primarily as a placeholder or a basic test to confirm that the Python environment is functioning correctly.
+This script outputs a series of messages to the console. It uses the `print` function to display the text "new file 4" followed by four identical lines of "another new line". The script demonstrates basic usage of the `print` function in Python to produce output. The functionality is narrow, focusing solely on printing predefined strings.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
