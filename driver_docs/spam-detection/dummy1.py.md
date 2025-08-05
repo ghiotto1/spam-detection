@@ -6,7 +6,7 @@
 Prints "new file".
 
 # Purpose
-This code is a simple script that outputs the string "new file" to the standard output. It provides narrow functionality, serving primarily as a basic demonstration or placeholder for printing text to the console. The script does not include any additional logic or functionality beyond this print statement.
+This code is a simple script that outputs the string "new file" to the standard output. It serves a narrow functionality, primarily for testing or demonstration purposes, such as verifying that a Python environment is correctly set up to execute scripts. The script does not take any input or produce any output beyond the printed message.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

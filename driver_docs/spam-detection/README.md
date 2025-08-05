@@ -11,8 +11,8 @@ Python scripts for printing messages and C files for memory allocation and error
 - **[dummy2.py](dummy2.py.md)**: Prints a message indicating it is a different new file.
 - **[dummy3.py](dummy3.py.md)**: Prints 'new file'.
 - **[dummy4.py](dummy4.py.md)**: Prints multiple lines of text to the console.
-- **[xmalloc.c](xmalloc.c.md)**: Memory allocation and string manipulation functions that check for errors and call fatalx on failure.
-- **[xmalloc.h](xmalloc.h.md)**: Memory allocation functions that check results and call fatal on error.
+- **[xmalloc.c](xmalloc.c.md)**: Memory allocation and string manipulation functions that check results and handle errors.
+- **[xmalloc.h](xmalloc.h.md)**: Memory allocation functions that check results and handle errors by calling fatal.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
