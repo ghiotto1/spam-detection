@@ -6,7 +6,7 @@
 Prints 'new file'.
 
 # Purpose
-This code is a simple script that outputs the string `'new file'` to the standard output. It uses the `print` function, which is a built-in Python function for displaying text. The script provides narrow functionality, as it performs a single action without any additional logic or complexity.
+This code is a simple script that outputs the string `'new file'` to the standard output. It uses the `print` function to display the message. The script provides narrow functionality, serving primarily as a basic demonstration or placeholder for further development.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

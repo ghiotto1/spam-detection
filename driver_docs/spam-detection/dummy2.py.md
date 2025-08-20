@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints a message indicating it is a different new file.
+Prints the message "this is a different new file".
 
 # Purpose
-This code is a simple script that outputs the string "this is a different new file" to the standard output. It uses the `print` function to display the message on the console. The script does not take any input or perform any other operations. It serves a narrow purpose of demonstrating or confirming the execution of a print statement in Python.
+This code is a simple script that outputs the string "this is a different new file" to the standard output. It uses the `print` function to display the message on the console. The script does not take any input or perform any other operations. It serves a narrow purpose of demonstrating or confirming the execution of a print statement.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
