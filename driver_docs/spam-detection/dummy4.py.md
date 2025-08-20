@@ -6,7 +6,7 @@
 Prints multiple lines of text to the console.
 
 # Purpose
-This script outputs a series of text lines to the console. It uses the `print` function to display the string "new file 4" followed by multiple repetitions of the string "another new line." The script demonstrates basic usage of the `print` function in Python to produce output. The functionality is narrow, focusing solely on printing predefined text to the standard output.
+This code is a simple script that outputs a series of text lines to the console. It uses the `print` function to display the string "new file 4" followed by multiple repetitions of the string "another new line". The script demonstrates basic usage of the `print` function in Python to produce console output. The functionality is narrow, focusing solely on printing predefined text.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
