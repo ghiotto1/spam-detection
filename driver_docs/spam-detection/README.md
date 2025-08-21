@@ -3,7 +3,7 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints messages and implements memory allocation functions with error checking.
+Memory allocation and string manipulation functions with error checking, and dummy Python scripts for printing.
 
 
 ## Files
@@ -11,8 +11,8 @@ Prints messages and implements memory allocation functions with error checking.
 - **[dummy2.py](dummy2.py.md)**: Prints the message "this is a different new file".
 - **[dummy3.py](dummy3.py.md)**: Prints 'new file'.
 - **[dummy4.py](dummy4.py.md)**: Prints multiple lines of text to the console.
-- **[xmalloc.c](xmalloc.c.md)**: Memory allocation functions that check results and call fatalx on errors.
-- **[xmalloc.h](xmalloc.h.md)**: Memory allocation functions that check results and call fatal on error.
+- **[xmalloc.c](xmalloc.c.md)**: Memory allocation and string manipulation functions that check for errors and call fatalx on failure.
+- **[xmalloc.h](xmalloc.h.md)**: Memory allocation functions that check results and call fatal on error, ensuring no failure returns.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
