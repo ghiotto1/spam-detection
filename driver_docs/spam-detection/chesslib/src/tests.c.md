@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Tests for a C-based chess implementation, covering board setup, move generation, and special rules.
+Tests for various chess functionalities, including move generation, board state validation, and special rules like castling and en passant.
 
 # Purpose
-The code is a test suite for a chess implementation in C. It is designed to verify the functionality of various components of a chess library, which includes modules for handling squares, moves, move lists, boards, piece movements, and board lists. The test suite is structured to run a series of tests, each focusing on a specific aspect of the chess library, such as square operations, move creation and validation, board setup and manipulation, and special chess rules like castling and en passant.
+This code is a test suite for a chess implementation in C. It is designed to verify the functionality of various components of a chess library, which includes modules for handling squares, moves, move lists, boards, piece moves, and board lists. The test suite is structured to run a series of tests, each focusing on a specific aspect of the chess library, such as square manipulation, move creation and validation, board setup and manipulation, and special chess rules like castling and en passant.
 
-The [`main`](<#main>) function orchestrates the execution of these tests, using the `RUN_TEST` macro to execute each test function. If a test fails, the [`failTest`](<#failtest>) function is called, which outputs an error message and halts the program. Helper functions like [`validateString`](<#validatestring>) and [`validateMove`](<#validatemove>) are used to compare expected and actual results, ensuring the chess library functions as intended. The test suite covers a wide range of scenarios, including initial board setup, move generation, special moves, and draw conditions, providing comprehensive coverage of the chess library's capabilities.
+The main function orchestrates the execution of these tests, using the `RUN_TEST` macro to set the current test name and execute the corresponding test function. If a test fails, the [`failTest`](<#failtest>) function is called, which outputs an error message and halts the program. Helper functions like [`validateString`](<#validatestring>) and [`validateMove`](<#validatemove>) are used to compare expected and actual results, ensuring the chess library functions as intended. The test suite covers a wide range of scenarios, including initial board setup, move generation, special moves, and draw conditions, providing comprehensive coverage of the chess library's capabilities.
 # Imports and Dependencies
 
 ---
@@ -54,15 +54,15 @@ Executes a series of predefined test functions for a chess implementation and re
 ### failTest<!-- {{#callable:failTest}} -->
 [View Source →](<../../../../chesslib/src/tests.c#L87>)
 
-Prints a failure message for the current test and terminates the program.
+Prints a failure message for the current test and exits the program.
 - **Inputs**:
-    - `msg`: A constant character pointer to a message that provides additional information about the test failure; can be `NULL` if no additional message is needed.
+    - `msg`: A constant character pointer to a message string that provides additional information about the test failure; can be `NULL` if no additional message is needed.
 - **Logic and Control Flow**:
-    - Checks if `msg` is `NULL`.
-    - If `msg` is `NULL`, prints 'TEST FAILED - <current test name>' to the standard error stream.
-    - If `msg` is not `NULL`, prints 'TEST FAILED - <current test name>: <msg>' to the standard error stream.
-    - Calls `exit(1)` to terminate the program with a status code of 1.
-- **Output**: No return value; the function terminates the program.
+    - Check if `msg` is `NULL`.
+    - If `msg` is `NULL`, print 'TEST FAILED - <current test name>' to the standard error stream.
+    - If `msg` is not `NULL`, print 'TEST FAILED - <current test name>: <msg>' to the standard error stream.
+    - Call `exit(1)` to terminate the program.
+- **Output**: No return value; the function terminates the program with an exit status of 1.
 
 
 ---
@@ -76,10 +76,10 @@ Compares two strings and triggers a test failure if they do not match.
 - **Logic and Control Flow**:
     - Compares the `actual` and `expected` strings using `strcmp`.
     - If the strings do not match, calculates the lengths of both strings.
-    - Allocates memory for a message string that includes both `actual` and `expected`.
+    - Allocates memory for a message string that includes both the `actual` and `expected` strings.
     - Formats a message indicating the mismatch and calls [`failTest`](<#failtest>) with this message.
     - Frees the allocated memory for the message string, although this line is not executed because [`failTest`](<#failtest>) exits the program.
-- **Output**: No return value; exits the program if the strings do not match.
+- **Output**: No output is returned as the function calls [`failTest`](<#failtest>) which exits the program if the strings do not match.
 - **Functions Called**:
     - [`failTest`](<#failtest>)
 
@@ -88,14 +88,15 @@ Compares two strings and triggers a test failure if they do not match.
 ### testSqI<!-- {{#callable:testSqI}} -->
 [View Source →](<../../../../chesslib/src/tests.c#L119>)
 
-Tests the [`sqI`](<chesslib/square.c.md#sqi>) function by verifying that it correctly maps file and rank inputs to a square structure with matching file and rank values.
-- **Inputs**: None
+Tests the [`sqI`](<chesslib/square.c.md#sqi>) function to ensure it correctly maps file and rank inputs to a square with matching file and rank properties.
+- **Inputs**:
+    - `None`: This function does not take any input parameters.
 - **Logic and Control Flow**:
     - Iterates over ranks from 1 to 8.
     - For each rank, iterates over files from 1 to 8.
     - Calls [`sqI`](<chesslib/square.c.md#sqi>) with the current file and rank to get a square `s`.
     - Checks if the file and rank of `s` match the current file and rank.
-    - If they do not match, formats an error message and calls [`failTest`](<#failtest>) with the message.
+    - If they do not match, formats an error message and calls [`failTest`](<#failtest>) with this message.
 - **Output**: No output is returned; the function will terminate the program with an error message if a test fails.
 - **Functions Called**:
     - [`sqI`](<chesslib/square.c.md#sqi>)
@@ -111,7 +112,7 @@ Tests the conversion of chessboard coordinates from string format to a square st
 - **Logic and Control Flow**:
     - Iterates over all possible ranks (1 to 8) and files (1 to 8) on a chessboard.
     - For each rank and file, constructs a string `str` representing the square in chess notation (e.g., 'a1', 'b2').
-    - Calls the function [`sqS`](<chesslib/square.c.md#sqs>) with `str` to convert the string to a square structure `s`.
+    - Calls the function [`sqS`](<chesslib/square.c.md#sqs>) with the constructed string to convert it to a square structure `s`.
     - Checks if the `file` and `rank` of the square `s` match the expected `file` and `rank`.
     - If there is a mismatch, constructs an error message and calls [`failTest`](<#failtest>) to indicate the test failure.
 - **Output**: No output is returned; the function will terminate the program with an error message if a test fails.
@@ -124,16 +125,16 @@ Tests the conversion of chessboard coordinates from string format to a square st
 ### testSqGetStr<!-- {{#callable:testSqGetStr}} -->
 [View Source →](<../../../../chesslib/src/tests.c#L157>)
 
-Validates that the string representation of each square on a chessboard matches the expected format.
+Validates that the string representation of each chessboard square matches the expected format for all squares on an 8x8 chessboard.
 - **Inputs**:
     - `None`: This function does not take any input parameters.
 - **Logic and Control Flow**:
     - Iterates over each rank from 1 to 8.
     - For each rank, iterates over each file from 1 to 8.
-    - Calls [`sqI`](<chesslib/square.c.md#sqi>) to get the square object for the current file and rank.
-    - Creates a string `str` representing the square in chess notation (e.g., 'a1', 'b2').
-    - Calls [`validateString`](<#validatestring>) to compare the string returned by [`sqGetStr`](<chesslib/square.c.md#sqgetstr>) with the expected string `str`.
-- **Output**: No output is returned; the function validates the correctness of square string representations and may halt the program if a test fails.
+    - Calls [`sqI`](<chesslib/square.c.md#sqi>) to get the square `s` for the current file and rank.
+    - Creates a string `str` representing the square using the file and rank.
+    - Calls [`validateString`](<#validatestring>) to compare the string from `sqGetStr(s)` with `str`.
+- **Output**: No output is returned; the function performs validation and may terminate the program if a test fails.
 - **Functions Called**:
     - [`sqI`](<chesslib/square.c.md#sqi>)
     - [`validateString`](<#validatestring>)
@@ -144,16 +145,17 @@ Validates that the string representation of each square on a chessboard matches 
 ### testSqIsDark<!-- {{#callable:testSqIsDark}} -->
 [View Source →](<../../../../chesslib/src/tests.c#L172>)
 
-Verifies that each square on a chessboard is correctly identified as dark or light and reports any discrepancies.
-- **Inputs**: None
+Verifies if each square on a chessboard is dark and reports mismatches.
+- **Inputs**:
+    - `None`: This function does not take any input parameters.
 - **Logic and Control Flow**:
-    - Initialize `expectedIsDark` to 1, indicating that the square a1 is expected to be dark.
+    - Initialize `expectedIsDark` to 1, indicating the square a1 is expected to be dark.
     - Iterate over each rank from 1 to 8.
     - For each rank, iterate over each file from 1 to 8.
     - For each square, call `sqI(file, rank)` to get the square object `s`.
-    - Call `sqIsDark(s)` to determine if the square is dark, storing the result in `actualIsDark`.
-    - If `actualIsDark` does not match `expectedIsDark`, format a message indicating the discrepancy and call `failTest(message)` to report the failure.
-    - Toggle `expectedIsDark` after each file iteration to alternate the expected color of the next square.
+    - Call `sqIsDark(s)` to determine if the square is actually dark, storing the result in `actualIsDark`.
+    - If `actualIsDark` does not match `expectedIsDark`, format a message indicating the mismatch and call `failTest(message)` to report the failure.
+    - Toggle `expectedIsDark` after each file iteration to alternate the expected color for the next square.
     - Toggle `expectedIsDark` after each rank iteration to maintain the checkerboard pattern.
 - **Output**: No output is returned; the function reports test failures via [`failTest`](<#failtest>).
 - **Functions Called**:
@@ -169,17 +171,17 @@ Verifies that each square on a chessboard is correctly identified as dark or lig
 
 Validates a chess move against expected parameters and triggers a test failure if they do not match.
 - **Inputs**:
-    - `m`: The move to validate, containing the starting square, ending square, and promotion type.
-    - `expectedFrom`: The expected starting square of the move.
-    - `expectedTo`: The expected ending square of the move.
-    - `expectedPromotion`: The expected promotion type of the move.
+    - `m`: The `move` structure representing the actual move to validate.
+    - `expectedFrom`: The `sq` structure representing the expected starting square of the move.
+    - `expectedTo`: The `sq` structure representing the expected destination square of the move.
+    - `expectedPromotion`: The `pieceType` representing the expected promotion piece type, if any.
 - **Logic and Control Flow**:
-    - Check if the starting square of `m` is not equal to `expectedFrom` using [`sqEq`](<chesslib/square.c.md#sqeq>) function.
-    - Check if the ending square of `m` is not equal to `expectedTo` using [`sqEq`](<chesslib/square.c.md#sqeq>) function.
-    - Check if the promotion type of `m` is not equal to `expectedPromotion`.
-    - If any of the above checks fail, format a message with the actual and expected values using `sprintf`.
+    - Check if the actual move's starting square `m.from` is not equal to `expectedFrom` using [`sqEq`](<chesslib/square.c.md#sqeq>) function.
+    - Check if the actual move's destination square `m.to` is not equal to `expectedTo` using [`sqEq`](<chesslib/square.c.md#sqeq>) function.
+    - Check if the actual move's promotion piece type `m.promotion` is not equal to `expectedPromotion`.
+    - If any of the above checks fail, format a message with the actual and expected move details using `sprintf`.
     - Call [`failTest`](<#failtest>) with the formatted message to indicate a test failure.
-- **Output**: No return value; the function triggers a test failure if the move does not match the expected parameters.
+- **Output**: No return value; the function triggers a test failure and halts the program if the move does not match the expected parameters.
 - **Functions Called**:
     - [`sqEq`](<chesslib/square.c.md#sqeq>)
     - [`sqGetStr`](<chesslib/square.c.md#sqgetstr>)
@@ -190,7 +192,7 @@ Validates a chess move against expected parameters and triggers a test failure i
 ### testMoveCreate<!-- {{#callable:testMoveCreate}} -->
 [View Source →](<../../../../chesslib/src/tests.c#L218>)
 
-Tests the creation and validation of chess moves, including promotions, using predefined square positions.
+Tests the creation and validation of chess moves, including promotions.
 - **Inputs**: None
 - **Logic and Control Flow**:
     - Creates a move `m` from square (5, 8) to square (5, 7) using [`moveSq`](<chesslib/move.c.md#movesq>) and validates it with [`validateMove`](<#validatemove>) expecting no promotion.
@@ -208,11 +210,12 @@ Tests the creation and validation of chess moves, including promotions, using pr
 [View Source →](<../../../../chesslib/src/tests.c#L228>)
 
 Tests the conversion of chess moves to UCI (Universal Chess Interface) format and validates the output.
-- **Inputs**: None
+- **Inputs**:
+    - `None`: This function does not take any input parameters.
 - **Logic and Control Flow**:
-    - Create a move `m` from square `e8` to `e7` using [`moveSq`](<chesslib/move.c.md#movesq>) and validate its UCI string representation is `e8e7` using [`validateString`](<#validatestring>).
-    - Create a move `m` from square `c2` to `b1` with promotion to a queen using [`movePromote`](<chesslib/move.c.md#movepromote>) and validate its UCI string representation is `c2b1q` using [`validateString`](<#validatestring>).
-- **Output**: No output is returned; the function performs validation checks and may terminate the program if a test fails.
+    - Creates a move `m` from square `e8` to `e7` using [`moveSq`](<chesslib/move.c.md#movesq>) and validates its UCI string representation as `e8e7` using [`validateString`](<#validatestring>).
+    - Creates a promotion move `m` from square `c2` to `b1` promoting to a queen using [`movePromote`](<chesslib/move.c.md#movepromote>) and validates its UCI string representation as `c2b1q` using [`validateString`](<#validatestring>).
+- **Output**: No output is returned as the function is a test function that validates the correctness of UCI string conversion.
 - **Functions Called**:
     - [`moveSq`](<chesslib/move.c.md#movesq>)
     - [`sqI`](<chesslib/square.c.md#sqi>)
@@ -226,13 +229,14 @@ Tests the conversion of chess moves to UCI (Universal Chess Interface) format an
 [View Source →](<../../../../chesslib/src/tests.c#L238>)
 
 Tests the conversion of UCI (Universal Chess Interface) strings to move objects and validates the resulting moves.
-- **Inputs**: None
+- **Inputs**:
+    - `None`: This function does not take any input parameters.
 - **Logic and Control Flow**:
-    - Calls [`moveFromUci`](<chesslib/move.c.md#movefromuci>) with the string "e8e7" to create a move object `m`.
-    - Calls [`validateMove`](<#validatemove>) to check if `m` corresponds to a move from square `e8` to `e7` with no promotion (`ptEmpty`).
-    - Calls [`moveFromUci`](<chesslib/move.c.md#movefromuci>) with the string "c2b1q" to create another move object `m`.
-    - Calls [`validateMove`](<#validatemove>) to check if `m` corresponds to a move from square `c2` to `b1` with a promotion to a queen (`ptQueen`).
-- **Output**: No output is returned as the function is a void type and is used for testing purposes.
+    - Calls [`moveFromUci`](<chesslib/move.c.md#movefromuci>) with the UCI string 'e8e7' to create a move object `m`.
+    - Calls [`validateMove`](<#validatemove>) to check if the move `m` corresponds to moving from square `e8` to `e7` with no promotion (`ptEmpty`).
+    - Calls [`moveFromUci`](<chesslib/move.c.md#movefromuci>) with the UCI string 'c2b1q' to create another move object `m`.
+    - Calls [`validateMove`](<#validatemove>) to check if the move `m` corresponds to moving from square `c2` to `b1` with a promotion to a queen (`ptQueen`).
+- **Output**: There is no output returned from this function as it is a test function that validates moves.
 - **Functions Called**:
     - [`moveFromUci`](<chesslib/move.c.md#movefromuci>)
     - [`validateMove`](<#validatemove>)
@@ -246,13 +250,12 @@ Tests the conversion of UCI (Universal Chess Interface) strings to move objects 
 Tests the functionality of creating, adding, retrieving, and validating moves in a move list for a chess game.
 - **Inputs**: None
 - **Logic and Control Flow**:
-    - Create three moves `m1`, `m2`, and `m3` from UCI strings 'e2e4', 'e7e5', and 'e1e2' respectively using [`moveFromUci`](<chesslib/move.c.md#movefromuci>) function.
+    - Create three moves `m1`, `m2`, and `m3` using [`moveFromUci`](<chesslib/move.c.md#movefromuci>) with UCI strings 'e2e4', 'e7e5', and 'e1e2'.
     - Create a move list `list` using [`moveListCreate`](<chesslib/movelist.c.md#movelistcreate>).
-    - Add moves `m1`, `m2`, and `m3` to the move list `list` using [`moveListAdd`](<chesslib/movelist.c.md#movelistadd>).
-    - Retrieve moves `m11`, `m12`, and `m13` from the move list `list` at indices 0, 1, and 2 respectively using [`moveListGet`](<chesslib/movelist.c.md#movelistget>).
-    - Convert each retrieved move `m11`, `m12`, and `m13` to UCI strings using [`moveGetUci`](<chesslib/move.c.md#movegetuci>).
-    - Compare each UCI string with the expected values 'e2e4', 'e7e5', and 'e1e2' using `strcmp`.
-    - If any comparison fails, format a failure message and call [`failTest`](<#failtest>) to indicate the test failure.
+    - Add moves `m1`, `m2`, and `m3` to `list` using [`moveListAdd`](<chesslib/movelist.c.md#movelistadd>).
+    - Retrieve moves `m11`, `m12`, and `m13` from `list` at indices 0, 1, and 2 using [`moveListGet`](<chesslib/movelist.c.md#movelistget>).
+    - Convert each retrieved move to UCI format using [`moveGetUci`](<chesslib/move.c.md#movegetuci>) and compare with expected UCI strings 'e2e4', 'e7e5', and 'e1e2'.
+    - If any UCI string does not match the expected value, call [`failTest`](<#failtest>) with a formatted error message.
     - Free the UCI strings after comparison using `free`.
     - Free the move list `list` using [`moveListFree`](<chesslib/movelist.c.md#movelistfree>).
 - **Output**: No output is returned; the function performs validation and may call [`failTest`](<#failtest>) to indicate a test failure.
@@ -275,10 +278,10 @@ Compares two chess pieces and triggers a test failure if they do not match.
     - `actual`: The actual `piece` value to compare.
     - `expected`: The expected `piece` value to compare against.
 - **Logic and Control Flow**:
-    - Check if `actual` is not equal to `expected`.
-    - If they are not equal, get the letter representation of both `actual` and `expected` using [`pieceGetLetter`](<chesslib/piece.c.md#piecegetletter>).
-    - Format a message string indicating the mismatch between the actual and expected pieces.
-    - Call [`failTest`](<#failtest>) with the formatted message to indicate a test failure.
+    - Checks if `actual` is not equal to `expected`.
+    - If they are not equal, retrieves the letter representation of both `actual` and `expected` using [`pieceGetLetter`](<chesslib/piece.c.md#piecegetletter>).
+    - Formats a message indicating the mismatch between the actual and expected pieces.
+    - Calls [`failTest`](<#failtest>) with the formatted message to indicate a test failure.
 - **Output**: No return value; the function triggers a test failure if the pieces do not match.
 - **Functions Called**:
     - [`pieceGetLetter`](<chesslib/piece.c.md#piecegetletter>)
@@ -289,21 +292,20 @@ Compares two chess pieces and triggers a test failure if they do not match.
 ### testBoardCreate<!-- {{#callable:testBoardCreate}} -->
 [View Source →](<../../../../chesslib/src/tests.c#L322>)
 
-Validates the initial state of a chess board created by [`boardCreate`](<chesslib/board.c.md#boardcreate>) against expected values and conditions.
+Validates the initial state of a chess board created by [`boardCreate`](<chesslib/board.c.md#boardcreate>) against expected values and fails the test if any discrepancies are found.
 - **Inputs**: None
 - **Logic and Control Flow**:
     - Create a new board using [`boardCreate`](<chesslib/board.c.md#boardcreate>) and assign it to `b`.
-    - Check if `b` is `NULL` and call [`failTest`](<#failtest>) if true.
-    - Verify the initial positions of white pieces on the board using [`assertPiece`](<#assertpiece>).
-    - Verify the initial positions of black pieces on the board using [`assertPiece`](<#assertpiece>).
-    - Check that squares from index 16 to 47 are empty using [`assertPiece`](<#assertpiece>).
-    - Verify that the current player is white (`pcWhite`) and call [`failTest`](<#failtest>) if not.
-    - Check that all castling flags are enabled (`castleState` is `0b1111`) and call [`failTest`](<#failtest>) if not.
-    - Verify that the en passant target square is `SQ_INVALID` and call [`failTest`](<#failtest>) if not.
-    - Check that the half-move clock is 0 and call [`failTest`](<#failtest>) with a message if not.
-    - Check that the move number is 1 and call [`failTest`](<#failtest>) with a message if not.
-    - Free the memory allocated for the board `b`.
-- **Output**: No output is returned as the function is a test function and uses [`failTest`](<#failtest>) to indicate failure.
+    - Check if `b` is `NULL` and call [`failTest`](<#failtest>) with an error message if true.
+    - Verify the initial positions of white pieces on the board using [`assertPiece`](<#assertpiece>) for indices 0 to 7 and 8 to 15 for pawns.
+    - Verify the initial positions of black pieces on the board using [`assertPiece`](<#assertpiece>) for indices 48 to 55 and 56 to 63.
+    - Check if `b->currentPlayer` is `pcWhite` and call [`failTest`](<#failtest>) with an error message if not.
+    - Check if `b->castleState` is `0b1111` and call [`failTest`](<#failtest>) with an error message if not.
+    - Check if `b->epTarget` is `SQ_INVALID` using [`sqEq`](<chesslib/square.c.md#sqeq>) and call [`failTest`](<#failtest>) with an error message if not.
+    - Check if `b->halfMoveClock` is `0` and call [`failTest`](<#failtest>) with an error message if not, using `sprintf` to format the message.
+    - Check if `b->moveNumber` is `1` and call [`failTest`](<#failtest>) with an error message if not, using `sprintf` to format the message.
+    - Free the memory allocated for `b` using `free`.
+- **Output**: No output is returned as the function is a void type and is used for testing purposes.
 - **Functions Called**:
     - [`boardCreate`](<chesslib/board.c.md#boardcreate>)
     - [`failTest`](<#failtest>)
@@ -321,10 +323,10 @@ Tests the creation of a chess board from a FEN string and verifies the board's s
     - Call [`boardCreateFromFen`](<chesslib/board.c.md#boardcreatefromfen>) with a specific FEN string to create a board.
     - Check if the board pointer `b` is `NULL` and fail the test if it is.
     - Iterate over all 64 squares of the board, skipping specific indices where pieces are expected, and assert that the remaining squares are empty using [`assertPiece`](<#assertpiece>).
-    - Assert the presence of specific pieces at given indices using [`assertPiece`](<#assertpiece>).
+    - Assert that specific squares contain the expected pieces using [`assertPiece`](<#assertpiece>).
     - Check if the current player is black and fail the test if it is not.
     - Verify that all castling flags are disabled and fail the test if they are not.
-    - Check if the en passant target square is `e3` using [`sqEq`](<chesslib/square.c.md#sqeq>) and fail the test if it is not.
+    - Check if the en passant target square is `e3` and fail the test if it is not.
     - Verify that the half-move clock is 0 and fail the test if it is not.
     - Check if the move number is 46 and fail the test if it is not.
     - Free the allocated board memory.
@@ -342,11 +344,11 @@ Tests the creation of a chess board from a FEN string and verifies the board's s
 ### testBoardEq<!-- {{#callable:testBoardEq}} -->
 [View Source →](<../../../../chesslib/src/tests.c#L436>)
 
-Triggers a test failure with a message indicating the function is not yet implemented.
+Indicates a test failure for the `testBoardEq` function, which is not yet implemented.
 - **Inputs**: None
 - **Logic and Control Flow**:
     - Calls the [`failTest`](<#failtest>) function with the message 'Not yet implemented'.
-- **Output**: No output is produced as the function exits via [`failTest`](<#failtest>).
+- **Output**: No output is produced as the function calls [`failTest`](<#failtest>), which exits the program.
 - **Functions Called**:
     - [`failTest`](<#failtest>)
 
@@ -378,11 +380,11 @@ Checks if a given UCI move string is present in a move list and fails the test i
 
 Compares the size of a `moveList` to an expected size and triggers a test failure if they do not match.
 - **Inputs**:
-    - `list`: A pointer to a `moveList` structure that contains a list of moves.
-    - `expectedSize`: The expected number of elements in the `moveList`.
+    - `list`: A pointer to a `moveList` structure whose size is to be validated.
+    - `expectedSize`: The expected size of the `moveList` as a `size_t` value.
 - **Logic and Control Flow**:
-    - Checks if the `size` of the `moveList` pointed to by `list` is not equal to `expectedSize`.
-    - If the sizes do not match, formats an error message indicating the actual and expected sizes.
+    - Checks if the `size` of the `list` is not equal to `expectedSize`.
+    - If the sizes do not match, formats a message indicating the actual and expected sizes.
     - Calls [`failTest`](<#failtest>) with the formatted message to indicate a test failure.
 - **Output**: No return value; the function triggers a test failure if the list size does not match the expected size.
 - **Functions Called**:
@@ -393,22 +395,21 @@ Compares the size of a `moveList` to an expected size and triggers a test failur
 ### testPawnMoves<!-- {{#callable:testPawnMoves}} -->
 [View Source →](<../../../../chesslib/src/tests.c#L475>)
 
-Tests various scenarios for pawn moves on a chess board, including normal moves, captures, promotions, and en passant captures.
+Tests various scenarios for pawn moves on a chess board to validate correct move generation.
 - **Inputs**:
     - `None`: This function does not take any input parameters.
 - **Logic and Control Flow**:
-    - Create a board with a lone white pawn on the starting rank and get its possible moves.
-    - Validate that the pawn can move one or two squares forward, then free the move list.
-    - Set up a board where the pawn can capture pieces and validate the possible moves, including captures.
-    - Set up a board where the pawn is blocked and validate that there are no possible moves.
-    - Set up a board with a pawn not on the first rank and validate it can move one square forward.
-    - Set up a board with a white pawn about to promote and validate all promotion moves.
-    - Set up a board with a black pawn on the first rank and validate its possible moves.
-    - Set up a board with a pawn blocked with one free spot and validate the move.
-    - Set up a board with a black pawn about to promote with capturing ability and validate all promotion and capture moves.
-    - Set up a board with a white pawn with an opportunity to capture en passant and validate the moves.
-    - Set up a board with a black pawn with an opportunity to capture en passant and validate the moves.
-    - Free the board at the end of the function.
+    - Create a board with a lone white pawn on the starting rank and generate its moves, expecting two possible moves.
+    - Create a board with a pawn that can capture two enemy pieces and generate its moves, expecting four possible moves.
+    - Create a board with a pawn blocked by another piece and generate its moves, expecting zero possible moves.
+    - Create a board with a pawn not on the first rank and generate its moves, expecting one possible move.
+    - Create a board with a white pawn about to promote and generate its moves, expecting four promotion moves.
+    - Create a board with a black pawn on the first rank and generate its moves, expecting two possible moves.
+    - Create a board with a pawn blocked with one free spot and generate its moves, expecting one possible move.
+    - Create a board with a black pawn about to promote with capturing ability and generate its moves, expecting eight promotion moves.
+    - Create a board with a white pawn with an opportunity to capture en passant and generate its moves, expecting two possible moves.
+    - Create a board with a black pawn with an opportunity to capture en passant and generate its moves, expecting two possible moves.
+    - Free the memory allocated for the move list and the board after each test case.
 - **Output**: No output is returned as this function is used for testing purposes.
 - **Functions Called**:
     - [`boardCreateFromFen`](<chesslib/board.c.md#boardcreatefromfen>)
@@ -427,15 +428,15 @@ Tests various scenarios for pawn moves on a chess board, including normal moves,
 Tests the generation and validation of knight moves on a chessboard in various scenarios.
 - **Inputs**: None
 - **Logic and Control Flow**:
-    - Initializes a chessboard with a lone knight at position `c3` and generates its possible moves using [`pmGetKnightMoves`](<chesslib/piecemoves.c.md#pmgetknightmoves>).
-    - Validates that the move list contains 8 moves and checks each expected move using [`validateUciIsInMovelist`](<#validateuciisinmovelist>).
-    - Frees the move list using [`moveListFree`](<chesslib/movelist.c.md#movelistfree>).
-    - Reinitializes the board with a knight at the edge at position `h7` and generates its possible moves.
-    - Validates that the move list contains 3 moves and checks each expected move.
-    - Frees the move list.
-    - Reinitializes the board with a knight at position `f6` surrounded by other pieces and generates its possible moves.
-    - Validates that the move list contains 6 moves and checks each expected move.
-    - Frees the move list.
+    - Initialize a chessboard with a lone knight at position `c3` using FEN notation.
+    - Generate all possible knight moves from `c3` and validate that there are 8 moves, checking each expected move is in the list.
+    - Free the move list to release memory.
+    - Initialize a chessboard with a knight near the edge at position `h7`.
+    - Generate all possible knight moves from `h7` and validate that there are 3 moves, checking each expected move is in the list.
+    - Free the move list to release memory.
+    - Initialize a chessboard with a knight at `f6` surrounded by other pieces.
+    - Generate all possible knight moves from `f6` and validate that there are 6 moves, checking each expected move is in the list.
+    - Free the move list to release memory.
 - **Output**: No output is returned as this function is a test function that validates knight moves.
 - **Functions Called**:
     - [`boardInitFromFenInPlace`](<chesslib/board.c.md#boardinitfromfeninplace>)
@@ -453,15 +454,16 @@ Tests the generation and validation of knight moves on a chessboard in various s
 Tests the move generation for bishops on a chessboard in different scenarios.
 - **Inputs**: None
 - **Logic and Control Flow**:
-    - Initializes a chess board with a lone bishop on `e7` using FEN notation.
-    - Generates all possible moves for the bishop on `e7` and validates that there are 9 moves in the list.
-    - Checks that specific moves like `e7f8`, `e7f6`, `e7g5`, etc., are present in the move list.
-    - Frees the move list after validation.
-    - Reinitializes the board with a more complex position where the bishop on `c3` has some blocking pieces.
-    - Generates all possible moves for the bishop on `c3` and validates that there are 5 moves in the list.
-    - Checks that specific moves like `c3d4`, `c3e5`, `c3f6`, etc., are present in the move list.
-    - Frees the move list after validation.
-- **Output**: No output is returned as the function is a test function that validates bishop moves.
+    - Initialize a chess board `b` and a move list `list`.
+    - Set up a board with a lone bishop on `e7` using [`boardInitFromFenInPlace`](<chesslib/board.c.md#boardinitfromfeninplace>).
+    - Generate bishop moves from `e7` using [`pmGetBishopMoves`](<chesslib/piecemoves.c.md#pmgetbishopmoves>) and store in `list`.
+    - Validate that the move list size is 9 and contains specific moves like `e7f8`, `e7f6`, etc.
+    - Free the move list using [`moveListFree`](<chesslib/movelist.c.md#movelistfree>).
+    - Set up a board with a bishop on `c3` and some blocking pieces using [`boardInitFromFenInPlace`](<chesslib/board.c.md#boardinitfromfeninplace>).
+    - Generate bishop moves from `c3` using [`pmGetBishopMoves`](<chesslib/piecemoves.c.md#pmgetbishopmoves>) and store in `list`.
+    - Validate that the move list size is 5 and contains specific moves like `c3d4`, `c3e5`, etc.
+    - Free the move list using [`moveListFree`](<chesslib/movelist.c.md#movelistfree>).
+- **Output**: No output is returned as the function is a test function that validates move generation.
 - **Functions Called**:
     - [`boardInitFromFenInPlace`](<chesslib/board.c.md#boardinitfromfeninplace>)
     - [`pmGetBishopMoves`](<chesslib/piecemoves.c.md#pmgetbishopmoves>)
@@ -475,19 +477,19 @@ Tests the move generation for bishops on a chessboard in different scenarios.
 ### testRookMoves<!-- {{#callable:testRookMoves}} -->
 [View Source →](<../../../../chesslib/src/tests.c#L692>)
 
-Tests the move generation and validation for rooks on a chess board.
+Tests the move generation and validation for rooks in different board scenarios.
 - **Inputs**:
     - `None`: This function does not take any input parameters.
 - **Logic and Control Flow**:
-    - Initializes a chess board with a lone rook at position `d7` using the FEN string `8/3R4/8/8/8/8/8/8 w - - 0 1`.
-    - Generates all possible moves for the rook at `d7` using [`pmGetRookMoves`](<chesslib/piecemoves.c.md#pmgetrookmoves>).
-    - Validates that the move list contains 14 moves and checks for specific moves like `d7d8`, `d7e7`, etc., using [`validateListSize`](<#validatelistsize>) and [`validateUciIsInMovelist`](<#validateuciisinmovelist>).
-    - Frees the move list using [`moveListFree`](<chesslib/movelist.c.md#movelistfree>).
-    - Re-initializes the board with a more complex setup including a rook at `e5` using the FEN string `8/3R4/8/2k1r1BQ/8/8/3n1R2/4b3 b - - 0 1`.
-    - Generates all possible moves for the rook at `e5`.
-    - Validates that the move list contains 9 moves and checks for specific moves like `e5e6`, `e5e7`, etc.
-    - Frees the move list again.
-- **Output**: There is no return value as this function is used for testing purposes.
+    - Initialize a chess board with a lone rook at position `d7` using FEN notation.
+    - Generate all possible moves for the rook at `d7` and store them in `list`.
+    - Validate that the move list contains 14 moves and specific moves like `d7d8`, `d7e7`, etc.
+    - Free the move list to release memory.
+    - Initialize a chess board with a rook at `e5` surrounded by other pieces using FEN notation.
+    - Generate all possible moves for the rook at `e5` and store them in `list`.
+    - Validate that the move list contains 9 moves and specific moves like `e5e6`, `e5e7`, etc.
+    - Free the move list to release memory.
+- **Output**: No output is returned as this function is used for testing purposes and will halt the program if a test fails.
 - **Functions Called**:
     - [`boardInitFromFenInPlace`](<chesslib/board.c.md#boardinitfromfeninplace>)
     - [`pmGetRookMoves`](<chesslib/piecemoves.c.md#pmgetrookmoves>)
@@ -505,16 +507,14 @@ Tests the move generation for a queen on a chessboard in different scenarios.
 - **Inputs**: None
 - **Logic and Control Flow**:
     - Initialize a chess board `b` with a lone queen at position `b2` using FEN notation.
-    - Generate all possible moves for the queen at `b2` and store them in `list`.
-    - Validate that the size of `list` is 23, indicating 23 possible moves.
-    - Check that specific moves like `b2b3`, `b2b4`, `b2c3`, etc., are present in `list`.
-    - Free the memory allocated for `list`.
-    - Reinitialize the board `b` with a queen at `d5` surrounded by other pieces using FEN notation.
-    - Generate all possible moves for the queen at `d5` and store them in `list`.
-    - Validate that the size of `list` is 11, indicating 11 possible moves.
-    - Check that specific moves like `d5e6`, `d5f7`, `d5e5`, etc., are present in `list`.
-    - Free the memory allocated for `list`.
-- **Output**: No output is returned as the function is a test function that validates the correctness of queen move generation.
+    - Generate all possible moves for the queen at `b2` using [`pmGetQueenMoves`](<chesslib/piecemoves.c.md#pmgetqueenmoves>).
+    - Validate that the move list contains 23 moves and specific moves like `b2b3`, `b2b4`, etc., are present.
+    - Free the move list to release memory.
+    - Reinitialize the board `b` with a queen surrounded by other pieces at position `d5`.
+    - Generate all possible moves for the queen at `d5`.
+    - Validate that the move list contains 11 moves and specific moves like `d5e6`, `d5f7`, etc., are present.
+    - Free the move list to release memory.
+- **Output**: No output is returned as the function is a test function that validates queen moves on a chessboard.
 - **Functions Called**:
     - [`boardInitFromFenInPlace`](<chesslib/board.c.md#boardinitfromfeninplace>)
     - [`pmGetQueenMoves`](<chesslib/piecemoves.c.md#pmgetqueenmoves>)
@@ -528,9 +528,8 @@ Tests the move generation for a queen on a chessboard in different scenarios.
 ### testKingMoves<!-- {{#callable:testKingMoves}} -->
 [View Source →](<../../../../chesslib/src/tests.c#L799>)
 
-Tests the movement generation for a king on a chessboard without considering checks.
-- **Inputs**:
-    - `None`: This function does not take any input parameters.
+Tests the movement generation for a king on a chessboard in various scenarios without considering check conditions.
+- **Inputs**: None
 - **Logic and Control Flow**:
     - Initializes a chess board with a lone king at position `c7` and generates possible moves using [`pmGetKingMoves`](<chesslib/piecemoves.c.md#pmgetkingmoves>).
     - Validates that the move list contains 8 possible moves for the king from `c7`.
@@ -541,7 +540,7 @@ Tests the movement generation for a king on a chessboard without considering che
     - Initializes a chess board with a king surrounded by other pieces at position `d5` and generates possible moves.
     - Validates that the move list contains 5 possible moves for the king from `d5`.
     - Frees the move list memory.
-- **Output**: There is no return value; the function performs validation checks and may terminate the program if a test fails.
+- **Output**: No output is returned as the function is a test function that validates king moves on a chessboard.
 - **Functions Called**:
     - [`boardInitFromFenInPlace`](<chesslib/board.c.md#boardinitfromfeninplace>)
     - [`pmGetKingMoves`](<chesslib/piecemoves.c.md#pmgetkingmoves>)
@@ -558,9 +557,9 @@ Tests the movement generation for a king on a chessboard without considering che
 Tests if squares on a chess board are attacked by specific pieces in various scenarios.
 - **Inputs**: None
 - **Logic and Control Flow**:
-    - Initializes a chess board with a knight in the corner and a pawn using [`boardInitFromFenInPlace`](<chesslib/board.c.md#boardinitfromfeninplace>) and checks if specific squares are attacked by white pieces using [`boardIsSquareAttacked`](<chesslib/board.c.md#boardissquareattacked>).
-    - Iterates over all 64 squares, calculates expected attack status for each square, and compares it with the actual attack status returned by [`boardIsSquareAttacked`](<chesslib/board.c.md#boardissquareattacked>).
-    - If there is a mismatch between expected and actual attack status, constructs an error message and calls [`failTest`](<#failtest>) to indicate a test failure.
+    - Initializes a chess board with a knight in the corner and a pawn using [`boardInitFromFenInPlace`](<chesslib/board.c.md#boardinitfromfeninplace>) and checks if specific squares are attacked by the white pieces using [`boardIsSquareAttacked`](<chesslib/board.c.md#boardissquareattacked>).
+    - Iterates over all 64 squares on the board, calculates the expected attack status for each square, and compares it with the actual attack status returned by [`boardIsSquareAttacked`](<chesslib/board.c.md#boardissquareattacked>).
+    - If there is a mismatch between expected and actual attack status, it constructs an error message and calls [`failTest`](<#failtest>) to indicate a test failure.
     - Repeats the above steps for a board with a lone rook and another board with a rook that has blocking and capturing opportunities.
 - **Output**: No output is returned; the function uses [`failTest`](<#failtest>) to indicate test failures.
 - **Functions Called**:
@@ -577,18 +576,16 @@ Tests if squares on a chess board are attacked by specific pieces in various sce
 ### testIsInCheck<!-- {{#callable:testIsInCheck}} -->
 [View Source →](<../../../../chesslib/src/tests.c#L920>)
 
-Tests if a chess board is in check using various scenarios.
+Tests if a chess board is in check under various scenarios.
 - **Inputs**: None
 - **Logic and Control Flow**:
-    - Initialize a chess board `b` with a specific FEN string representing a board state where a rook puts the king in check.
-    - Check if the board is in check using `boardIsInCheck(&b)`; if not, call [`failTest`](<#failtest>) with an error message.
-    - Check if the black player is in check using `boardIsPlayerInCheck(&b, pcBlack)`; if true, call [`failTest`](<#failtest>) with an error message.
-    - Initialize the board `b` with a FEN string representing the Scholar's mate scenario.
-    - Repeat the check and fail test logic for the Scholar's mate scenario.
-    - Initialize the board `b` with a FEN string where checks are blocked by knights.
-    - Check if the board is in check using `boardIsInCheck(&b)`; if true, call [`failTest`](<#failtest>) with an error message.
-    - Check if the black player is in check using `boardIsPlayerInCheck(&b, pcBlack)`; if true, call [`failTest`](<#failtest>) with an error message.
-- **Output**: No output is returned; the function calls [`failTest`](<#failtest>) if any test fails.
+    - Initialize a `board` variable `b`.
+    - Set up the board with a rook putting the king in check using [`boardInitFromFenInPlace`](<chesslib/board.c.md#boardinitfromfeninplace>).
+    - Check if the board is in check using [`boardIsInCheck`](<chesslib/board.c.md#boardisincheck>); if not, call [`failTest`](<#failtest>).
+    - Check if the black player is in check using [`boardIsPlayerInCheck`](<chesslib/board.c.md#boardisplayerincheck>); if true, call [`failTest`](<#failtest>).
+    - Set up the board for Scholar's mate and repeat the check tests.
+    - Set up the board with knights blocking checks and repeat the check tests.
+- **Output**: No output; the function calls [`failTest`](<#failtest>) if any test fails.
 - **Functions Called**:
     - [`boardInitFromFenInPlace`](<chesslib/board.c.md#boardinitfromfeninplace>)
     - [`boardIsInCheck`](<chesslib/board.c.md#boardisincheck>)
@@ -622,17 +619,15 @@ Checks if two chess boards are equal and fails the test if they are not.
 Tests the functionality of playing moves on a chess board and validates the board state after each move.
 - **Inputs**: None
 - **Logic and Control Flow**:
-    - Create a new chess board `b` using `boardCreate()`.
-    - Play the move 1. e4 on `b` using `boardPlayMoveInPlace()` and validate against a board created from FEN.
-    - Check for exact and contextual equality with a fuzzy board state and handle discrepancies.
-    - Play the move 1... Nf6 and validate the board state.
-    - Test capturing by playing a rook capture and validate the board state.
-    - Test bishop capturing a pawn and validate the board state.
-    - Simulate a draw scenario with two moves and validate the board state after each move.
-    - Test castling for both white and black, including O-O and O-O-O, and validate the board state.
-    - Test en passant scenarios for both white and black, including moves and captures, and validate the board state.
-    - Free all allocated board resources at the end.
-- **Output**: No output is returned; the function performs tests and may terminate the program if a test fails.
+    - Create a new chess board `b` using `boardCreate()` and a board `bCheck` for validation.
+    - Play the move 1. e4 on `b` using `boardPlayMoveInPlace()` and validate against `bCheck` created from FEN string.
+    - Check for exact and contextual equality with a fuzzy board `bCheckFuzzy`.
+    - Play the move 1... Nf6 and validate the board state against `bCheck`.
+    - Test capturing moves such as a rook capturing another rook and a bishop capturing a pawn, validating each state.
+    - Test special moves like castling (O-O, O-O-O) for both white and black, validating each state.
+    - Test en passant captures for both white and black, validating each state.
+    - Free the memory allocated for `b` and `bCheck`.
+- **Output**: No output is returned as the function is a void type and primarily performs validation through assertions.
 - **Functions Called**:
     - [`boardCreate`](<chesslib/board.c.md#boardcreate>)
     - [`boardPlayMoveInPlace`](<chesslib/board.c.md#boardplaymoveinplace>)
@@ -651,18 +646,18 @@ Tests the functionality of playing moves on a chess board and validates the boar
 ### validateUciIsNotInMovelist<!-- {{#callable:validateUciIsNotInMovelist}} -->
 [View Source →](<../../../../chesslib/src/tests.c#L1095>)
 
-Checks if a given UCI string is not present in a move list and fails the test if it is found.
+Checks if a given UCI move string is not present in a move list and fails the test if it is found.
 - **Inputs**:
     - ``list``: A pointer to a `moveList` structure that contains a list of moves.
-    - ``expectedUci``: A string representing the UCI (Universal Chess Interface) notation of the move that is expected to be absent from the move list.
+    - ``expectedUci``: A string representing the UCI format of the move that is expected to be absent from the move list.
 - **Logic and Control Flow**:
     - Iterates through each node in the move list starting from the head.
     - For each node, retrieves the UCI string of the move using [`moveGetUci`](<chesslib/move.c.md#movegetuci>).
     - Compares the retrieved UCI string with the `expectedUci` using `strcmp`.
     - Frees the memory allocated for the retrieved UCI string.
     - If a match is found (comparison result is 0), constructs an error message and calls [`failTest`](<#failtest>) with the message, then returns.
-    - If no match is found after iterating through the list, the function completes without any action.
-- **Output**: No output is returned; the function either completes silently or calls [`failTest`](<#failtest>) to indicate a failure.
+    - If no match is found after iterating through the list, the function completes without error.
+- **Output**: No output is returned; the function either completes successfully or calls [`failTest`](<#failtest>) to indicate a failure.
 - **Functions Called**:
     - [`moveGetUci`](<chesslib/move.c.md#movegetuci>)
     - [`failTest`](<#failtest>)
@@ -678,15 +673,15 @@ Tests the move generation functionality of a chess board by validating the gener
     - Initialize a chess board `b` and a move list `list`.
     - Generate moves for the initial board setup and validate that there are 20 possible moves, including all pawn and knight moves.
     - Free the move list after validation.
-    - Set up a board with a specific FEN string and generate moves, validating the expected number of moves and specific pawn, knight, bishop, queen, and king moves.
+    - Set up a board with some moves played using FEN notation and generate moves, validating the expected number of moves and specific pawn, knight, bishop, queen, and king moves.
     - Free the move list after validation.
-    - Set up another board with fewer pieces and generate moves, validating the expected number of moves and specific knight and king moves.
+    - Set up a board with fewer pieces and generate moves, validating the expected number of moves and specific knight and king moves.
     - Free the move list after validation.
     - Set up a board with a pinned knight and generate moves, validating that only king moves are possible and the knight cannot move.
     - Free the move list after validation.
-    - Set up a board where the king is in check but can be blocked, generate moves, and validate that only the blocking move is possible.
+    - Set up a board where the king is in check but can be blocked, generate moves, and validate that only moves that block the check are possible.
     - Free the move list after validation.
-- **Output**: No output is returned as the function is a test function that validates move generation logic by using assertions.
+- **Output**: No output is returned as this function is used for testing purposes and will halt execution if a test fails.
 - **Functions Called**:
     - [`boardInitInPlace`](<chesslib/board.c.md#boardinitinplace>)
     - [`boardGenerateMoves`](<chesslib/board.c.md#boardgeneratemoves>)
@@ -704,14 +699,12 @@ Tests the move generation functionality of a chess board by validating the gener
 Tests the generation of castling moves in various chess board scenarios.
 - **Inputs**: None
 - **Logic and Control Flow**:
-    - Initialize a chess board `b` and a move list `list` for storing generated moves.
-    - Set up the board for white's kingside castling (O-O) and generate moves, then validate that the move 'e1g1' is in the move list.
-    - Remove the white kingside castling right and regenerate moves, then validate that 'e1g1' is not in the move list.
-    - Switch to black's turn and generate moves for black's kingside castling (O-O), then validate that 'e8g8' is in the move list.
-    - Set up the board for white's queenside castling (O-O-O) and generate moves, then validate that 'e1c1' is in the move list.
-    - Switch to black's turn and generate moves for black's queenside castling (O-O-O), then validate that 'e8c8' is in the move list.
-    - Set up scenarios where the king is in check or squares are attacked, and validate that castling moves are correctly included or excluded from the move list based on the rules of chess.
-- **Output**: No output is returned; the function validates castling move generation through assertions.
+    - Initialize a chess board `b` with a specific FEN string for each test case.
+    - Generate possible moves for the board using [`boardGenerateMoves`](<chesslib/board.c.md#boardgeneratemoves>).
+    - Validate if specific castling moves (e.g., `e1g1`, `e1c1`, `e8g8`, `e8c8`) are present or absent in the generated move list using [`validateUciIsInMovelist`](<#validateuciisinmovelist>) and [`validateUciIsNotInMovelist`](<#validateuciisnotinmovelist>).
+    - Free the move list after each validation using [`moveListFree`](<chesslib/movelist.c.md#movelistfree>).
+    - Repeat the process for different board configurations to test various castling conditions, such as when the king is in check, when castling rights are removed, and when squares are attacked.
+- **Output**: No output is returned as this function is used for testing purposes.
 - **Functions Called**:
     - [`boardInitFromFenInPlace`](<chesslib/board.c.md#boardinitfromfeninplace>)
     - [`boardGenerateMoves`](<chesslib/board.c.md#boardgeneratemoves>)
@@ -724,13 +717,13 @@ Tests the generation of castling moves in various chess board scenarios.
 ### validateBoardFen<!-- {{#callable:validateBoardFen}} -->
 [View Source →](<../../../../chesslib/src/tests.c#L1387>)
 
-Validates a given FEN string by comparing it to the FEN string generated from a board initialized with the same FEN.
+Validates a given FEN string by comparing it with the FEN generated from a board initialized with the same string.
 - **Inputs**:
     - `fen`: A pointer to a character array representing a FEN (Forsyth-Edwards Notation) string for a chess board.
 - **Logic and Control Flow**:
     - Initialize a `board` structure `b`.
-    - Call [`boardInitFromFenInPlace`](<chesslib/board.c.md#boardinitfromfeninplace>) to initialize `b` with the given `fen` string.
-    - Generate a FEN string from `b` using [`boardGetFen`](<chesslib/board.c.md#boardgetfen>).
+    - Call [`boardInitFromFenInPlace`](<chesslib/board.c.md#boardinitfromfeninplace>) to set up the board `b` using the provided `fen` string.
+    - Generate a FEN string from the board `b` using [`boardGetFen`](<chesslib/board.c.md#boardgetfen>).
     - Call [`validateString`](<#validatestring>) to compare the generated FEN string with the input `fen` string.
     - Free the memory allocated for the generated FEN string.
 - **Output**: No return value; the function performs validation and may terminate the program if the validation fails.
@@ -744,16 +737,14 @@ Validates a given FEN string by comparing it to the FEN string generated from a 
 ### testBoardGetFen<!-- {{#callable:testBoardGetFen}} -->
 [View Source →](<../../../../chesslib/src/tests.c#L1398>)
 
-Validates the conversion of chess board states to FEN strings using various test cases.
+Validates the conversion of a chess board state to a FEN string by comparing generated FEN strings with expected ones.
 - **Inputs**:
     - `None`: This function does not take any input parameters.
 - **Logic and Control Flow**:
-    - Calls [`validateBoardFen`](<#validateboardfen>) with `INITIAL_FEN` to validate the initial board setup.
-    - Calls [`validateBoardFen`](<#validateboardfen>) with a FEN string representing Fool's mate to validate the board state conversion.
-    - Calls [`validateBoardFen`](<#validateboardfen>) with a FEN string representing Scholar's mate to validate the board state conversion.
-    - Calls [`validateBoardFen`](<#validateboardfen>) with a FEN string representing a specific game position (GotC Be6!!) to validate the board state conversion.
-    - Calls [`validateBoardFen`](<#validateboardfen>) with a FEN string representing a miscellaneous setup with varying castling states and en passant target to validate the board state conversion.
-- **Output**: No output is returned; the function uses [`validateBoardFen`](<#validateboardfen>) to check correctness and may call `failTest` if validation fails.
+    - Calls [`validateBoardFen`](<#validateboardfen>) with the initial FEN string `INITIAL_FEN` to validate the initial board setup.
+    - Calls [`validateBoardFen`](<#validateboardfen>) with a series of FEN strings representing different chess positions, including Fool's mate, Scholar's mate, and other setups.
+    - Each call to [`validateBoardFen`](<#validateboardfen>) checks if the board state can be correctly converted back to the given FEN string.
+- **Output**: No output is returned as this function is used for validation purposes.
 - **Functions Called**:
     - [`validateBoardFen`](<#validateboardfen>)
 
@@ -770,7 +761,7 @@ Checks if a chess board has insufficient material for a draw and compares the re
     - Call the function [`boardIsInsufficientMaterial`](<chesslib/board.c.md#boardisinsufficientmaterial>) with the board `b` to determine if the board is a draw by insufficient material, storing the result in `actual`.
     - Compare `actual` with `expected`.
     - If `actual` does not equal `expected`, format a message indicating the discrepancy and call [`failTest`](<#failtest>) with this message to indicate a test failure.
-- **Output**: No return value; the function will call [`failTest`](<#failtest>) and terminate the program if the actual result does not match the expected result.
+- **Output**: No return value; the function is used for validation and will terminate the program with an error message if the validation fails.
 - **Functions Called**:
     - [`boardIsInsufficientMaterial`](<chesslib/board.c.md#boardisinsufficientmaterial>)
     - [`failTest`](<#failtest>)
@@ -782,17 +773,17 @@ Checks if a chess board has insufficient material for a draw and compares the re
 
 Tests various chess board configurations to determine if they result in a draw due to insufficient material.
 - **Inputs**:
-    - `None`: This function does not take any input parameters.
+    - `b`: A `board` structure representing the current state of the chess board.
 - **Logic and Control Flow**:
-    - Initialize a `board` object `b`.
-    - Set up the initial board configuration and validate that it is not insufficient material using [`validateBoardIsInsufficientMaterial`](<#validateboardisinsufficientmaterial>).
-    - Set up a board with only kings and validate that it is insufficient material.
-    - Set up a board with a king versus a king and knight, and validate that it is insufficient material.
-    - Set up a board with a king versus a king and two knights, and validate that it is not insufficient material.
-    - Set up a board with a king and bishop versus a king and bishop of different colors, and validate that it is not insufficient material.
-    - Set up a board with a king and bishop versus a king and bishop of the same color, and validate that it is insufficient material.
-    - Set up a board with multiple bishops of the same color versus a king and bishops, and validate that it is insufficient material.
-- **Output**: There is no return value; the function uses assertions to validate the test cases.
+    - Initialize a `board` structure `b`.
+    - Set up the initial board configuration and validate it is not insufficient material.
+    - Set up a board with only kings and validate it is insufficient material.
+    - Set up a board with a king versus a king and knight, and validate it is insufficient material.
+    - Set up a board with a king versus a king and two knights, and validate it is not insufficient material.
+    - Set up a board with a king and bishop versus a king and bishop of different colors, and validate it is not insufficient material.
+    - Set up a board with a king and bishop versus a king and bishop of the same color, and validate it is insufficient material.
+    - Set up a board with multiple bishops of the same color versus a king and bishops of the same color, and validate it is insufficient material.
+- **Output**: No output is returned; the function uses assertions to validate the board state.
 - **Functions Called**:
     - [`boardInitInPlace`](<chesslib/board.c.md#boardinitinplace>)
     - [`validateBoardIsInsufficientMaterial`](<#validateboardisinsufficientmaterial>)
@@ -806,14 +797,14 @@ Tests various chess board configurations to determine if they result in a draw d
 Tests the functionality of adding and retrieving boards from a `boardList`.
 - **Inputs**: None
 - **Logic and Control Flow**:
-    - Create three board instances: `b1`, `b2`, and `b3` using [`boardCreate`](<chesslib/board.c.md#boardcreate>) and [`boardPlayMove`](<chesslib/board.c.md#boardplaymove>) functions.
-    - Create a `boardList` instance `l` using [`boardListCreate`](<chesslib/boardlist.c.md#boardlistcreate>).
+    - Create three boards: `b1`, `b2`, and `b3` using [`boardCreate`](<chesslib/board.c.md#boardcreate>) and [`boardPlayMove`](<chesslib/board.c.md#boardplaymove>) functions.
+    - Create a `boardList` named `l` using [`boardListCreate`](<chesslib/boardlist.c.md#boardlistcreate>).
     - Add the boards `b1`, `b2`, and `b3` to the list `l` using [`boardListAdd`](<chesslib/boardlist.c.md#boardlistadd>).
-    - Check if `boardListGet(l, 0)` returns `b1`, if not, call [`failTest`](<#failtest>).
-    - Check if `boardListGet(l, 1)` returns `b2`, if not, call [`failTest`](<#failtest>).
-    - Check if `boardListGet(l, 2)` returns `b3`, if not, call [`failTest`](<#failtest>).
+    - Check if `boardListGet(l, 0)` returns `b1`; if not, call [`failTest`](<#failtest>).
+    - Check if `boardListGet(l, 1)` returns `b2`; if not, call [`failTest`](<#failtest>).
+    - Check if `boardListGet(l, 2)` returns `b3`; if not, call [`failTest`](<#failtest>).
     - Free the `boardList` `l` using [`boardListFree`](<chesslib/boardlist.c.md#boardlistfree>), which also frees all boards in the list.
-- **Output**: No output is returned; the function performs tests and may call [`failTest`](<#failtest>) to indicate a failure.
+- **Output**: No output is returned; the function performs tests and may call [`failTest`](<#failtest>) if a test fails.
 - **Functions Called**:
     - [`boardCreate`](<chesslib/board.c.md#boardcreate>)
     - [`boardPlayMove`](<chesslib/board.c.md#boardplaymove>)
@@ -831,15 +822,17 @@ Tests the functionality of adding and retrieving boards from a `boardList`.
 
 Tests the [`sqSetSet`](<chesslib/squareset.c.md#sqsetset>) function by setting specific squares in a `uint64_t` bitboard and verifying the expected bit pattern.
 - **Inputs**:
-    - `ss`: A pointer to a `uint64_t` bitboard representing a set of squares.
-    - [`sqS`](<chesslib/square.c.md#sqs>): A function that converts a square notation (e.g., "e4") to a square index.
-    - [`sqSetSet`](<chesslib/squareset.c.md#sqsetset>): A function that sets a specific bit in the bitboard to indicate a square is occupied.
-    - [`failTest`](<#failtest>): A function that halts the test and reports a failure message if the condition is not met.
+    - `ss`: A `uint64_t` variable representing a bitboard where each bit corresponds to a square on a chessboard.
 - **Logic and Control Flow**:
-    - Initialize `ss` to 0, representing an empty set of squares.
-    - Call [`sqSetSet`](<chesslib/squareset.c.md#sqsetset>) to set the square 'e4' in the bitboard `ss`.
-    - Check if `ss` matches the expected bit pattern for 'e4'; if not, call [`failTest`](<#failtest>).
-    - Repeat the process for squares 'd5', 'a1', and 'h8', each time checking the bit pattern and calling [`failTest`](<#failtest>) if it does not match the expected value.
+    - Initialize `ss` to 0, representing an empty bitboard.
+    - Call [`sqSetSet`](<chesslib/squareset.c.md#sqsetset>) with `ss`, the square 'e4', and the value 1 to set the bit corresponding to 'e4'.
+    - Check if `ss` equals `0x0000000010000000`; if not, call [`failTest`](<#failtest>) with an error message.
+    - Call [`sqSetSet`](<chesslib/squareset.c.md#sqsetset>) with `ss`, the square 'd5', and the value 1 to set the bit corresponding to 'd5'.
+    - Check if `ss` equals `0x0000000810000000`; if not, call [`failTest`](<#failtest>) with an error message.
+    - Call [`sqSetSet`](<chesslib/squareset.c.md#sqsetset>) with `ss`, the square 'a1', and the value 1 to set the bit corresponding to 'a1'.
+    - Check if `ss` equals `0x0000000810000001`; if not, call [`failTest`](<#failtest>) with an error message.
+    - Call [`sqSetSet`](<chesslib/squareset.c.md#sqsetset>) with `ss`, the square 'h8', and the value 1 to set the bit corresponding to 'h8'.
+    - Check if `ss` equals `0x8000000810000001`; if not, call [`failTest`](<#failtest>) with an error message.
 - **Output**: No output is returned; the function uses [`failTest`](<#failtest>) to indicate failure.
 - **Functions Called**:
     - [`sqSetSet`](<chesslib/squareset.c.md#sqsetset>)
@@ -856,9 +849,9 @@ Validates the correctness of the [`sqSetGet`](<chesslib/squareset.c.md#sqsetget>
     - `None`: This function does not take any input parameters.
 - **Logic and Control Flow**:
     - Initializes a 64-bit integer `ss` to represent a diagonal from a1 to h8.
-    - Iterates over each square index from 0 to 63.
-    - For each square, calculates the expected value based on whether the file equals the rank.
-    - Calls [`sqSetGet`](<chesslib/squareset.c.md#sqsetget>) to get the actual value for the square from the set `ss`.
+    - Iterates over all 64 squares on a chessboard using a loop.
+    - For each square, calculates the expected value based on whether the square is on the diagonal (file equals rank).
+    - Calls [`sqSetGet`](<chesslib/squareset.c.md#sqsetget>) to get the actual value of the square from the set `ss`.
     - Compares the expected and actual values; if they differ, constructs an error message and calls [`failTest`](<#failtest>).
     - Reinitializes `ss` to represent specific files and ranks (c file, f file, 3 rank, and 6 rank).
     - Repeats the iteration and comparison process for the new set `ss`.
