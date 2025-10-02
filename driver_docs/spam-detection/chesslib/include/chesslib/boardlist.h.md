@@ -6,7 +6,7 @@
 Defines data structures and functions for managing a linked list of chess boards.
 
 # Purpose
-This code defines a simple C header file for managing a linked list of chess boards. It includes the necessary structure definitions and function prototypes to create and manipulate a `boardList`, which is a linked list of `boardListNode` elements. Each `boardListNode` contains a pointer to a `board` and a pointer to the next node in the list. The `boardList` structure maintains pointers to the head and tail of the list, as well as the size of the list. The file provides function prototypes for creating a new list or node, adding a board to the list, retrieving a board by index, undoing the last addition, and freeing the list and its nodes.
+This code defines a simple C header file for managing a linked list of chess boards. It includes the necessary structure definitions and function prototypes for creating and manipulating a `boardList`, which is a linked list of `boardListNode` elements. Each `boardListNode` contains a pointer to a `board` and a pointer to the next node in the list. The `boardList` structure maintains pointers to the head and tail of the list, as well as the size of the list. The file provides function prototypes for creating a new list or node, adding a board to the list, retrieving a board by index, undoing the last addition, and freeing the entire list.
 # Imports and Dependencies
 
 ---
@@ -22,17 +22,17 @@ This code defines a simple C header file for managing a linked list of chess boa
 - **Members**:
     - ``board``: A pointer to a `board` structure.
     - ``next``: A pointer to the next `boardListNode` in the list.
-- **Description**: Defines a node in a linked list that stores a pointer to a `board` and a pointer to the next node, enabling traversal through the list.
+- **Description**: Represents a node in a linked list that stores a pointer to a `board` and a pointer to the next node in the list, enabling traversal through the list.
 
 
 ---
 ### boardList
 - **Type**: ``struct``
 - **Members**:
-    - ``head``: Pointer to the first node in the list.
-    - ``tail``: Pointer to the last node in the list.
-    - ``size``: Number of nodes in the list.
-- **Description**: Defines a linked list structure to manage a sequence of `boardListNode` elements, where each node contains a `board` and a pointer to the next node. The `head` and `tail` pointers allow efficient insertion and removal of nodes at both ends of the list, while the `size` member tracks the total number of nodes in the list.
+    - ``head``: A pointer to the first node in the list.
+    - ``tail``: A pointer to the last node in the list.
+    - ``size``: The number of nodes in the list.
+- **Description**: Represents a linked list of `boardListNode` elements, where each node contains a `board` and a pointer to the next node. The `head` and `tail` pointers allow for efficient insertion and removal of nodes at both ends of the list, while the `size` member keeps track of the total number of nodes in the list.
 
 
 # Function Declarations (Public API)
@@ -53,10 +53,10 @@ Creates an empty board list.
 [View Source →](<../../../../../chesslib/include/chesslib/boardlist.h#L27>)
 
 Creates a new board list node with a specified board.
-- **Description**: Use this function to create a new node for a board list, initializing it with a given board. This function allocates memory for the node, sets its board pointer to the provided board, and initializes the next pointer to NULL. Ensure that the board pointer provided is valid and that you manage the memory of the created node to prevent memory leaks.
+- **Description**: Use this function to create a new node for a linked list of boards. The function allocates memory for a new `boardListNode` and initializes it with the given `board` pointer. The `next` pointer of the node is set to `NULL`, indicating that it is the last node in the list. Ensure that the `board` pointer provided is valid and that you manage the memory of the created node to prevent memory leaks.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure that the new node will reference. Must not be null. The caller retains ownership of the board.
-- **Output**: Returns a pointer to the newly created `boardListNode`. The caller is responsible for managing the memory of this node.
+    - `b`: A pointer to a `board` structure. This pointer must be valid and is assigned to the `board` field of the new node. The caller retains ownership of the `board`.
+- **Output**: Returns a pointer to the newly created `boardListNode`. If memory allocation fails, the behavior is undefined.
 - **See Also**: [`boardListNodeCreate`](<../../src/chesslib/boardlist.c.md#boardlistnodecreate>)  (Implementation)
 
 
@@ -64,11 +64,11 @@ Creates a new board list node with a specified board.
 ### boardListAdd<!-- {{#callable_declaration:boardListAdd}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/boardlist.h#L30>)
 
-Adds a board to the end of a board list.
+Adds a board to the end of the board list.
 - **Description**: Use this function to append a new board to the end of an existing `boardList`. This function increases the size of the list by one. Ensure that the `boardList` is properly initialized before calling this function. The function does not handle null pointers for the `list` or `b` parameters, so ensure these are valid before calling.
 - **Inputs**:
-    - `list`: A pointer to a `boardList` structure where the board will be added. Must not be null. The list must be initialized before use.
-    - `b`: A pointer to a `board` structure to add to the list. Must not be null. The caller retains ownership of the board.
+    - `list`: A pointer to a `boardList` structure where the board will be added. Must not be null and must point to a valid `boardList`.
+    - `b`: A pointer to a `board` structure that will be added to the list. Must not be null and must point to a valid `board`.
 - **Output**: None
 - **See Also**: [`boardListAdd`](<../../src/chesslib/boardlist.c.md#boardlistadd>)  (Implementation)
 
@@ -82,7 +82,7 @@ Retrieves a board from the list at the specified index.
 - **Inputs**:
     - `list`: A pointer to a `boardList` from which to retrieve the board. Must not be null, and the list should be properly initialized.
     - `index`: An unsigned integer representing the position in the list from which to retrieve the board. Must be less than the size of the list.
-- **Output**: A pointer to the `board` at the specified index in the list.
+- **Output**: Returns a pointer to the `board` at the specified index in the list.
 - **See Also**: [`boardListGet`](<../../src/chesslib/boardlist.c.md#boardlistget>)  (Implementation)
 
 
@@ -91,9 +91,9 @@ Retrieves a board from the list at the specified index.
 [View Source →](<../../../../../chesslib/include/chesslib/boardlist.h#L32>)
 
 Removes the last node from a board list.
-- **Description**: Use this function to remove the last node from a `boardList`. It decreases the size of the list by one and updates the list's tail pointer. If the list is empty or the provided list pointer is null, the function does nothing. This function must be called only on a valid `boardList` that has been initialized and populated with nodes.
+- **Description**: Use this function to remove the last node from a `boardList`. It decreases the size of the list by one and updates the `tail` pointer to the new last node. If the list is empty or the `head` is null, the function does nothing. This function must be called only on a valid `boardList` that has been initialized and populated with nodes.
 - **Inputs**:
-    - `list`: A pointer to a `boardList` structure. Must not be null. The list must be initialized and can contain zero or more nodes. If the list is empty or null, the function performs no action.
+    - `list`: A pointer to a `boardList` structure. Must not be null. The function does nothing if `list` is null or if `list->head` is null.
 - **Output**: None
 - **See Also**: [`boardListUndo`](<../../src/chesslib/boardlist.c.md#boardlistundo>)  (Implementation)
 
@@ -103,9 +103,9 @@ Removes the last node from a board list.
 [View Source →](<../../../../../chesslib/include/chesslib/boardlist.h#L35>)
 
 Frees a board list and all its nodes.
-- **Description**: Use this function to release all memory associated with a `boardList` and its nodes. Call this function when the `boardList` is no longer needed to prevent memory leaks. Ensure that the `list` parameter is not null before calling this function. This function will free each `board` within the nodes and the nodes themselves, followed by the `boardList` structure.
+- **Description**: Use this function to release all memory associated with a `boardList` and its nodes. This function must be called when the list is no longer needed to prevent memory leaks. Ensure that the `list` parameter is not null before calling this function. After execution, the `list` and its nodes are invalid and should not be accessed.
 - **Inputs**:
-    - `list`: A pointer to the `boardList` to free. Must not be null. The function will free all nodes and their associated `board` objects, as well as the `boardList` itself.
+    - `list`: A pointer to a `boardList` structure. Must not be null. The function will free all nodes and the list itself. If `list` is null, behavior is undefined.
 - **Output**: None
 - **See Also**: [`boardListFree`](<../../src/chesslib/boardlist.c.md#boardlistfree>)  (Implementation)
 
