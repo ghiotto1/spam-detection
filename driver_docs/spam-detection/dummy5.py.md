@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints a message indicating it is a different new file.
+Prints "added a new file".
 
 # Purpose
-This code is a simple script that outputs the string "this is a different new file" to the standard output. It uses the `print` function to display the message on the console. The script provides narrow functionality, as it performs a single action without any additional logic or complexity.
+This code is a simple script that outputs the message "added a new file" to the standard output. It uses the `print` function to display this message. The script provides narrow functionality, serving primarily as a notification or log message to indicate that a new file has been added. There are no additional operations or logic included in this script.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

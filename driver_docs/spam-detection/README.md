@@ -3,16 +3,20 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Memory allocation and string manipulation functions with error checking, and dummy Python scripts for printing.
+Data structures and functions for a C-based chess library, dummy Python scripts, and memory management in C.
 
+## Folders
+- **[chesslib](chesslib/README.md)**: Data structures, functions, and components for a C-based chess library with build and test instructions.
 
 ## Files
 - **[dummy1.py](dummy1.py.md)**: Prints "new file".
-- **[dummy2.py](dummy2.py.md)**: Prints the message "this is a different new file".
+- **[dummy2.py](dummy2.py.md)**: Prints a message indicating it is a different new file.
 - **[dummy3.py](dummy3.py.md)**: Prints 'new file'.
-- **[dummy4.py](dummy4.py.md)**: Prints multiple lines of text to the console.
-- **[xmalloc.c](xmalloc.c.md)**: Memory allocation and string manipulation functions that check for errors and call fatalx on failure.
-- **[xmalloc.h](xmalloc.h.md)**: Memory allocation functions that check results and call fatal on error, ensuring no failure returns.
+- **[dummy5.py](dummy5.py.md)**: Prints "added a new file".
+- **[dummy6.py](dummy6.py.md)**: Prints "A sixth new file".
+- **[dummy7.py](dummy7.py.md)**: Prints the message "more new files".
+- **[xmalloc.c](xmalloc.c.md)**: Memory allocation and string manipulation functions that check results and handle errors.
+- **[xmalloc.h](xmalloc.h.md)**: Memory allocation functions that check results and call fatal on error.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
