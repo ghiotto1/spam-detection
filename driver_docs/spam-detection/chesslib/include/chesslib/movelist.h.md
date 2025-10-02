@@ -3,12 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines data structures and functions for managing a list of chess moves.
+Data structures and functions for managing a list of chess moves.
 
 # Purpose
-The code defines a set of data structures and functions for managing a list of chess moves. It includes the definitions for `moveListNode` and `moveList` structures, which are used to create and manipulate a linked list of chess moves. The `moveListNode` structure contains a `move` and a pointer to the next node, while the `moveList` structure maintains pointers to the head and tail of the list, as well as the size of the list.
-
-The code provides several functions to operate on these structures. The [`moveListCreate`](<#movelistcreate>) and [`moveListNodeCreate`](<#movelistnodecreate>) functions are used to initialize an empty move list and a move list node, respectively. The [`moveListAdd`](<#movelistadd>) function adds a move to the list, and [`moveListGet`](<#movelistget>) retrieves a move from the list by index. The [`moveListUndo`](<#movelistundo>) function removes the most recent move from the list. Additionally, the [`moveListGetUciString`](<#movelistgetucistring>) function generates a UCI (Universal Chess Interface) string representation of the move list, which must be freed after use. Finally, the [`moveListFree`](<#movelistfree>) function deallocates the memory used by the move list and its nodes. This code is intended to be used as part of a larger chess application, providing a way to manage and manipulate sequences of moves.
+This code is a C header file that defines data structures and function prototypes for managing a list of chess moves. It includes the definition of two structures: `moveListNode`, which represents a node containing a single move and a pointer to the next node, and `moveList`, which represents the entire list with pointers to the head and tail nodes and a size attribute. The file declares functions for creating and manipulating these structures, such as [`moveListCreate`](<#movelistcreate>) and [`moveListNodeCreate`](<#movelistnodecreate>) for initialization, [`moveListAdd`](<#movelistadd>) for adding moves, [`moveListGet`](<#movelistget>) for retrieving a move by index, and [`moveListUndo`](<#movelistundo>) for removing the last move. Additionally, it provides a function [`moveListGetUciString`](<#movelistgetucistring>) to generate a UCI (Universal Chess Interface) string representation of the move list, and [`moveListFree`](<#movelistfree>) to deallocate the list and its nodes.
 # Imports and Dependencies
 
 ---
@@ -22,19 +20,19 @@ The code provides several functions to operate on these structures. The [`moveLi
 ### moveListNode
 - **Type**: ``struct``
 - **Members**:
-    - `move`: Contains a `move` object that represents a chess move.
+    - `move`: Contains a `move` data type representing a chess move.
     - `next`: Points to the next `moveListNode` in the list.
-- **Description**: Defines a node in a linked list that stores chess moves, where each node contains a `move` and a pointer to the next node in the list.
+- **Description**: Defines a node in a linked list that stores a chess move and a pointer to the next node, enabling traversal through a sequence of moves.
 
 
 ---
 ### moveList
 - **Type**: ``struct``
 - **Members**:
-    - `head`: Pointer to the first node in the move list.
-    - `tail`: Pointer to the last node in the move list.
-    - `size`: Number of nodes in the move list.
-- **Description**: Stores a linked list of chess moves, with pointers to the first and last nodes and a count of the total number of moves.
+    - `head`: A pointer to the first node in the move list.
+    - `tail`: A pointer to the last node in the move list.
+    - `size`: The number of nodes in the move list.
+- **Description**: Represents a linked list of chess moves, where each node contains a move and a pointer to the next node. The `head` and `tail` pointers allow for efficient addition and removal of moves at the beginning and end of the list, while the `size` member keeps track of the total number of moves in the list.
 
 
 # Function Declarations (Public API)
@@ -44,7 +42,7 @@ The code provides several functions to operate on these structures. The [`moveLi
 [View Source →](<../../../../../chesslib/include/chesslib/movelist.h#L26>)
 
 Creates an empty move list.
-- **Description**: Use this function to create a new, empty move list. This function allocates memory for a `moveList` structure and initializes its members. The `head` and `tail` pointers are set to `NULL`, and the `size` is set to zero. The caller is responsible for freeing the allocated memory using `moveListFree` when the move list is no longer needed.
+- **Description**: Use this function to create a new, empty move list for storing chess moves. It initializes the list with no elements and sets the head, tail, and size to their default values. This function allocates memory for the list, so you must call `moveListFree` to release the memory when the list is no longer needed.
 - **Inputs**: None
 - **Output**: Returns a pointer to a newly allocated `moveList` structure, or `NULL` if memory allocation fails.
 - **See Also**: [`moveListCreate`](<../../src/chesslib/movelist.c.md#movelistcreate>)  (Implementation)
@@ -66,11 +64,11 @@ Creates a new move list node with a specified move.
 ### moveListAdd<!-- {{#callable_declaration:moveListAdd}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/movelist.h#L30>)
 
-Adds a move to the end of the move list.
-- **Description**: Use this function to append a new move to an existing move list. The function updates the list's head and tail pointers as necessary and increments the list size. Ensure that the `list` parameter is a valid pointer to a `moveList` structure. This function does not handle null pointers, so the caller must ensure that `list` is not null before calling.
+Adds a move to the end of a move list.
+- **Description**: Use this function to append a move to an existing move list. The function updates the list's head and tail pointers as necessary and increments the list size. Ensure that the `list` parameter is a valid pointer to a `moveList` structure, and that the list has been properly initialized before calling this function. This function does not handle null pointers and assumes that the `move` parameter is valid.
 - **Inputs**:
-    - `list`: A pointer to a `moveList` structure where the move will be added. Must not be null. The caller retains ownership.
-    - `move`: The move to add to the list. The function does not validate the move, so it is the caller's responsibility to ensure it is valid.
+    - `list`: A pointer to a `moveList` structure. Must not be null. The list must be initialized before use.
+    - `move`: A `move` object to add to the list. The function assumes this is a valid move.
 - **Output**: None
 - **See Also**: [`moveListAdd`](<../../src/chesslib/movelist.c.md#movelistadd>)  (Implementation)
 
@@ -79,12 +77,12 @@ Adds a move to the end of the move list.
 ### moveListGet<!-- {{#callable_declaration:moveListGet}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/movelist.h#L31>)
 
-Retrieves a move from the move list at the specified index.
-- **Description**: Use this function to get a move from a `moveList` at a specific position. The function assumes that the index is within the bounds of the list, so ensure that the index is less than the size of the list to avoid undefined behavior. This function is useful when you need to access a specific move in a sequence of moves stored in a `moveList`. It does not modify the list or the move.
+Retrieves a move from the move list at a specified index.
+- **Description**: Use this function to get a move from a `moveList` at a specific position. The function assumes that the index is within the bounds of the list, so ensure that the index is less than the size of the list to avoid undefined behavior. This function is useful when you need to access a particular move in a sequence of moves stored in a `moveList`. It does not modify the list or the move.
 - **Inputs**:
     - `list`: A pointer to a `moveList` from which to retrieve the move. Must not be null, and the list must be properly initialized.
     - `index`: An unsigned integer representing the position of the move to retrieve. Must be less than the size of the list to avoid undefined behavior.
-- **Output**: Returns the move at the specified index in the `moveList`.
+- **Output**: Returns the `move` at the specified index in the `moveList`.
 - **See Also**: [`moveListGet`](<../../src/chesslib/movelist.c.md#movelistget>)  (Implementation)
 
 
@@ -95,7 +93,7 @@ Retrieves a move from the move list at the specified index.
 Removes the last move from the move list.
 - **Description**: Use this function to remove the most recent move from a `moveList`. It decreases the size of the list by one and updates the list's tail pointer. If the list is empty or the head is null, the function does nothing. This function must be called with a valid `moveList` pointer, and it assumes that the list has been properly initialized.
 - **Inputs**:
-    - `list`: A pointer to a `moveList` structure. Must not be null. The function does nothing if the list is empty or the head is null. The caller retains ownership of the list.
+    - `list`: A pointer to a `moveList` structure. Must not be null. The function does nothing if the list is empty or if the head of the list is null. The caller retains ownership of the list.
 - **Output**: None
 - **See Also**: [`moveListUndo`](<../../src/chesslib/movelist.c.md#movelistundo>)  (Implementation)
 
@@ -104,10 +102,10 @@ Removes the last move from the move list.
 ### moveListGetUciString<!-- {{#callable_declaration:moveListGetUciString}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/movelist.h#L35>)
 
-Creates a UCI string from a move list.
-- **Description**: Use this function to convert a `moveList` into a string formatted according to the Universal Chess Interface (UCI) standard. The function allocates memory for the resulting string, which the caller must free after use. If the move list is empty, the function returns an empty string. If the list contains one move, the function returns the UCI string for that move. For multiple moves, the function concatenates their UCI strings, separated by spaces. Ensure that the `moveList` is valid and properly initialized before calling this function.
+Creates a UCI string from the given move list.
+- **Description**: Use this function to convert a list of chess moves into a UCI (Universal Chess Interface) formatted string. This function is useful when you need to represent a sequence of moves in a standardized format. The function allocates memory for the resulting string, which the caller must free after use. If the move list is empty, the function returns an empty string. If the list contains one move, the function returns the UCI string for that move. For multiple moves, the function concatenates the UCI strings of each move, separated by spaces.
 - **Inputs**:
-    - `list`: A pointer to a `moveList` structure. The list must be valid and initialized. The function does not modify the list. If the list is empty, the function returns an empty string.
+    - `list`: A pointer to a `moveList` structure that contains the moves to convert. Must not be null. The function does not modify the list or its contents.
 - **Output**: A dynamically allocated string containing the UCI representation of the moves in the list. The caller is responsible for freeing this string.
 - **See Also**: [`moveListGetUciString`](<../../src/chesslib/movelist.c.md#movelistgetucistring>)  (Implementation)
 
@@ -117,9 +115,9 @@ Creates a UCI string from a move list.
 [View Source →](<../../../../../chesslib/include/chesslib/movelist.h#L38>)
 
 Frees a move list and all its nodes.
-- **Description**: Use this function to release the memory allocated for a `moveList` and all its associated nodes. Call this function when the move list is no longer needed to prevent memory leaks. Ensure that the `list` parameter is not null before calling this function. After calling, the `list` and its nodes are no longer valid and should not be accessed.
+- **Description**: Use this function to release the memory allocated for a `moveList` and all its associated nodes. Call this function when the move list is no longer needed to prevent memory leaks. Ensure that the `list` parameter is not null before calling this function, as passing a null pointer can lead to undefined behavior.
 - **Inputs**:
-    - `list`: A pointer to a `moveList` structure. Must not be null. The function will free the memory for the list and all its nodes. If `list` is null, the behavior is undefined.
+    - `list`: A pointer to a `moveList` structure. Must not be null. The function will free the memory for the list and all its nodes.
 - **Output**: None
 - **See Also**: [`moveListFree`](<../../src/chesslib/movelist.c.md#movelistfree>)  (Implementation)
 
