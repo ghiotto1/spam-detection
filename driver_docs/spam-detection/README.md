@@ -3,18 +3,18 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Data structures and functions for a C-based chess library, dummy Python scripts, and memory management in C.
+Data structures and functions for a C-based chess library, flow management in Python, and memory management in C.
 
 ## Folders
 - **[chesslib](chesslib/README.md)**: Data structures, functions, and components for a C-based chess library with build and test instructions.
+- **[kestra_lite](kestra_lite/README.md)**: Schedulers, scheduling contexts, and interfaces for managing and executing flows and triggers.
 
 ## Files
 - **[dummy1.py](dummy1.py.md)**: Prints "new file".
 - **[dummy2.py](dummy2.py.md)**: Prints a message indicating it is a different new file.
 - **[dummy3.py](dummy3.py.md)**: Prints 'new file'.
 - **[dummy5.py](dummy5.py.md)**: Prints "added a new file".
-- **[dummy6.py](dummy6.py.md)**: Prints "A sixth new file".
-- **[dummy7.py](dummy7.py.md)**: Prints the message "more new files".
+- **[dummy6.py](dummy6.py.md)**: Defines a DummyClass with a method to print a given string.
 - **[xmalloc.c](xmalloc.c.md)**: Memory allocation and string manipulation functions that check results and handle errors.
 - **[xmalloc.h](xmalloc.h.md)**: Memory allocation functions that check results and call fatal on error.
 
