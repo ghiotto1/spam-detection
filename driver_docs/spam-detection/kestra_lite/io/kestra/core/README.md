@@ -3,10 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints "A sixth new file".
+Schedulers, scheduling contexts, and interfaces for managing execution and trigger states.
 
-# Purpose
-This code is a simple script that outputs the string "A sixth new file" to the standard output. It provides narrow functionality, serving primarily as a demonstration or placeholder for printing a specific message. There are no variables, functions, or classes defined in this script, indicating its limited scope and purpose.
+## Folders
+- **[schedulers](schedulers/README.md)**: Implements schedulers, scheduling contexts, and interfaces for managing execution and trigger states.
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

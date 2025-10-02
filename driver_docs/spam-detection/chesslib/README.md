@@ -3,16 +3,16 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Data structures, functions, and components for a C-based chess library with build and test instructions.
+Data structures, functions, implementations, and tests for chess, with build and version control files.
 
 ## Folders
-- **[include](include/README.md)**: Data structures and functions for chess board management, game play, and move handling.
-- **[src](src/README.md)**: Implements chess game components and tests for a C-based chess implementation.
+- **[include](include/README.md)**: Data structures and functions for chess board management, game play, move handling, and piece operations.
+- **[src](src/README.md)**: Chess board and game implementations, move handling, and tests for chess functionalities.
 
 ## Files
-- **[.gitignore](.gitignore.md)**: Specifies files and directories to ignore in version control, including executables and build artifacts.
+- **[.gitignore](.gitignore.md)**: Specifies ignored files for version control, including executables, object files, and debug files.
 - **[LICENSE](LICENSE.md)**: MIT License for the software, permitting use, distribution, and modification with conditions.
-- **[Makefile](Makefile.md)**: Makefile for building a C-based chess library and test executable with platform-independent settings.
+- **[Makefile](Makefile.md)**: Makefile for building a C-based chess library and tests with platform-independent settings.
 - **[README.md](README.md.md)**: Instructions for building and testing a C-based chess library with example code and future plans.
 
 ---

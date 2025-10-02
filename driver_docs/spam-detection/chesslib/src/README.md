@@ -3,14 +3,14 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements chess game components and tests for a C-based chess implementation.
+Chess board and game implementations, move handling, and tests for chess functionalities.
 
 ## Folders
-- **[chesslib](chesslib/README.md)**: Implements chess game components including board, move, piece, and square management functions.
+- **[chesslib](chesslib/README.md)**: Chess board and game implementations, move and piece handling, and data structures for boards, moves, and squares.
 
 ## Files
-- **[tests.c](tests.c.md)**: Tests for a C-based chess implementation, covering board setup, move generation, and special rules.
-- **[tests.h](tests.h.md)**: Testing functions for various components of a Chess implementation in C, including moves and board states.
+- **[tests.c](tests.c.md)**: Tests for various chess functionalities, including move generation, board state validation, and special rules like castling and en passant.
+- **[tests.h](tests.h.md)**: Testing functions for various chess components, including moves, boards, and FEN generation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
