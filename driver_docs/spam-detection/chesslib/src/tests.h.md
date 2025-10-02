@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Testing functions for various components of a Chess implementation in C, including moves and board states.
+Testing functions for various chess components, including moves, boards, and FEN generation.
 
 # Purpose
-This header file defines function prototypes for testing various components of a Chess implementation in C. It includes functions to test the creation and manipulation of chess squares, moves, move lists, and boards. The file also contains functions to validate specific chess rules, such as checking if a square is attacked or if a board position is in check. Additionally, it provides functions to test the generation of moves, including special moves like castling, and the conversion of board states to and from the FEN (Forsyth-Edwards Notation) format. The [`failTest`](<#failtest>) function is used to fail a test and halt the program, optionally displaying a message.
+This code is a C header file that defines function prototypes for testing various components of a chess implementation. It includes functions to test different aspects of the chess game, such as square operations, move creation and validation, move lists, board setup and comparison, and piece-specific move generation. The file also contains functions to test the detection of square attacks, check conditions, move playing, full move generation, FEN (Forsyth-Edwards Notation) generation, and draw conditions due to insufficient material. The [`failTest`](<#failtest>) function is used to fail a test and halt the program, optionally displaying a message. This header file is intended to be included in a test suite to ensure the correctness of the chess implementation.
 # Function Declarations (Public API)
 
 ---
@@ -14,9 +14,9 @@ This header file defines function prototypes for testing various components of a
 [View Source →](<../../../../chesslib/src/tests.h#L9>)
 
 Fails the current test and stops the program.
-- **Description**: Use this function to indicate a test failure and terminate the program immediately. It is useful in test scenarios where continuing execution after a failure is not desired. The function can optionally take a message to provide additional context about the failure. If the message is `NULL`, only the test name is printed. This function does not return, as it calls `exit(1)` to stop the program.
+- **Description**: Use this function to indicate a test failure and terminate the program immediately. It is useful in test scenarios where continuing execution after a failure is not desired. The function can output an optional message to provide additional context about the failure. If no message is provided, it will only indicate the test name.
 - **Inputs**:
-    - `msg`: A pointer to a null-terminated string that contains a message to display with the failure notice. If `NULL`, no additional message is displayed. The caller retains ownership of the string.
+    - `msg`: A pointer to a null-terminated string that contains an optional message to display with the failure notice. If `msg` is `NULL`, the function will not include a message in the output. The caller retains ownership of the string.
 - **Output**: None
 - **See Also**: [`failTest`](<tests.c.md#failtest>)  (Implementation)
 
@@ -25,11 +25,11 @@ Fails the current test and stops the program.
 ### validateString<!-- {{#callable_declaration:validateString}} -->
 [View Source →](<../../../../chesslib/src/tests.h#L10>)
 
-Compares two strings and fails the test if they are not equal.
-- **Description**: Use this function to compare two strings during a test. If the strings are not equal, the function calls `failTest` with a message indicating the actual and expected strings, and then halts the program. This function is useful for validating string outputs in test cases. Ensure that both input strings are valid, null-terminated C strings.
+Compares two strings and fails the test if they do not match.
+- **Description**: Use this function to compare two strings during a test. If the strings do not match, the function calls `failTest` with a message indicating the mismatch and halts the program. This function is useful for validating expected outcomes in test scenarios. Ensure that both input strings are null-terminated and valid. The function does not return control to the caller if the strings differ, as `failTest` will terminate the program.
 - **Inputs**:
-    - `actual`: The string to compare against the expected value. Must be a valid, null-terminated C string. Caller retains ownership.
-    - `expected`: The string that represents the expected value. Must be a valid, null-terminated C string. Caller retains ownership.
+    - `actual`: A pointer to the actual string to compare. Must be a valid, null-terminated string. Caller retains ownership.
+    - `expected`: A pointer to the expected string to compare against. Must be a valid, null-terminated string. Caller retains ownership.
 - **Output**: None
 - **See Also**: [`validateString`](<tests.c.md#validatestring>)  (Implementation)
 
@@ -39,7 +39,7 @@ Compares two strings and fails the test if they are not equal.
 [View Source →](<../../../../chesslib/src/tests.h#L13>)
 
 Tests the square indexing function for correctness.
-- **Description**: Use this function to verify that the square indexing function `sqI` correctly maps file and rank values to a square structure. It iterates over all possible file and rank combinations on a chessboard, checks if the `sqI` function returns the expected square, and calls `failTest` if there is a discrepancy. This function is useful for validating the integrity of the square indexing logic in a chess implementation.
+- **Description**: Use this function to verify that the square indexing function `sqI` correctly maps file and rank values to a square structure. It iterates over all possible file and rank combinations on a chessboard, checks if the `sqI` function returns the expected square, and calls `failTest` if there is a discrepancy. This function is useful for ensuring the integrity of the square indexing logic in a chess implementation.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testSqI`](<tests.c.md#testsqi>)  (Implementation)
@@ -49,8 +49,8 @@ Tests the square indexing function for correctness.
 ### testSqS<!-- {{#callable_declaration:testSqS}} -->
 [View Source →](<../../../../chesslib/src/tests.h#L14>)
 
-Tests the conversion of chess board coordinates to square representation.
-- **Description**: Use this function to verify that the conversion from chess board coordinates (file and rank) to a square representation is correct. It iterates over all possible squares on a standard 8x8 chess board, converts each coordinate to a square, and checks if the conversion is accurate. If a discrepancy is found, it calls `failTest` with a descriptive message. This function is useful for ensuring the integrity of square conversion logic in a chess application.
+Tests the conversion of chess square strings to square objects.
+- **Description**: Use this function to verify that the conversion from chess square notation (e.g., "a1", "h8") to square objects is correct. It iterates over all possible squares on a chessboard, converts each square's string representation to a square object, and checks if the resulting object has the expected file and rank. If a mismatch occurs, the function calls `failTest` with a descriptive error message. This function is useful for ensuring the integrity of square conversion logic in a chess application.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testSqS`](<tests.c.md#testsqs>)  (Implementation)
@@ -61,7 +61,7 @@ Tests the conversion of chess board coordinates to square representation.
 [View Source →](<../../../../chesslib/src/tests.h#L15>)
 
 Validates the string representation of chessboard squares.
-- **Description**: Use this function to verify that the string representation of each square on a chessboard matches the expected format. It iterates over all possible squares, generates their string representation, and compares it to the expected value. This function is useful for testing the correctness of square-to-string conversion functions in a chess implementation. It must be called in a test environment where the `validateString` function is available to compare actual and expected strings.
+- **Description**: Use this function to verify that the string representation of each square on a chessboard matches the expected format. It iterates over all possible squares, generates their string representation, and compares it to the expected value. This function is useful for testing the correctness of square-to-string conversion functions in a chess implementation. Ensure that the necessary square and string validation functions are available before calling this function.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testSqGetStr`](<tests.c.md#testsqgetstr>)  (Implementation)
@@ -94,7 +94,7 @@ Tests the creation and validation of chess moves.
 [View Source →](<../../../../chesslib/src/tests.h#L20>)
 
 Tests the conversion of UCI strings to move objects.
-- **Description**: Use this function to verify that the conversion from UCI (Universal Chess Interface) strings to move objects works correctly. It checks if the moves generated from UCI strings match expected start and end squares and the piece type involved. This function is part of a test suite and is intended to validate the correctness of move creation from UCI strings. It is typically used during development to ensure that the move conversion logic is functioning as expected.
+- **Description**: Use this function to verify that the conversion from UCI (Universal Chess Interface) strings to move objects works correctly. It checks if the moves generated from UCI strings match expected start and end squares and the promotion type. This function is part of a test suite and is intended to be used in a testing context to ensure the correctness of move conversion logic.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testMoveFromUci`](<tests.c.md#testmovefromuci>)  (Implementation)
@@ -105,7 +105,7 @@ Tests the conversion of UCI strings to move objects.
 [View Source →](<../../../../chesslib/src/tests.h#L21>)
 
 Tests the conversion of chess moves to UCI format.
-- **Description**: Use this function to verify that the conversion of chess moves to the Universal Chess Interface (UCI) format is correct. It checks specific move scenarios and compares the UCI string output against expected values. This function is part of a suite of tests for a chess implementation and should be used in a testing context to ensure the correctness of move-to-UCI conversions.
+- **Description**: Use this function to verify that the conversion of chess moves to the Universal Chess Interface (UCI) format is correct. It checks specific move scenarios and compares the UCI output against expected values. This function is part of a suite of tests for a chess implementation and is intended to ensure that the move conversion logic works as expected. It is typically used during development to validate changes to the move conversion functionality.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testMoveGetUci`](<tests.c.md#testmovegetuci>)  (Implementation)
@@ -116,7 +116,7 @@ Tests the conversion of chess moves to UCI format.
 [View Source →](<../../../../chesslib/src/tests.h#L24>)
 
 Tests the functionality of move list operations.
-- **Description**: Use this function to verify that move list operations, such as creation, addition, retrieval, and conversion to UCI format, work as expected. It creates a move list, adds moves to it, retrieves them, and checks their UCI string representation against expected values. If any discrepancies occur, it calls `failTest` to halt the test with an error message. This function is useful for ensuring the correctness of move list handling in a chess application.
+- **Description**: Use this function to verify that move list operations, such as creation, addition, retrieval, and conversion to UCI format, work as expected. It creates a move list, adds moves to it, retrieves them, and checks their UCI string representation against expected values. If any discrepancies occur, it calls `failTest` to halt the program with an error message. This function is useful for ensuring the correctness of move list handling in a chess application.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testMoveList`](<tests.c.md#testmovelist>)  (Implementation)
@@ -126,8 +126,8 @@ Tests the functionality of move list operations.
 ### testBoardCreate<!-- {{#callable_declaration:testBoardCreate}} -->
 [View Source →](<../../../../chesslib/src/tests.h#L27>)
 
-Tests the creation of a chess board.
-- **Description**: Use this function to verify that a newly created chess board is initialized correctly. It checks that all pieces are in their starting positions, the current player is set to white, all castling rights are enabled, the en passant target square is invalid, the half-move clock is zero, and the move number is set to one. This function is useful for ensuring that the board setup logic is correct and should be called during testing to validate board initialization.
+Verifies the initial state of a newly created chess board.
+- **Description**: Use this function to confirm that a newly created chess board is initialized correctly. It checks that all pieces are in their starting positions, the current player is set to white, all castling rights are enabled, the en passant target square is invalid, the half-move clock is zero, and the move number is one. This function is useful for validating the board creation logic in a chess application. It is intended for use in a testing environment and will halt the program if any condition fails.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testBoardCreate`](<tests.c.md#testboardcreate>)  (Implementation)
@@ -138,7 +138,7 @@ Tests the creation of a chess board.
 [View Source →](<../../../../chesslib/src/tests.h#L28>)
 
 Tests board creation from a FEN string.
-- **Description**: Use this function to verify that a chess board is correctly created from a given FEN string. It checks that the board's pieces, current player, castling rights, en passant target square, half-move clock, and full move number match the expected values. This function is part of a test suite and will halt the program if the board does not meet the expected conditions.
+- **Description**: Use this function to verify that a chess board is correctly created from a given FEN string. It checks that the board state, including piece positions, current player, castling rights, en passant target square, half-move clock, and full move number, matches the expected values. This function is part of a test suite and will halt the program if the board does not match the expected state.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testBoardCreateFromFen`](<tests.c.md#testboardcreatefromfen>)  (Implementation)
@@ -149,7 +149,7 @@ Tests board creation from a FEN string.
 [View Source →](<../../../../chesslib/src/tests.h#L29>)
 
 Fails the test for board equality.
-- **Description**: Use this function to test if two chess boards are equal. It is part of a suite of test functions for a chess implementation. The function currently fails the test and halts the program with a message indicating it is not yet implemented. This function is intended for use in a testing environment and should be called when you need to verify board equality as part of a test case.
+- **Description**: Use this function to test if two chess boards are equal. It is part of a suite of test functions for a chess implementation. This function currently fails the test and halts the program with a message indicating it is not yet implemented. It is intended for use in a testing environment where board equality needs verification.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testBoardEq`](<tests.c.md#testboardeq>)  (Implementation)
@@ -159,8 +159,8 @@ Fails the test for board equality.
 ### testPawnMoves<!-- {{#callable_declaration:testPawnMoves}} -->
 [View Source →](<../../../../chesslib/src/tests.h#L32>)
 
-Tests the pawn move generation logic in a chess game.
-- **Description**: Use this function to verify that the pawn move generation logic in a chess game implementation works correctly. It tests various scenarios including pawns on their starting rank, capturing moves, blocked pawns, promotion opportunities, and en passant captures. This function is part of a test suite and is intended to validate the correctness of pawn move generation by comparing expected moves with actual generated moves. It must be used in a controlled test environment where the board state can be set and manipulated as needed.
+Verify the correctness of pawn move generation in various scenarios.
+- **Description**: Use this function to test the pawn move generation logic in a chess program. It checks different scenarios such as a lone pawn on its starting rank, pawns with capture opportunities, blocked pawns, pawns about to promote, and en passant captures. This function is useful for ensuring that the pawn move generation logic handles all these cases correctly. It is intended for use in a testing environment and will halt the program if any test fails.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testPawnMoves`](<tests.c.md#testpawnmoves>)  (Implementation)
@@ -171,7 +171,7 @@ Tests the pawn move generation logic in a chess game.
 [View Source →](<../../../../chesslib/src/tests.h#L33>)
 
 Tests the generation of knight moves on a chessboard.
-- **Description**: Use this function to verify that the move generation logic for knights on a chessboard is correct. It sets up different board scenarios with knights in various positions and checks if the generated moves match the expected legal moves. This function is useful for testing the correctness of knight move generation in a chess engine. It does not take any parameters and does not return a value. Ensure that the chessboard and move generation functions are correctly implemented before using this function.
+- **Description**: Use this function to verify that the move generation logic for knights on a chessboard is correct. It sets up different board scenarios with knights in various positions and checks if the generated moves match the expected legal moves. This function is useful for testing the accuracy of knight move generation in a chess engine. It must be called in a test environment where the board and move list structures are properly initialized and managed.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testKnightMoves`](<tests.c.md#testknightmoves>)  (Implementation)
@@ -181,8 +181,8 @@ Tests the generation of knight moves on a chessboard.
 ### testBishopMoves<!-- {{#callable_declaration:testBishopMoves}} -->
 [View Source →](<../../../../chesslib/src/tests.h#L34>)
 
-Tests the move generation for bishops on a chessboard.
-- **Description**: Use this function to verify that the move generation logic for bishops on a chessboard is correct. It tests scenarios with a lone bishop and a bishop with potential blocking pieces and captures. This function is part of a test suite and is intended to validate the correctness of bishop move generation by checking the expected moves against the generated move list. It is typically used during development to ensure that changes to the move generation logic do not introduce errors.
+Validates bishop move generation in chess.
+- **Description**: Use this function to verify that the move generation logic for bishops in a chess game is correct. It tests scenarios with a lone bishop and a bishop with potential blocks and captures. The function checks if the generated moves match expected outcomes, ensuring the move generation algorithm works as intended. This function is part of a test suite and should be used in a testing environment where the chess board and move list are properly initialized and managed.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testBishopMoves`](<tests.c.md#testbishopmoves>)  (Implementation)
@@ -192,8 +192,8 @@ Tests the move generation for bishops on a chessboard.
 ### testRookMoves<!-- {{#callable_declaration:testRookMoves}} -->
 [View Source →](<../../../../chesslib/src/tests.h#L35>)
 
-Tests the move generation for rooks on a chessboard.
-- **Description**: Use this function to verify that the move generation logic for rooks on a chessboard is correct. It sets up specific board positions and checks if the generated moves for rooks match the expected outcomes. This function is part of a test suite and should be used in a testing environment to ensure the correctness of rook move generation. It does not return a value but will halt the program if a test fails, indicating an error in the move generation logic.
+Tests rook move generation on a chess board.
+- **Description**: Use this function to verify that the move generation logic for rooks on a chess board is correct. It sets up specific board positions and checks if the generated moves for rooks match the expected outcomes. This function is useful for validating the correctness of rook move generation in a chess engine. It must be used in a testing environment where the program can halt on failure.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testRookMoves`](<tests.c.md#testrookmoves>)  (Implementation)
@@ -204,7 +204,7 @@ Tests the move generation for rooks on a chessboard.
 [View Source →](<../../../../chesslib/src/tests.h#L36>)
 
 Tests the move generation for a queen on a chessboard.
-- **Description**: Use this function to verify that the move generation logic for a queen on a chessboard is correct. It sets up specific board positions and checks if the generated moves for a queen match the expected moves. This function is part of a test suite and should be used in a testing environment to ensure the correctness of queen move generation. It does not return a value but will halt the program if a test fails.
+- **Description**: Use this function to verify that the move generation logic for a queen on a chessboard is correct. It sets up specific board positions and checks if the generated moves for a queen match the expected moves. This function is useful for validating the correctness of the queen's move generation in a chess engine. It must be called in a test environment where the board and move list structures are properly initialized and managed.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testQueenMoves`](<tests.c.md#testqueenmoves>)  (Implementation)
@@ -215,7 +215,7 @@ Tests the move generation for a queen on a chessboard.
 [View Source →](<../../../../chesslib/src/tests.h#L37>)
 
 Tests the generation of king moves on a chessboard.
-- **Description**: Use this function to verify that the move generation for a king piece on a chessboard is correct. It checks various scenarios, including a lone king, a king in a corner, and a king surrounded by other pieces. The function does not consider whether the king's moves place it in check, so it is important to use it in contexts where move legality is not a concern. This function is useful for testing purposes in a chess engine or similar application.
+- **Description**: Use this function to verify that the move generation for a king piece on a chessboard is correct. It checks various scenarios, including a lone king, a king in a corner, and a king surrounded by other pieces. The function does not consider whether the king's moves place it in check, so it is important to use it in contexts where move legality is not a concern. This function is useful for testing the correctness of king move generation logic in a chess engine.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testKingMoves`](<tests.c.md#testkingmoves>)  (Implementation)
@@ -226,7 +226,7 @@ Tests the generation of king moves on a chessboard.
 [View Source →](<../../../../chesslib/src/tests.h#L40>)
 
 Tests if squares on a chess board are correctly identified as attacked.
-- **Description**: Use this function to verify that the `boardIsSquareAttacked` function correctly identifies attacked squares on a chess board. It sets up various board configurations and checks if the function's output matches expected results. This function is useful for validating the accuracy of square attack detection logic in a chess program. It must be used in a testing environment where the `failTest` function can handle test failures.
+- **Description**: Use this function to verify that the `boardIsSquareAttacked` function correctly identifies attacked squares on a chess board. It sets up various board positions and checks if the function's output matches expected results. This function is useful for validating the accuracy of square attack detection logic in a chess engine. It must be called in a test environment where the `failTest` function can handle test failures.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testIsSquareAttacked`](<tests.c.md#testissquareattacked>)  (Implementation)
@@ -237,7 +237,7 @@ Tests if squares on a chess board are correctly identified as attacked.
 [View Source →](<../../../../chesslib/src/tests.h#L41>)
 
 Tests if a chess board is in check.
-- **Description**: Use this function to verify that the `boardIsInCheck` and `boardIsPlayerInCheck` functions correctly identify when a chess board is in check. It sets up specific board configurations and checks the expected outcomes. This function is part of a test suite and should be used in a testing context to ensure the correctness of check detection logic. It does not return a value but will halt the program if a test fails, using `failTest` to report the failure.
+- **Description**: Use this function to verify if the current implementation correctly identifies when a chess board is in check. It sets up specific board configurations and checks if the function `boardIsInCheck` correctly identifies the check status. This function is useful for validating the correctness of the check detection logic in a chess program. It must be used in a test environment where the `failTest` function is available to handle test failures.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testIsInCheck`](<tests.c.md#testisincheck>)  (Implementation)
@@ -258,8 +258,8 @@ Tests the functionality of playing moves on a chess board.
 ### testBoardGenerateMoves<!-- {{#callable_declaration:testBoardGenerateMoves}} -->
 [View Source →](<../../../../chesslib/src/tests.h#L47>)
 
-Tests the generation of all possible moves on a chess board.
-- **Description**: Use this function to verify that the move generation logic for a chess board is correct. It tests various board states, including the initial position, positions with some moves played, and special cases like pinned pieces and checks. This function is part of a test suite and is intended to validate the correctness of move generation by comparing expected and actual move lists. It does not return a value or modify any input parameters.
+Tests the move generation functionality of a chess board.
+- **Description**: Use this function to verify that the move generation logic for a chess board is correct. It initializes various board states and checks if the generated moves match expected results. This function is useful for validating the correctness of move generation in different scenarios, including initial positions, positions with fewer pieces, and positions with pinned pieces or checks. It is a test function and should be used in a testing environment to ensure the move generation logic works as intended.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testBoardGenerateMoves`](<tests.c.md#testboardgeneratemoves>)  (Implementation)
@@ -269,8 +269,8 @@ Tests the generation of all possible moves on a chess board.
 ### testBoardGenerateMovesCastling<!-- {{#callable_declaration:testBoardGenerateMovesCastling}} -->
 [View Source →](<../../../../chesslib/src/tests.h#L48>)
 
-Tests castling move generation on a chess board.
-- **Description**: Use this function to verify that castling moves are correctly generated under various board conditions. It checks both kingside and queenside castling for both players, ensuring that moves are only generated when legal. This includes scenarios where the king is in check, squares are attacked, or castling rights are removed. Call this function to validate the correctness of castling move generation in a chess implementation.
+Tests castling move generation in chess.
+- **Description**: Use this function to verify that the chess move generation logic correctly includes or excludes castling moves based on the current board state. It tests various scenarios where castling is allowed or disallowed, such as when the king is in check, when squares between the king and rook are attacked, and when castling rights have been removed. This function is part of a test suite and is intended to validate the correctness of the move generation logic for castling in a chess game.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testBoardGenerateMovesCastling`](<tests.c.md#testboardgeneratemovescastling>)  (Implementation)
@@ -280,8 +280,8 @@ Tests castling move generation on a chess board.
 ### testBoardGetFen<!-- {{#callable_declaration:testBoardGetFen}} -->
 [View Source →](<../../../../chesslib/src/tests.h#L51>)
 
-Tests the FEN string validation for various chess board states.
-- **Description**: Use this function to verify that the `validateBoardFen` function correctly validates FEN strings for different chess board scenarios. This function is useful for testing the accuracy of FEN string parsing and validation in a chess application. It does not return a value or modify any input, but it will halt the program if a test fails, indicating an issue with FEN validation.
+Validates FEN strings for various chess board setups.
+- **Description**: Use this function to test the validation of Forsyth-Edwards Notation (FEN) strings for different chess board configurations. It checks the correctness of FEN strings by calling `validateBoardFen` with predefined FEN strings representing initial positions and specific chess scenarios like Fool's mate and Scholar's mate. This function is useful for ensuring that FEN string validation logic works correctly across different board states.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testBoardGetFen`](<tests.c.md#testboardgetfen>)  (Implementation)
@@ -292,7 +292,7 @@ Tests the FEN string validation for various chess board states.
 [View Source →](<../../../../chesslib/src/tests.h#L54>)
 
 Tests if a chess board position results in a draw due to insufficient material.
-- **Description**: Use this function to verify that a chess board position is correctly identified as a draw due to insufficient material. It tests various board configurations to ensure that the logic for detecting insufficient material is accurate. This function is part of a test suite and is intended to validate the behavior of the chess implementation. It must be used in a testing environment where the program can halt upon failure.
+- **Description**: Use this function to verify that a chess board position is correctly identified as a draw by insufficient material. This function is part of a test suite and checks various board configurations to ensure that the logic for detecting insufficient material is accurate. It is intended for use in a testing environment to validate the correctness of the chess implementation.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testBoardIsInsufficientMaterial`](<tests.c.md#testboardisinsufficientmaterial>)  (Implementation)
@@ -303,7 +303,7 @@ Tests if a chess board position results in a draw due to insufficient material.
 [View Source →](<../../../../chesslib/src/tests.h#L57>)
 
 Tests the functionality of board list operations.
-- **Description**: Use this function to verify that board list operations, such as creation, addition, retrieval, and freeing, work as expected. It creates a list of boards, adds boards to the list, retrieves them to check for correctness, and finally frees the list. This function is useful for ensuring that the board list implementation correctly handles these operations without errors.
+- **Description**: Use this function to verify that board list operations, such as creation, addition, retrieval, and freeing, work as expected. It creates a list of chess boards, adds boards to the list, retrieves them to ensure correct order, and finally frees the list. This function is useful for testing the integrity of board list management in a chess application.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testBoardList`](<tests.c.md#testboardlist>)  (Implementation)
@@ -313,8 +313,8 @@ Tests the functionality of board list operations.
 ### testSqSetSet<!-- {{#callable_declaration:testSqSetSet}} -->
 [View Source →](<../../../../chesslib/src/tests.h#L60>)
 
-Tests the functionality of setting squares in a bitboard.
-- **Description**: Use this function to verify that the `sqSetSet` function correctly sets specific squares on a bitboard. It initializes a bitboard and sets various squares, checking if the expected bitboard state matches the actual state after each operation. If a mismatch occurs, it calls `failTest` to indicate the failure. This function is useful for ensuring the correctness of square setting operations in a chess bitboard implementation.
+Tests the functionality of setting squares in a square set.
+- **Description**: Use this function to verify that the `sqSetSet` function correctly sets specific squares in a square set. It initializes a square set and performs a series of operations to set specific squares. If any operation does not produce the expected result, it calls `failTest` to indicate failure. This function is useful for ensuring the correctness of square setting operations in a chess implementation.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testSqSetSet`](<tests.c.md#testsqsetset>)  (Implementation)
@@ -324,8 +324,8 @@ Tests the functionality of setting squares in a bitboard.
 ### testSqSetGet<!-- {{#callable_declaration:testSqSetGet}} -->
 [View Source →](<../../../../chesslib/src/tests.h#L61>)
 
-Tests the retrieval of square set values in a chessboard context.
-- **Description**: Use this function to verify that the `sqSetGet` function correctly retrieves values from a square set representation of a chessboard. It checks specific patterns on the board, such as the diagonal from a1 to h8 and specific files and ranks, to ensure that the function returns expected results. This function is useful for validating the correctness of square set operations in a chess implementation.
+Tests the retrieval of square set values.
+- **Description**: Use this function to verify that the `sqSetGet` function correctly retrieves values from a square set. It checks specific patterns on a chessboard, such as the diagonal from a1 to h8 and specific files and ranks, to ensure the function's accuracy. This function is useful for validating the correctness of square set operations in a chess implementation.
 - **Inputs**: None
 - **Output**: None
 - **See Also**: [`testSqSetGet`](<tests.c.md#testsqsetget>)  (Implementation)

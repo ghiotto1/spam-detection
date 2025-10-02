@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Data structures and functions for a C-based chess library, dummy Python scripts, and memory management in C.
+Data structures and functions for chess, dummy Python scripts, and memory allocation functions.
 
 ## Folders
-- **[chesslib](chesslib/README.md)**: Data structures, functions, and components for a C-based chess library with build and test instructions.
+- **[chesslib](chesslib/README.md)**: Data structures, functions, implementations, and tests for chess, with build and version control files.
 
 ## Files
 - **[dummy1.py](dummy1.py.md)**: Prints "new file".
@@ -14,8 +14,7 @@ Data structures and functions for a C-based chess library, dummy Python scripts,
 - **[dummy3.py](dummy3.py.md)**: Prints 'new file'.
 - **[dummy5.py](dummy5.py.md)**: Prints "added a new file".
 - **[dummy6.py](dummy6.py.md)**: Prints "A sixth new file".
-- **[dummy7.py](dummy7.py.md)**: Prints the message "more new files".
-- **[xmalloc.c](xmalloc.c.md)**: Memory allocation and string manipulation functions that check results and handle errors.
+- **[xmalloc.c](xmalloc.c.md)**: Memory allocation and string manipulation functions that check for errors and call fatalx on failure.
 - **[xmalloc.h](xmalloc.h.md)**: Memory allocation functions that check results and call fatal on error.
 
 ---

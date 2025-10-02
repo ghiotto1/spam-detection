@@ -6,7 +6,7 @@
 Prints "A sixth new file".
 
 # Purpose
-This code is a simple script that outputs the string "A sixth new file" to the standard output. It provides narrow functionality, serving primarily as a demonstration or placeholder for printing a specific message. There are no variables, functions, or classes defined in this script, indicating its limited scope and purpose.
+This code is a simple script that outputs the string "A sixth new file" to the standard output. It provides narrow functionality, as it only performs a single print operation. This type of code is typically used for testing, demonstration, or logging purposes to confirm that a specific part of a program is executing.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
