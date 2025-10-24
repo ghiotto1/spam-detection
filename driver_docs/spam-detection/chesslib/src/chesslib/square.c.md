@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for creating and manipulating chessboard squares using file and rank or SAN notation.
+Functions for creating and manipulating chessboard squares, including validation and string conversion.
 
 # Purpose
-The code provides functionality for handling chessboard squares within a chess library. It defines several functions to create and manipulate chessboard squares, which are represented by the `sq` data type. The functions include [`sqI`](<#sqi>) for creating a square from file and rank integers, [`sqS`](<#sqs>) for creating a square from a Standard Algebraic Notation (SAN) string, and [`sqIndex`](<#sqindex>) for creating a square from an index. The code also includes utility functions such as [`sqGetIndex`](<#sqgetindex>) to get the index of a square, [`sqGetStr`](<#sqgetstr>) to get the SAN string representation of a square, [`sqIsDark`](<#sqisdark>) to determine if a square is dark-colored, and [`sqEq`](<#sqeq>) to check if two squares are equal.
+This code provides functionality for handling chessboard squares in a chess library. It defines several functions to create and manipulate chessboard square representations. The [`sqI`](<#sqi>) function creates a square from two integers representing the file and rank, while the [`sqS`](<#sqs>) function creates a square from a string in Standard Algebraic Notation (SAN), such as "e4". The code also includes a constant array `SQ_STRS` that holds SAN strings for all 64 squares on a chessboard.
 
-The code uses a constant array `SQ_STRS` to map indices to SAN strings for all 64 squares on a chessboard. The functions ensure that the file and rank values are within valid ranges (1 to 8) and return `SQ_INVALID` for invalid inputs. The code is part of a larger chess library, as indicated by the inclusion of the header file `chesslib/square.h`, and it is intended to be used as a utility for managing chessboard positions in a chess application.
+Additional functions include [`sqIndex`](<#sqindex>), which creates a square from an index, and [`sqGetIndex`](<#sqgetindex>), which returns the index of a given square. The [`sqGetStr`](<#sqgetstr>) function returns the SAN string for a given square, and [`sqIsDark`](<#sqisdark>) determines if a square is dark-colored. The [`sqEq`](<#sqeq>) function checks if two squares are equal. The code uses a structure `sq` to represent squares and includes error handling to return `SQ_INVALID` for invalid inputs. This file is part of a larger chess library, as indicated by the inclusion of the header file `chesslib/square.h`.
 # Imports and Dependencies
 
 ---
@@ -20,8 +20,8 @@ The code uses a constant array `SQ_STRS` to map indices to SAN strings for all 6
 ---
 ### SQ\_STRS
 - **Type**: `const char *[64]`
-- **Description**: An array of 64 constant character pointers, each representing a square on a chessboard using standard algebraic notation (SAN). The array elements are strings like 'a1', 'b1', ..., 'h8', which correspond to the squares on a chessboard from the bottom-left to the top-right.
-- **Use**: Used to map an index to its corresponding chessboard square in SAN format.
+- **Description**: An array of 64 constant character pointers, each representing a square on a chessboard using standard algebraic notation (SAN). The array elements are strings like 'a1', 'b1', ..., 'h8', corresponding to the squares on a chessboard from the bottom-left to the top-right.
+- **Use**: Used to map an index to its corresponding square notation on a chessboard.
 
 
 # Functions
@@ -32,15 +32,15 @@ The code uses a constant array `SQ_STRS` to map indices to SAN strings for all 6
 
 Creates a chessboard square from given file and rank values.
 - **Inputs**:
-    - `file`: An unsigned 8-bit integer representing the file (column) of the square, expected to be between 1 and 8.
-    - `rank`: An unsigned 8-bit integer representing the rank (row) of the square, expected to be between 1 and 8.
+    - `file`: The file of the square, represented as an unsigned 8-bit integer, expected to be between 1 and 8.
+    - `rank`: The rank of the square, represented as an unsigned 8-bit integer, expected to be between 1 and 8.
 - **Logic and Control Flow**:
     - Check if `file` is less than 1 or greater than 8, or if `rank` is less than 1 or greater than 8.
     - If any of the above conditions are true, return `SQ_INVALID`.
     - Create a variable `s` of type `sq`.
     - Assign `file` to `s.file` and `rank` to `s.rank`.
     - Return the square `s`.
-- **Output**: Returns a `sq` structure representing the square with the specified file and rank, or `SQ_INVALID` if the inputs are out of range.
+- **Output**: Returns a `sq` structure representing the square if the inputs are valid; otherwise, returns `SQ_INVALID`.
 
 
 ---
@@ -56,8 +56,8 @@ Converts a string representing a chess square in SAN format to a `sq` structure.
     - Get the second character of the string `str` and store it in `c2`.
     - Check if `c2` is outside the range '1' to '8'; if true, return `SQ_INVALID`.
     - Create a `sq` structure `s`.
-    - Set `s.file` to the integer value of `c1` minus 'a' plus 1.
-    - Set `s.rank` to the integer value of `c2` minus '0'.
+    - Set `s.file` to the numeric value of `c1` by subtracting 'a' and adding 1.
+    - Set `s.rank` to the numeric value of `c2` by subtracting '0'.
     - Return the `sq` structure `s`.
 - **Output**: A `sq` structure representing the file and rank of the chess square, or `SQ_INVALID` if the input is not valid.
 
@@ -88,7 +88,7 @@ Calculates the zero-based index of a chessboard square from its file and rank.
     - `s`: A structure representing a square on a chessboard, with `file` and `rank` attributes.
 - **Logic and Control Flow**:
     - Check if `s.file` is less than 1 or greater than 8, or if `s.rank` is less than 1 or greater than 8.
-    - If any of the above conditions are true, return -1 indicating an invalid square.
+    - If any of the above conditions are true, return -1 to indicate an invalid square.
     - Calculate the index using the formula `(8 * (s.rank - 1)) + (s.file - 1)` and return it.
 - **Output**: Returns a `uint8_t` representing the zero-based index of the square, or -1 if the square is invalid.
 
@@ -101,7 +101,7 @@ Retrieves the Standard Algebraic Notation (SAN) string for a given chess square.
 - **Inputs**:
     - `s`: A `sq` structure representing a chess square with `file` and `rank` attributes.
 - **Logic and Control Flow**:
-    - Call [`sqGetIndex`](<#sqgetindex>) with the input `sq` to get the index of the square.
+    - Call [`sqGetIndex`](<#sqgetindex>) with `s` to get the index of the square.
     - Check if the index is greater than 63; if true, return the string '##'.
     - If the index is valid (0 to 63), return the corresponding SAN string from the `SQ_STRS` array.
 - **Output**: A constant character pointer to the SAN string representing the square, or '##' if the index is invalid.
@@ -115,10 +115,10 @@ Retrieves the Standard Algebraic Notation (SAN) string for a given chess square.
 
 Determines if a given chessboard square is dark-colored.
 - **Inputs**:
-    - `s`: A `sq` structure representing a square on a chessboard, with `rank` and `file` attributes.
+    - `s`: A `sq` structure representing a square on the chessboard, with `rank` and `file` attributes.
 - **Logic and Control Flow**:
     - Calculate the parity of the `rank` and `file` attributes using bitwise AND with 1.
-    - Perform a bitwise XOR operation on the results of the parity calculations.
+    - Perform a bitwise XOR operation on the parities of `rank` and `file`.
     - Negate the result of the XOR operation to determine if the square is dark.
 - **Output**: Returns `1` if the square is dark-colored, otherwise returns `0`.
 
@@ -127,15 +127,15 @@ Determines if a given chessboard square is dark-colored.
 ### sqEq<!-- {{#callable:sqEq}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/square.c#L83>)
 
-Compares two chessboard squares for equality, considering invalid squares.
+Compares two chessboard squares for equality, marking invalid squares if out of bounds.
 - **Inputs**:
     - `s1`: The first square to compare, represented by a `sq` structure with `file` and `rank` attributes.
     - `s2`: The second square to compare, represented by a `sq` structure with `file` and `rank` attributes.
 - **Logic and Control Flow**:
-    - Check if `s1` is a valid square by verifying if its `file` and `rank` are within the range 1 to 8; if not, set `s1` to `SQ_INVALID`.
-    - Check if `s2` is a valid square by verifying if its `file` and `rank` are within the range 1 to 8; if not, set `s2` to `SQ_INVALID`.
-    - Return `true` (1) if both `s1` and `s2` have the same `file` and `rank` values, otherwise return `false` (0).
-- **Output**: Returns `1` if the squares are equal, otherwise returns `0`.
+    - Check if `s1` is out of bounds (file or rank not between 1 and 8); if so, set `s1` to `SQ_INVALID`.
+    - Check if `s2` is out of bounds (file or rank not between 1 and 8); if so, set `s2` to `SQ_INVALID`.
+    - Return the result of comparing the `file` and `rank` of `s1` and `s2` for equality.
+- **Output**: Returns `1` if both squares are equal (same file and rank), otherwise returns `0`.
 
 
 
