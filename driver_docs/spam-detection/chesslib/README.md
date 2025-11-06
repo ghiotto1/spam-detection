@@ -7,7 +7,7 @@ Data structures, functions, and components for a C-based chess library with buil
 
 ## Folders
 - **[include](include/README.md)**: Data structures and functions for chess board management, game play, and move handling.
-- **[src](src/README.md)**: Implements chess game components and tests for a C-based chess implementation.
+- **[src](src/README.md)**: Implements chess game components including board, move, piece, and square management functions.
 
 ## Files
 - **[.gitignore](.gitignore.md)**: Specifies files and directories to ignore in version control, including executables and build artifacts.
