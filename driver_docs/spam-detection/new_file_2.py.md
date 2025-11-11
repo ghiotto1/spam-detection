@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints 'new file'.
+Prints "making more files".
 
 # Purpose
-This code is a simple script that outputs the string `'new file'` to the standard output. It uses the `print` function to display the message. The script provides narrow functionality, serving primarily as a basic demonstration or placeholder for further development.
+This code is a simple script that outputs the string "making more files" to the standard output. It does not perform any other operations or provide additional functionality. The script is likely intended for demonstration or testing purposes, where the primary goal is to display a specific message.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
