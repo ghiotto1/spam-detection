@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Makefile for building a C-based chess library and test executable with platform-independent settings.
+Makefile for building a C-based chess library and tests with platform-independent settings.
 
 # Purpose
-The `Makefile` is used to automate the build process for a Chess implementation in C. It defines the compiler as `gcc` and sets the compiler flags to include all warnings. If the `DEBUG` variable is set to 1, it adds debugging information to the build; otherwise, it omits it. The file specifies source files located in `src/chesslib` and `src` directories, and it compiles them into object files. It creates a static library `libchesslib.a` and a test executable, with platform-specific naming for Windows. The `Makefile` includes targets for building the library, running tests, creating the `bin` directory, and cleaning up generated files.
+The `Makefile` is used to automate the build process for a Chess implementation in C. It defines the compiler as `gcc` and sets the compiler flags to include all warnings. If the `DEBUG` variable is set to 1, it adds debugging information to the compiler flags; otherwise, it disables debugging information. The file specifies source files located in `src/chesslib` and `src` directories, and it compiles these into object files, excluding the `src/tests.o` file from the main library build. The `Makefile` also handles platform-specific differences for executable naming, with separate targets for building the chess library and test executable. It includes rules for creating a `bin` directory, cleaning up compiled files, and running tests.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
