@@ -6,9 +6,9 @@
 Functions for creating, comparing, and converting chess moves to and from UCI strings.
 
 # Purpose
-The code is a C implementation for handling chess moves, specifically focusing on creating, comparing, and converting moves to and from the Universal Chess Interface (UCI) format. It includes functions to create a move with or without a promotion using [`moveSq`](<#movesq>) and [`movePromote`](<#movepromote>), respectively. The [`moveEq`](<#moveeq>) function checks if two moves are equivalent by comparing their starting and ending squares and any promotion involved. The [`moveGetUci`](<#movegetuci>) function converts a move into a UCI string, which is a standard notation for representing chess moves, and allocates memory for this string. Conversely, [`moveFromUci`](<#movefromuci>) parses a UCI string to create a move, interpreting the string to determine the starting and ending squares and any promotion piece.
+This code provides functionality for handling chess moves within a chess application. It includes functions to create and manipulate chess moves, specifically focusing on the representation and conversion of moves to and from the Universal Chess Interface (UCI) format. The code defines several functions: [`moveSq`](<#movesq>) and [`movePromote`](<#movepromote>) for creating moves, [`moveEq`](<#moveeq>) for comparing two moves, [`moveGetUci`](<#movegetuci>) for converting a move to a UCI string, and [`moveFromUci`](<#movefromuci>) for creating a move from a UCI string. The `move` structure is used to represent a chess move, including the starting and ending squares and any promotion piece type.
 
-The code relies on external components, such as the `chesslib/move.h` header, and functions like `sqEq`, `sqGetStr`, and `sqS`, which are likely defined elsewhere to handle square operations. The `pieceTypeGetLetter` function is used to get the character representation of a promotion piece. The code does not include error checking for the UCI string parsing, which is noted in the comments. This module is part of a broader chess library, providing specific functionality for move operations within a chess game.
+The code is part of a larger library, as indicated by the inclusion of the header file `chesslib/move.h`. It does not define a public API but provides utility functions that can be used by other parts of the chess application to handle move-related operations. The functions handle both standard moves and moves involving piece promotion, and they support conversion to and from the UCI format, which is a standard notation for recording chess moves. The code assumes the existence of other functions and types, such as `sqEq`, `sqGetStr`, and `pieceTypeGetLetter`, which are likely defined elsewhere in the chess library.
 # Imports and Dependencies
 
 ---
@@ -58,16 +58,16 @@ Creates a `move` structure with specified starting and ending squares and a prom
 ### moveEq<!-- {{#callable:moveEq}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/move.c#L28>)
 
-Compares two chess moves to determine if they are identical in terms of starting square, ending square, and promotion piece.
+Compares two `move` structures to determine if they are equal based on their `from`, `to`, and `promotion` fields.
 - **Inputs**:
-    - `m1`: The first move to compare, represented as a `move` structure.
-    - `m2`: The second move to compare, represented as a `move` structure.
+    - `m1`: The first `move` structure to compare.
+    - `m2`: The second `move` structure to compare.
 - **Logic and Control Flow**:
-    - Calls [`sqEq`](<square.c.md#sqeq>) to compare the `from` squares of `m1` and `m2` for equality.
-    - Calls [`sqEq`](<square.c.md#sqeq>) to compare the `to` squares of `m1` and `m2` for equality.
+    - Calls [`sqEq`](<square.c.md#sqeq>) to compare the `from` fields of `m1` and `m2` for equality.
+    - Calls [`sqEq`](<square.c.md#sqeq>) to compare the `to` fields of `m1` and `m2` for equality.
     - Checks if the `promotion` fields of `m1` and `m2` are equal.
-    - Returns the logical AND of the three comparisons to indicate if the moves are identical.
-- **Output**: Returns a `uint8_t` value of 1 if the moves are identical, otherwise returns 0.
+    - Returns the logical AND of the three comparisons.
+- **Output**: Returns `1` (true) if all compared fields are equal, otherwise returns `0` (false).
 - **Functions Called**:
     - [`sqEq`](<square.c.md#sqeq>)
 
@@ -78,13 +78,12 @@ Compares two chess moves to determine if they are identical in terms of starting
 
 Converts a chess move into its UCI (Universal Chess Interface) string representation.
 - **Inputs**:
-    - `m`: A `move` structure containing the starting square (`from`), ending square (`to`), and optional promotion piece (`promotion`).
+    - `m`: A `move` structure containing the source square, destination square, and optional promotion piece type.
 - **Logic and Control Flow**:
     - Initialize a character array `p` with two elements set to 0.
-    - Check if the move has a promotion piece.
-    - If there is a promotion, convert the promotion piece to a lowercase letter and store it in `p[0]`, then allocate memory for a 6-character string.
-    - If there is no promotion, allocate memory for a 5-character string.
-    - Use `sprintf` to format the move into the UCI string format, combining the string representations of the `from` and `to` squares with the promotion piece if applicable.
+    - Check if the move has a promotion piece; if so, convert the promotion piece type to a lowercase letter and store it in `p[0]`.
+    - Allocate memory for the UCI string: 6 characters if there is a promotion, otherwise 5 characters.
+    - Use `sprintf` to format the UCI string by concatenating the string representations of the source square, destination square, and promotion piece (if any).
     - Return the formatted UCI string.
 - **Output**: A dynamically allocated string representing the UCI format of the move, which must be freed by the caller.
 - **Functions Called**:

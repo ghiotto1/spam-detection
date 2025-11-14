@@ -3,10 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints a message indicating it is a different new file.
+Schedulers, scheduling contexts, and interfaces for managing execution and trigger states.
 
-# Purpose
-This code is a simple script that outputs the string "this is a different new file" to the standard output. It uses the `print` function to display the message on the console. The script provides narrow functionality, as it performs a single action without any additional logic or complexity.
+## Folders
+- **[kestra](kestra/README.md)**: Schedulers, scheduling contexts, and interfaces for managing execution and trigger states.
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
