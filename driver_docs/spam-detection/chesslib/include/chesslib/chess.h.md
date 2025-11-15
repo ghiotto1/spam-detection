@@ -6,9 +6,9 @@
 Defines data structures and functions for managing and playing a chess game, including move validation.
 
 # Purpose
-The code defines a C module for managing a chess game, providing functionality to create, initialize, and manipulate a chess game state. It includes the `chess` structure, which holds the current legal moves, terminal state, board history, move history, and repetition count. The module offers functions to create a new chess game, either from scratch or from a given FEN (Forsyth-Edwards Notation) string, and to free the resources associated with a chess game. It also provides functions to play and undo moves, check the game's terminal state, and retrieve various game-related data such as the current board, legal moves, and move history.
+The code defines a C header file for managing a chess game. It provides a structured way to represent and manipulate the state of a chess game, including the board, legal moves, and game history. The file includes definitions for a `chess` struct, which encapsulates the current legal moves, terminal state, board history, move history, and the number of repetitions of the current board position. The `terminalState` enumeration defines various end-game conditions, such as checkmate and different types of draws.
 
-The module includes several utility functions that mirror operations available in the `board` structure, such as retrieving the piece at a specific square, the current player's color, and castling rights. It also provides functions to check if a position is in check or if a square is attacked. Additionally, the module supports draw claims based on the 50-move rule and threefold repetition. Internal functions update the game state after each move, ensuring that the legal moves, repetition count, and terminal state are current. The module is intended to be used as part of a larger chess application, interfacing with other components through the defined functions and data structures.
+The file declares functions for creating, initializing, and freeing a chess game, as well as functions to retrieve various aspects of the game state, such as the current board, legal moves, and terminal state. It also includes functions to play and undo moves, check for check conditions, and manage draw claims. Additionally, the file provides utility functions that mirror operations on the board, such as getting the piece at a specific square and retrieving the current player's turn. The code is intended to be used as part of a larger chess application, providing a public API for interacting with the chess game state.
 # Imports and Dependencies
 
 ---
@@ -31,19 +31,19 @@ The module includes several utility functions that mirror operations available i
     - ``tsDrawClaimedThreefold``: Indicates that a draw has been claimed due to threefold repetition.
     - ``tsDrawFivefold``: Indicates that the game has ended in a draw due to fivefold repetition.
     - ``tsDrawInsufficient``: Indicates that the game has ended in a draw due to insufficient material.
-- **Description**: Represents the possible terminal states of a chess game, including ongoing, checkmate, and various draw conditions.
+- **Description**: Defines the possible terminal states of a chess game, including ongoing, checkmate, and various draw conditions.
 
 
 ---
 ### chess
 - **Type**: ``struct``
 - **Members**:
-    - `currentLegalMoves`: Pointer to a `moveList` that contains the current legal moves in the game.
-    - `terminal`: Represents the current terminal state of the game using the `terminalState` enum.
-    - `boardHistory`: Pointer to a `boardList` that records the history of board states.
-    - `moveHistory`: Pointer to a `moveList` that records the history of moves made in the game.
-    - `repetitions`: Counts how many times the current board position has been repeated.
-- **Description**: Represents the state of a chess game, including the current legal moves, terminal state, history of board states and moves, and the number of repetitions of the current position.
+    - ``currentLegalMoves``: A pointer to a `moveList` that contains the current legal moves in the game.
+    - ``terminal``: An enumeration of type `terminalState` that indicates the current state of the game, such as ongoing or checkmate.
+    - ``boardHistory``: A pointer to a `boardList` that records the history of board states throughout the game.
+    - ``moveHistory``: A pointer to a `moveList` that records the history of moves made in the game.
+    - ``repetitions``: A `uint8_t` that counts how many times the current board position has occurred.
+- **Description**: Represents the state of a chess game, including the current legal moves, the terminal state of the game, the history of board states and moves, and the number of repetitions of the current board position.
 
 
 # Function Declarations (Public API)
@@ -64,9 +64,9 @@ Creates and initializes a new chess game.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L35>)
 
 Creates a chess game from a FEN string.
-- **Description**: Use this function to create and initialize a new chess game based on a given FEN (Forsyth-Edwards Notation) string. This function allocates memory for a new `chess` structure and initializes it using the provided FEN string. If the FEN string is invalid, the function returns `NULL` and the allocated memory is freed. Ensure to free the returned `chess` structure using `chessFree` when it is no longer needed to avoid memory leaks.
+- **Description**: Use this function to create and initialize a new chess game based on a given FEN (Forsyth-Edwards Notation) string. This function allocates memory for a new `chess` structure and initializes it using the provided FEN string. If the FEN string is invalid, the function returns `NULL` and frees any allocated memory. Ensure to free the returned `chess` structure using `chessFree` when it is no longer needed to avoid memory leaks.
 - **Inputs**:
-    - `fen`: A pointer to a null-terminated string containing the FEN representation of a chess position. The string must be valid FEN; otherwise, the function returns `NULL`. The caller retains ownership of the string.
+    - `fen`: A pointer to a null-terminated string containing the FEN representation of a chess position. The string must be valid FEN; otherwise, the function returns `NULL`. The caller retains ownership of the string and must ensure it is not null.
 - **Output**: A pointer to an initialized `chess` structure if the FEN is valid, or `NULL` if the FEN is invalid.
 - **See Also**: [`chessCreateFen`](<../../src/chesslib/chess.c.md#chesscreatefen>)  (Implementation)
 
@@ -76,9 +76,9 @@ Creates a chess game from a FEN string.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L38>)
 
 Initializes a chess game to the standard starting position.
-- **Description**: Use this function to set up a chess game to the standard initial position. This function is useful when you want to start a new game from the beginning. It must be called with a valid `chess` structure that has been allocated by the caller. The function does not return a value, and it assumes that the `chess` structure is ready to be initialized. Ensure that the `chess` structure is properly allocated before calling this function.
+- **Description**: Use this function to set up a chess game to the standard initial position. This function is useful when you want to start a new game from the beginning. It must be called with a valid `chess` structure that has been allocated by the caller. The function does not return a value, and it assumes that the `chess` structure is properly allocated and not null.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure that must be allocated by the caller. The function initializes this structure to represent the standard starting position of a chess game. The pointer must not be null, and the caller retains ownership of the memory.
+    - `c`: A pointer to a `chess` structure that must be allocated by the caller. The pointer must not be null, and the function assumes ownership of the structure for initialization.
 - **Output**: None
 - **See Also**: [`chessInitInPlace`](<../../src/chesslib/chess.c.md#chessinitinplace>)  (Implementation)
 
@@ -88,11 +88,11 @@ Initializes a chess game to the standard starting position.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L40>)
 
 Initializes a chess game with a given FEN string.
-- **Description**: Use this function to initialize a chess game state from a given FEN (Forsyth-Edwards Notation) string. This function sets up the board and game state according to the FEN provided. It must be called on a valid `chess` structure. If the FEN string is invalid, the function returns an error code and does not modify the game state. This function is useful for starting a game from a specific position rather than the standard starting position.
+- **Description**: Use this function to initialize a chess game with a specific board position described by a FEN (Forsyth-Edwards Notation) string. This function sets up the game state, including board history and move history, based on the provided FEN. It must be called on a valid `chess` structure. If the FEN string is invalid, the function returns an error code and does not modify the game state. This function is useful for starting a game from a specific position rather than the standard starting position.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure that must be initialized before calling this function. The function modifies this structure to reflect the game state described by the FEN string.
-    - `fen`: A pointer to a null-terminated string containing the FEN representation of the chess position. The string must be valid FEN; otherwise, the function returns an error code.
-- **Output**: Returns 0 if the FEN string is valid and the game state is successfully initialized. Returns 1 if the FEN string is invalid, and the game state is not modified.
+    - `c`: A pointer to a `chess` structure that will be initialized. Must not be null. The caller retains ownership.
+    - `fen`: A pointer to a null-terminated string containing the FEN representation of the chess position. Must not be null. If the FEN is invalid, the function returns an error code.
+- **Output**: Returns 0 if the initialization is successful, or 1 if the FEN string is invalid.
 - **See Also**: [`chessInitFenInPlace`](<../../src/chesslib/chess.c.md#chessinitfeninplace>)  (Implementation)
 
 
@@ -101,9 +101,9 @@ Initializes a chess game with a given FEN string.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L43>)
 
 Frees a chess game and all its components.
-- **Description**: Use this function to release all resources associated with a `chess` game object when it is no longer needed. This function deallocates memory for the chess game structure and its associated components, such as board history and move history. It is important to call this function to prevent memory leaks after you finish using a `chess` object. Ensure that the pointer to the `chess` object is valid and not null before calling this function.
+- **Description**: Use this function to release all resources associated with a `chess` game instance when it is no longer needed. This function deallocates memory for the chess game structure and its associated components, such as board history and move history. It is important to call this function to prevent memory leaks after you finish using a `chess` instance. Ensure that the pointer to the `chess` instance is valid and not null before calling this function.
 - **Inputs**:
-    - `c`: A pointer to a `chess` object to free. Must not be null. The function will deallocate the memory for this object and its components.
+    - `c`: A pointer to a `chess` instance to free. Must not be null. The function deallocates the memory for the chess game and its components. After calling this function, the pointer is no longer valid.
 - **Output**: None
 - **See Also**: [`chessFree`](<../../src/chesslib/chess.c.md#chessfree>)  (Implementation)
 
@@ -113,10 +113,10 @@ Frees a chess game and all its components.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L46>)
 
 Retrieves the current board state from a chess game.
-- **Description**: Use this function to obtain the current board state of a chess game. It is useful when you need to analyze or display the current position of pieces on the board. Ensure that the `chess` object is properly initialized before calling this function. The function does not modify the state of the game or the board.
+- **Description**: Use this function to obtain the current board state of a chess game. It is useful for inspecting the board at any point during the game. Ensure that the `chess` structure is properly initialized before calling this function to avoid undefined behavior.
 - **Inputs**:
-    - `c`: A pointer to a `chess` object. This must not be null and must point to a valid, initialized chess game structure. If the pointer is invalid, the behavior is undefined.
-- **Output**: A pointer to a `board` object representing the current state of the chess board. The caller does not own this pointer and should not attempt to free it.
+    - `c`: A pointer to a `chess` structure representing the game. Must not be null and must point to a valid, initialized `chess` object.
+- **Output**: A pointer to a `board` structure representing the current board state of the game.
 - **See Also**: [`chessGetBoard`](<../../src/chesslib/chess.c.md#chessgetboard>)  (Implementation)
 
 
@@ -125,10 +125,10 @@ Retrieves the current board state from a chess game.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L47>)
 
 Retrieves the list of legal moves for the current game state.
-- **Description**: Use this function to obtain the current list of legal moves in a chess game. This function is useful when you need to determine the possible moves a player can make from the current board position. It is important to ensure that the chess game structure is properly initialized and updated before calling this function to get accurate results.
+- **Description**: Use this function to obtain the current list of legal moves in a chess game. This function is useful when you need to determine the possible moves a player can make from the current board position. It is important to ensure that the chess game is properly initialized before calling this function to avoid undefined behavior. The function does not modify the game state or the list of moves.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure representing the current state of the chess game. Must not be null. The caller retains ownership of this pointer.
-- **Output**: Returns a pointer to a `moveList` structure containing the legal moves for the current game state. The caller does not own this pointer and should not attempt to free it.
+    - `c`: A pointer to a `chess` structure representing the current game state. Must not be null. The caller retains ownership of the `chess` structure.
+- **Output**: A pointer to a `moveList` structure containing the legal moves for the current game state. The caller must not modify or free this list.
 - **See Also**: [`chessGetLegalMoves`](<../../src/chesslib/chess.c.md#chessgetlegalmoves>)  (Implementation)
 
 
@@ -136,11 +136,11 @@ Retrieves the list of legal moves for the current game state.
 ### chessGetTerminalState<!-- {{#callable_declaration:chessGetTerminalState}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L48>)
 
-Retrieves the current terminal state of a chess game.
-- **Description**: Use this function to obtain the current terminal state of a chess game, which indicates whether the game is ongoing, in checkmate, or drawn under various conditions. This function is useful for determining the game's status at any point during play. Ensure that the `chess` structure is properly initialized before calling this function to avoid undefined behavior.
+Retrieves the terminal state of a chess game.
+- **Description**: Use this function to obtain the current terminal state of a chess game, which indicates whether the game is ongoing, in checkmate, or drawn under various conditions. This function is useful for determining the end state of a game after moves have been played. It must be called with a valid `chess` object that has been properly initialized.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure. Must not be null. The `chess` structure should be initialized before use.
-- **Output**: Returns a `terminalState` value representing the current state of the game, such as ongoing, checkmate, or various draw conditions.
+    - `c`: A pointer to a `chess` object. This must not be null and must point to a valid, initialized chess game structure. If the pointer is invalid, the behavior is undefined.
+- **Output**: Returns a `terminalState` enumeration value representing the current terminal state of the chess game.
 - **See Also**: [`chessGetTerminalState`](<../../src/chesslib/chess.c.md#chessgetterminalstate>)  (Implementation)
 
 
@@ -149,10 +149,10 @@ Retrieves the current terminal state of a chess game.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L50>)
 
 Retrieves the history of board states in a chess game.
-- **Description**: Use this function to obtain a list of all board states that have occurred during the course of a chess game. This can be useful for analyzing the progression of the game or for implementing features that require knowledge of past board configurations. Ensure that the `chess` structure is properly initialized before calling this function to avoid undefined behavior.
+- **Description**: Use this function to obtain a list of all board states that have occurred during the course of a chess game. This can be useful for analyzing the progression of the game or for implementing features that require knowledge of past board configurations. Ensure that the `chess` object is properly initialized before calling this function to avoid undefined behavior.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure. This must not be null and should point to a valid, initialized chess game instance. The function does not modify the `chess` structure.
-- **Output**: Returns a pointer to a `boardList` structure containing the history of board states. The caller does not take ownership of this list and should not attempt to free it.
+    - `c`: A pointer to a `chess` object. This must not be null and should point to a valid, initialized chess game structure. The function does not modify the `chess` object.
+- **Output**: Returns a pointer to a `boardList` object representing the history of board states. The caller does not take ownership of this list, and it should not be freed directly.
 - **See Also**: [`chessGetBoardHistory`](<../../src/chesslib/chess.c.md#chessgetboardhistory>)  (Implementation)
 
 
@@ -160,11 +160,11 @@ Retrieves the history of board states in a chess game.
 ### chessGetMoveHistory<!-- {{#callable_declaration:chessGetMoveHistory}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L51>)
 
-Retrieves the history of moves made in a chess game.
-- **Description**: Use this function to obtain a list of all moves that have been played in a chess game. This function is useful for analyzing the sequence of moves or for displaying the move history to users. It must be called with a valid `chess` object that has been properly initialized. The function does not modify the state of the chess game or the move history.
+Retrieves the move history of a chess game.
+- **Description**: Use this function to obtain the list of moves that have been played in a chess game. This function is useful for analyzing the sequence of moves or for displaying the move history to users. Ensure that the chess game object is properly initialized before calling this function. The function does not modify the state of the chess game.
 - **Inputs**:
-    - `c`: A pointer to a `chess` object. This must not be null and must point to a valid, initialized chess game structure. If the pointer is invalid, the behavior is undefined.
-- **Output**: A pointer to a `moveList` object representing the history of moves in the chess game. The caller does not own this pointer and should not attempt to free it.
+    - `c`: A pointer to a `chess` structure representing the chess game. Must not be null. The caller retains ownership of the `chess` object.
+- **Output**: A pointer to a `moveList` structure containing the history of moves played in the game. The caller must not modify or free this list.
 - **See Also**: [`chessGetMoveHistory`](<../../src/chesslib/chess.c.md#chessgetmovehistory>)  (Implementation)
 
 
@@ -173,10 +173,10 @@ Retrieves the history of moves made in a chess game.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L52>)
 
 Retrieves the number of times the current board position has occurred.
-- **Description**: Use this function to obtain the count of how many times the current board position has been repeated in the game. This can help in determining if a draw can be claimed due to repetition. Ensure that the `chess` structure is properly initialized before calling this function.
+- **Description**: Use this function to obtain the count of how many times the current board position has been repeated in the game. This can be useful for determining draw conditions such as the threefold repetition rule. Ensure that the `chess` structure is properly initialized before calling this function.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure. Must not be null and must point to a valid, initialized chess game instance.
-- **Output**: Returns the number of repetitions as an unsigned 8-bit integer.
+    - `c`: A pointer to a `chess` structure. Must not be null. The structure should be initialized before use.
+- **Output**: Returns an 8-bit unsigned integer representing the number of repetitions of the current board position.
 - **See Also**: [`chessGetRepetitions`](<../../src/chesslib/chess.c.md#chessgetrepetitions>)  (Implementation)
 
 
@@ -184,12 +184,12 @@ Retrieves the number of times the current board position has occurred.
 ### chessPlayMove<!-- {{#callable_declaration:chessPlayMove}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L55>)
 
-Attempts to play a move in a chess game.
-- **Description**: Use this function to attempt to play a specified move in an ongoing chess game. The function checks if the game is still active and if the move is legal. If the game is not ongoing or the move is illegal, the function returns an error code. If the move is legal, it updates the game state by recording the move and updating the board history. This function must be called with a valid chess game structure and a move that is intended to be played.
+Attempts to play a specified move in a chess game.
+- **Description**: Use this function to attempt to play a move in an ongoing chess game. It checks if the game is still active and if the move is legal. If the game has ended or the move is illegal, the function returns an error code. This function updates the game state by adding the move to the move history and updating the board history. It also recalculates the game's fields to reflect the new state. Call this function only when the game is in progress and you have a valid move to play.
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current game state. Must not be null and must represent an ongoing game.
-    - `m`: A `move` structure representing the move to be played. The move must be legal within the current game context.
-- **Output**: Returns 0 if the move is successfully played, or 1 if the move is illegal or the game is not ongoing.
+    - `m`: A `move` structure representing the move to be played. The move must be legal according to the current game state.
+- **Output**: Returns 0 if the move is successfully played. Returns 1 if the game is not ongoing or if the move is illegal.
 - **See Also**: [`chessPlayMove`](<../../src/chesslib/chess.c.md#chessplaymove>)  (Implementation)
 
 
@@ -198,10 +198,10 @@ Attempts to play a move in a chess game.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L57>)
 
 Undoes the last move or draw claim in a chess game.
-- **Description**: Use this function to revert the most recent move or draw claim in a chess game. It is applicable when you need to backtrack a move or undo a draw claim, such as in scenarios where a mistake was made or a different strategy is desired. The function must be called on a valid `chess` object that has at least one move or draw claim to undo. If there are no moves to undo, the function will return an error code. The function also resets the terminal state if a draw was claimed.
+- **Description**: Use this function to revert the last move or draw claim made in a chess game. It is useful when you need to backtrack or correct a move. The function must be called on a valid `chess` object that has at least one move in its history. If the game is in a terminal state due to a draw claim, the state is reset to ongoing. If there are no moves to undo, the function returns an error code.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure representing the current game state. Must not be null and must have a valid game history with at least one move or draw claim to undo. If the game history is empty, the function returns an error code.
-- **Output**: Returns 0 if the undo operation is successful, or 1 if there are no moves or draw claims to undo.
+    - `c`: A pointer to a `chess` object representing the current game state. Must not be null and must have a valid move history to undo.
+- **Output**: Returns 0 if the undo operation is successful, or 1 if there are no moves to undo.
 - **See Also**: [`chessUndo`](<../../src/chesslib/chess.c.md#chessundo>)  (Implementation)
 
 
@@ -210,11 +210,11 @@ Undoes the last move or draw claim in a chess game.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L60>)
 
 Retrieves the piece located at a specific square on the chessboard.
-- **Description**: Use this function to get the piece located at a given square in a chess game. It is useful for determining the current state of the board at a specific location. Ensure that the `chess` game structure is properly initialized before calling this function. The function does not modify the state of the game or the board.
+- **Description**: Use this function to get the piece located at a specific square on the chessboard in a given chess game. This function is useful when you need to determine what piece, if any, occupies a particular square. It is important to ensure that the `chess` structure is properly initialized before calling this function to avoid undefined behavior. The function does not modify the state of the chess game.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure representing the current game. Must not be null and should be initialized before use.
-    - `s`: A `sq` value representing the square on the chessboard from which to retrieve the piece. The value should be within the valid range of squares on a chessboard.
-- **Output**: Returns the `piece` located at the specified square `s` on the chessboard.
+    - `c`: A pointer to a `chess` structure representing the current state of the chess game. Must not be null and must point to a valid, initialized chess game.
+    - `s`: A `sq` value representing the square on the chessboard from which to retrieve the piece. The value must be within the valid range of squares on a chessboard.
+- **Output**: Returns the `piece` located at the specified square `s` on the chessboard. If the square is empty, a value representing no piece is returned.
 - **See Also**: [`chessGetPiece`](<../../src/chesslib/chess.c.md#chessgetpiece>)  (Implementation)
 
 
@@ -222,11 +222,11 @@ Retrieves the piece located at a specific square on the chessboard.
 ### chessGetPlayer<!-- {{#callable_declaration:chessGetPlayer}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L61>)
 
-Gets the current player's color in the chess game.
-- **Description**: Use this function to determine which player's turn it is in the current state of the chess game. This function is useful when you need to know the active player to make decisions or display information. Ensure that the `chess` structure is properly initialized before calling this function to avoid undefined behavior.
+Gets the current player's color in a chess game.
+- **Description**: Use this function to determine which player's turn it is in a chess game. It retrieves the color of the player who is currently expected to make a move. This function is useful for game logic that depends on knowing the active player. Ensure that the chess game structure is properly initialized before calling this function to avoid undefined behavior.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure representing the current game state. Must not be null. The caller retains ownership of the `chess` structure.
-- **Output**: Returns the `pieceColor` of the current player, indicating which player's turn it is.
+    - `c`: A pointer to a `chess` structure representing the current state of the chess game. Must not be null. The caller retains ownership of the `chess` structure.
+- **Output**: Returns a `pieceColor` value indicating the color of the current player. The return value will be one of the defined colors in the `pieceColor` enumeration.
 - **See Also**: [`chessGetPlayer`](<../../src/chesslib/chess.c.md#chessgetplayer>)  (Implementation)
 
 
@@ -234,11 +234,11 @@ Gets the current player's color in the chess game.
 ### chessGetCastleState<!-- {{#callable_declaration:chessGetCastleState}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L62>)
 
-Retrieves the castling state of the chess game.
-- **Description**: Use this function to get the current castling state of a chess game. The castling state indicates which castling moves are still available for both players. This function is useful when you need to check the castling rights during the game. Ensure that the chess game object is properly initialized before calling this function.
+Retrieves the current castling rights state from the chess game.
+- **Description**: Use this function to get the current castling rights state of a chess game. It is useful when you need to determine if castling is still possible for either player. This function should be called with a valid `chess` object that has been properly initialized. The function does not modify the state of the game or the input object.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure representing the current state of the chess game. Must not be null. The function does not modify the `chess` object.
-- **Output**: Returns an 8-bit unsigned integer representing the castling state. The specific meaning of the bits is not detailed in the header file.
+    - `c`: A pointer to a `chess` object. This must not be null and should point to a valid, initialized chess game structure. If the pointer is invalid, the behavior is undefined.
+- **Output**: Returns an 8-bit unsigned integer representing the castling rights state of the chess game.
 - **See Also**: [`chessGetCastleState`](<../../src/chesslib/chess.c.md#chessgetcastlestate>)  (Implementation)
 
 
@@ -247,10 +247,10 @@ Retrieves the castling state of the chess game.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L63>)
 
 Retrieves the en passant target square from the chess game state.
-- **Description**: Use this function to obtain the en passant target square from the current state of a chess game. This function is useful when you need to determine if an en passant capture is possible in the current position. It is important to ensure that the chess game structure is properly initialized before calling this function to avoid undefined behavior.
+- **Description**: Use this function to obtain the en passant target square from the current state of a chess game. This function is useful when you need to determine if an en passant capture is possible after a pawn move. It is important to ensure that the `chess` structure is properly initialized before calling this function to avoid undefined behavior.
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current state of the chess game. Must not be null. The caller retains ownership of the `chess` structure.
-- **Output**: Returns the en passant target square as a value of type `sq`. If there is no en passant target, the return value indicates this condition.
+- **Output**: Returns the en passant target square as a value of type `sq`. If there is no en passant target, the return value indicates this (typically as a special value or invalid square).
 - **See Also**: [`chessGetEpTarget`](<../../src/chesslib/chess.c.md#chessgeteptarget>)  (Implementation)
 
 
@@ -259,10 +259,10 @@ Retrieves the en passant target square from the chess game state.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L64>)
 
 Retrieves the half-move clock from the chess game state.
-- **Description**: Use this function to obtain the number of half-moves since the last capture or pawn advance in a chess game. This is useful for determining draw conditions such as the fifty-move rule. Ensure that the chess game state is properly initialized before calling this function to avoid undefined behavior.
+- **Description**: Use this function to obtain the current half-move clock value from a chess game. The half-move clock counts the number of half-moves (or ply) since the last capture or pawn advance, which is relevant for enforcing the fifty-move rule in chess. This function requires a valid `chess` object that has been properly initialized. It does not modify the game state.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure representing the current game state. Must not be null. The function does not modify the game state.
-- **Output**: Returns the number of half-moves since the last capture or pawn advance as an unsigned integer.
+    - `c`: A pointer to a `chess` object. This must not be null and must point to a valid, initialized chess game structure. If the pointer is invalid, the behavior is undefined.
+- **Output**: Returns the current half-move clock as an unsigned integer.
 - **See Also**: [`chessGetHalfMoveClock`](<../../src/chesslib/chess.c.md#chessgethalfmoveclock>)  (Implementation)
 
 
@@ -271,10 +271,10 @@ Retrieves the half-move clock from the chess game state.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L65>)
 
 Retrieves the current move number in the chess game.
-- **Description**: Use this function to obtain the current move number of an ongoing chess game. This is useful for tracking the progress of the game or for display purposes. The function requires a valid `chess` structure that has been properly initialized. It does not modify the game state or any of its components.
+- **Description**: Use this function to obtain the current move number from a chess game instance. This is useful for tracking the progress of the game. The function requires a valid `chess` structure that has been properly initialized. It does not modify the game state or any of its components.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure representing the current game. Must not be null and must point to a valid, initialized chess game.
-- **Output**: Returns an unsigned integer representing the current move number in the game.
+    - `c`: A pointer to a `chess` structure. This must not be null and must point to a valid, initialized chess game instance. If the pointer is invalid, the behavior is undefined.
+- **Output**: Returns the current move number as an unsigned integer.
 - **See Also**: [`chessGetMoveNumber`](<../../src/chesslib/chess.c.md#chessgetmovenumber>)  (Implementation)
 
 
@@ -295,9 +295,9 @@ Returns a string of all moves in the game's history in UCI format.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L70>)
 
 Checks if the current player is in check.
-- **Description**: Use this function to determine if the current player in a chess game is in a check position. This function is useful for validating game states and ensuring that moves comply with chess rules. It must be called with a valid `chess` object that represents an ongoing game. The function does not modify the game state or any input parameters.
+- **Description**: Use this function to determine if the current player in a chess game is in check. This function is useful for validating game states and ensuring that moves comply with chess rules. It must be called with a valid `chess` structure that represents an ongoing game. The function does not modify the game state or any input parameters.
 - **Inputs**:
-    - `c`: A pointer to a `chess` object representing the current game state. Must not be null. The function assumes that the `chess` object is properly initialized and represents a valid game state.
+    - `c`: A pointer to a `chess` structure representing the current game state. Must not be null. The caller retains ownership of the `chess` structure.
 - **Output**: Returns 1 if the current player is in check, otherwise returns 0.
 - **See Also**: [`chessIsInCheck`](<../../src/chesslib/chess.c.md#chessisincheck>)  (Implementation)
 
@@ -306,12 +306,12 @@ Checks if the current player is in check.
 ### chessIsSquareAttacked<!-- {{#callable_declaration:chessIsSquareAttacked}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L71>)
 
-Checks if a specific square is under attack in a chess game.
-- **Description**: Use this function to determine if a given square on the chessboard is currently attacked by the opponent's pieces. This function is useful for evaluating the safety of a square before making a move. It requires a valid chess game object and a square identifier. Ensure that the chess game object is properly initialized before calling this function.
+Checks if a square is attacked by the opponent.
+- **Description**: Use this function to determine if a specific square on the chessboard is under attack by the opponent's pieces. This function is useful for evaluating the safety of a square before making a move. It requires a valid `chess` game object and a square identifier. Ensure that the `chess` object is properly initialized before calling this function.
 - **Inputs**:
-    - `c`: A pointer to a `chess` object representing the current state of the chess game. Must not be null and must be initialized.
+    - `c`: A pointer to a `chess` object representing the current state of the game. Must not be null and must be initialized.
     - `s`: An identifier for the square to check. Must be a valid square on the chessboard.
-- **Output**: Returns 1 if the square is attacked, otherwise returns 0.
+- **Output**: Returns 1 if the square is attacked by the opponent, otherwise returns 0.
 - **See Also**: [`chessIsSquareAttacked`](<../../src/chesslib/chess.c.md#chessissquareattacked>)  (Implementation)
 
 
@@ -320,9 +320,9 @@ Checks if a specific square is under attack in a chess game.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L72>)
 
 Returns a string containing the FEN representation of the current chess game state.
-- **Description**: Use this function to obtain the current state of a chess game in Forsyth-Edwards Notation (FEN). This is useful for saving the game state or for analysis purposes. The returned string must be freed by the caller to avoid memory leaks. Ensure that the `chess` object is properly initialized before calling this function.
+- **Description**: Use this function to obtain the current state of a chess game in Forsyth-Edwards Notation (FEN). This is useful for saving the game state or for analysis purposes. The returned string must be freed by the caller to avoid memory leaks. Ensure that the `chess` object is properly initialized before calling this function to avoid undefined behavior.
 - **Inputs**:
-    - `c`: A pointer to a `chess` object representing the current game state. Must not be null. The function does not modify the `chess` object.
+    - `c`: A pointer to a `chess` object representing the current game state. Must not be null and must point to a valid, initialized `chess` structure.
 - **Output**: A dynamically allocated string containing the FEN representation of the chess game. The caller is responsible for freeing this string.
 - **See Also**: [`chessGetFen`](<../../src/chesslib/chess.c.md#chessgetfen>)  (Implementation)
 
@@ -332,10 +332,10 @@ Returns a string containing the FEN representation of the current chess game sta
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L76>)
 
 Checks if a draw can be claimed under the 50-move rule.
-- **Description**: Use this function to determine if a player can claim a draw based on the 50-move rule in a chess game. This rule applies when no pawn has been moved and no capture has been made in the last 50 moves by each player, which corresponds to 100 half-moves. The function checks the current state of the game and the half-move clock to decide if the draw condition is met. It is important to call this function only when the game is ongoing, as it will not be applicable in other terminal states.
+- **Description**: Use this function to determine if a player can claim a draw based on the 50-move rule in a chess game. This rule allows a player to claim a draw if no pawn has been moved and no capture has been made in the last 50 moves by each player, which is equivalent to 100 half-moves. The function checks the current state of the game and the half-move clock to decide if the draw condition is met. It is important to call this function only when the game is ongoing.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure representing the current game state. Must not be null. The game must be in an ongoing state for the function to return a valid result.
-- **Output**: Returns 1 if a draw can be claimed under the 50-move rule, otherwise returns 0.
+    - `c`: A pointer to a `chess` structure representing the current game state. Must not be null. The function assumes the game is ongoing and will not perform any action if the game is in a terminal state other than `tsOngoing`.
+- **Output**: Returns a non-zero value if a draw can be claimed under the 50-move rule, otherwise returns zero.
 - **See Also**: [`chessCanClaimDraw50`](<../../src/chesslib/chess.c.md#chesscanclaimdraw50>)  (Implementation)
 
 
@@ -344,9 +344,9 @@ Checks if a draw can be claimed under the 50-move rule.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L77>)
 
 Checks if a draw can be claimed due to threefold repetition.
-- **Description**: Use this function to determine if the current game state allows a player to claim a draw based on the threefold repetition rule. This function checks if the game is ongoing and if the current board position has been repeated at least three times. It is important to call this function before attempting to claim a draw to ensure the conditions are met.
+- **Description**: Use this function to determine if the current chess game state allows a player to claim a draw based on the threefold repetition rule. This function checks if the game is ongoing and if the current board position has been repeated at least three times. It is important to call this function before attempting to claim a draw to ensure the conditions are met.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure representing the current game state. Must not be null. The function assumes that the game state is properly initialized and updated.
+    - `c`: A pointer to a `chess` structure representing the current game state. Must not be null. The function assumes that the game has been properly initialized and is in a valid state.
 - **Output**: Returns 1 if a draw can be claimed due to threefold repetition, otherwise returns 0.
 - **See Also**: [`chessCanClaimDrawThreefold`](<../../src/chesslib/chess.c.md#chesscanclaimdrawthreefold>)  (Implementation)
 
@@ -356,9 +356,9 @@ Checks if a draw can be claimed due to threefold repetition.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L78>)
 
 Claims a draw under the 50-move rule if possible.
-- **Description**: Use this function to claim a draw in a chess game when the 50-move rule applies. The function checks if the game state allows for a draw claim under this rule and updates the game's terminal state accordingly. It must be called on a valid `chess` object that represents an ongoing game. Ensure that the game is in a state where a draw can be claimed under the 50-move rule before calling this function.
+- **Description**: Use this function to claim a draw in a chess game when the 50-move rule applies. The function checks if the game state allows for a draw claim under this rule and updates the game's terminal state accordingly. It is important to ensure that the game state is valid and that the 50-move rule conditions are met before calling this function. This function does not return a value, and it only modifies the terminal state of the game if the draw claim is valid.
 - **Inputs**:
-    - `c`: A pointer to a `chess` object representing the current game state. Must not be null. The function does not modify `c` if a draw cannot be claimed.
+    - `c`: A pointer to a `chess` structure representing the current game state. Must not be null. The function assumes that the game state is valid and that the 50-move rule conditions are met. If the conditions are not met, the function does nothing.
 - **Output**: None
 - **See Also**: [`chessClaimDraw50`](<../../src/chesslib/chess.c.md#chessclaimdraw50>)  (Implementation)
 
@@ -368,9 +368,9 @@ Claims a draw under the 50-move rule if possible.
 [View Source →](<../../../../../chesslib/include/chesslib/chess.h#L79>)
 
 Claims a draw by threefold repetition if possible.
-- **Description**: Use this function to claim a draw in a chess game when the same position has occurred three times. This function must be called when you want to change the game's terminal state to a draw due to threefold repetition. It is important to ensure that the game state allows for such a claim, as the function will only update the terminal state if the conditions for a threefold repetition draw are met.
+- **Description**: Use this function to claim a draw in a chess game when the same board position has occurred three times. This function checks if the draw condition is met and updates the game's terminal state to indicate a draw by threefold repetition. It must be called on a valid chess game instance. Ensure that the game state allows for a draw claim by threefold repetition before calling this function.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure representing the current game state. Must not be null. The function checks if a draw can be claimed based on the current game state.
+    - `c`: A pointer to a `chess` structure representing the current game state. Must not be null. The function checks if a draw by threefold repetition can be claimed and modifies the terminal state if applicable.
 - **Output**: None
 - **See Also**: [`chessClaimDrawThreefold`](<../../src/chesslib/chess.c.md#chessclaimdrawthreefold>)  (Implementation)
 

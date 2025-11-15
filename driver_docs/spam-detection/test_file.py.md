@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints 'new file'.
+Prints 'this is a test_file'.
 
 # Purpose
-This code is a simple script that outputs the string `'new file'` to the standard output. It uses the `print` function to display the message. The script provides narrow functionality, serving primarily as a basic demonstration or placeholder for further development.
+This code is a simple script that outputs the string `'this is a test_file'` to the standard output. It demonstrates basic usage of the `print` function in Python to display text. The script does not take any input or perform any additional operations. It serves as a basic example or placeholder for testing the execution of Python code.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
