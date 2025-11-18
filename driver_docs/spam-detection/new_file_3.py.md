@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints 'new file'.
+Prints a message indicating the presence of new files.
 
 # Purpose
-This code is a simple script that outputs the string `'new file'` to the standard output. It uses the `print` function to display the message. The script provides narrow functionality, serving primarily as a basic demonstration or placeholder for further development.
+This code is a simple script that outputs a message to the console. It uses the `print` function to display the string "more new files!! the best". The script does not take any input or perform any other operations. It is likely intended for demonstration or testing purposes to verify that the print functionality is working as expected.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

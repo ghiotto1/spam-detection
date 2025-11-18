@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints the message "more new files".
+Prints a message indicating the addition of a new test file.
 
 # Purpose
-This code is a simple script that outputs the string "more new files" to the standard output. It uses the `print` function, which is a built-in Python function for displaying text. The script provides narrow functionality, as it performs a single action without any additional logic or complexity.
+This code is a simple script that outputs the message "adding a new test file" to the console. It serves a narrow functionality, primarily for logging or indicating the action of adding a new test file. The script does not include any additional logic or functionality beyond printing this specific message.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

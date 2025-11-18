@@ -6,7 +6,7 @@
 Instructions for building and testing a C-based chess library with example code and future plans.
 
 # Purpose
-The document describes the build and usage instructions for `chesslib`, a chess implementation written in C. It provides guidance on compiling the source files located in the `src/chesslib` directory using a C compiler, with specific instructions for building on Linux and Windows using MSYS2. The makefile included in the project facilitates the build process, and users can execute `make` to compile the library or `make test` to run tests. Additionally, the document includes an example program that demonstrates how to use `chesslib` to simulate a random chess game, printing the UCI moves and the final FEN position. Future development plans for `chesslib` include support for SAN and PGN formats, improved documentation, and enhancements to the API.
+The document describes the build and usage instructions for a C-based chess library named `chesslib`. It provides guidance on compiling the source files located in the `src/chesslib` directory using a C compiler, with specific instructions for building on Linux and Windows using MSYS2. The document includes commands for building the library and running tests using a makefile. Additionally, it provides an example program that demonstrates how to use the library to simulate a random chess game, printing the UCI moves and the final FEN position. Future development plans for the library include support for SAN and PGN formats, improved documentation, and enhancements to the API.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
