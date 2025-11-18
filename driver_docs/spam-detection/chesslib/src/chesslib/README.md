@@ -3,19 +3,19 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements chess game components including board, move, piece, and square management functions.
+Chess board and game implementations, move and piece handling, and square management functions.
 
 
 ## Files
-- **[board.c](board.c.md)**: Implements a chess board with functions for initialization, move generation, and FEN string handling.
+- **[board.c](board.c.md)**: Chess board implementation with functions for board creation, move generation, and FEN string handling.
 - **[boardlist.c](boardlist.c.md)**: Implements a linked list for managing chess boards, including creation, addition, retrieval, and removal.
 - **[chess.c](chess.c.md)**: Chess game implementation with functions for game state management, move execution, and draw claims.
-- **[move.c](move.c.md)**: Functions for creating, comparing, and converting chess moves to and from UCI strings.
+- **[move.c](move.c.md)**: Implements functions for chess move operations, including UCI string conversion and move comparison.
 - **[movelist.c](movelist.c.md)**: Implements a move list for chess, including creation, addition, retrieval, undo, and UCI string conversion.
-- **[piece.c](piece.c.md)**: Functions for handling chess pieces, including type and color identification and letter representation.
-- **[piecemoves.c](piecemoves.c.md)**: Implements movement logic for chess pieces, including pawns, knights, bishops, rooks, queens, and kings.
+- **[piece.c](piece.c.md)**: Implements functions for handling chess pieces, including type, color, and letter representation.
+- **[piecemoves.c](piecemoves.c.md)**: Implements chess piece movement logic, including specific move generation for each piece type.
 - **[square.c](square.c.md)**: Functions for creating and manipulating chessboard squares using file and rank or SAN notation.
-- **[squareset.c](squareset.c.md)**: Square set implementation for managing and accessing chessboard squares.
+- **[squareset.c](squareset.c.md)**: Square set implementation for managing chessboard squares using bit manipulation.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

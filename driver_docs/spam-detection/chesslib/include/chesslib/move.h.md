@@ -6,7 +6,7 @@
 Defines structures and functions for chess moves, including UCI notation conversion.
 
 # Purpose
-This code is a C header file that defines structures and functions for handling chess moves. It includes the necessary headers for square and piece definitions, which are likely part of a larger chess library. The `move` structure represents a chess move, including the starting square (`from`), the destination square (`to`), and an optional `promotion` piece type. The file declares functions to create moves ([`moveSq`](<#movesq>) and [`movePromote`](<#movepromote>)), compare two moves for equality ([`moveEq`](<#moveeq>)), and convert moves to and from UCI (Universal Chess Interface) notation ([`moveGetUci`](<#movegetuci>) and [`moveFromUci`](<#movefromuci>)). The [`moveGetUci`](<#movegetuci>) function returns a dynamically allocated string that must be freed by the caller.
+This header file defines structures and functions for handling chess moves in a C program. It includes the necessary headers for square and piece definitions, indicating dependencies on other components of a chess library. The `move` structure represents a chess move, containing fields for the starting square (`from`), the destination square (`to`), and an optional `promotion` piece type. The file declares functions to create moves ([`moveSq`](<#movesq>) and [`movePromote`](<#movepromote>)), compare two moves for equality ([`moveEq`](<#moveeq>)), and convert moves to and from UCI (Universal Chess Interface) notation ([`moveGetUci`](<#movegetuci>) and [`moveFromUci`](<#movefromuci>)). The [`moveGetUci`](<#movegetuci>) function returns a dynamically allocated string that must be freed by the caller.
 # Imports and Dependencies
 
 ---
@@ -23,7 +23,7 @@ This code is a C header file that defines structures and functions for handling 
     - ``from``: The starting square of the move.
     - ``to``: The destination square of the move.
     - ``promotion``: The type of piece to promote to, if applicable.
-- **Description**: Represents a chess move, including the starting and destination squares, and an optional piece promotion type.
+- **Description**: Defines a chess move, including the starting and destination squares, and the type of piece for promotion if the move involves a pawn promotion.
 
 
 # Function Declarations (Public API)
@@ -33,11 +33,11 @@ This code is a C header file that defines structures and functions for handling 
 [View Source →](<../../../../../chesslib/include/chesslib/move.h#L18>)
 
 Creates a move from one square to another without promotion.
-- **Description**: Use this function to create a move between two squares on a chessboard when no piece promotion is involved. This function is useful in scenarios where a piece is moved from one location to another without changing its type, such as moving a pawn forward without reaching the promotion rank. Ensure that the `from` and `to` parameters represent valid squares on the chessboard.
+- **Description**: Use this function to create a move between two squares on a chessboard when no piece promotion is involved. This function is useful in scenarios where a simple move is needed without any additional actions like promoting a pawn. Ensure that the `from` and `to` squares are valid and represent different positions on the board.
 - **Inputs**:
     - `from`: The starting square of the move. Must be a valid square on the chessboard.
-    - `to`: The destination square of the move. Must be a valid square on the chessboard.
-- **Output**: Returns a `move` structure representing the move from the `from` square to the `to` square without promotion.
+    - `to`: The destination square of the move. Must be a valid square on the chessboard and different from `from`.
+- **Output**: Returns a `move` structure representing the move from `from` to `to` without promotion.
 - **See Also**: [`moveSq`](<../../src/chesslib/move.c.md#movesq>)  (Implementation)
 
 
@@ -46,12 +46,12 @@ Creates a move from one square to another without promotion.
 [View Source →](<../../../../../chesslib/include/chesslib/move.h#L19>)
 
 Creates a move with a promotion.
-- **Description**: Use this function to create a chess move that includes a promotion. This is typically used when a pawn reaches the opposite end of the board and is promoted to another piece type. Ensure that the `from` and `to` parameters represent valid squares on the chessboard, and the `promotion` parameter represents a valid piece type for promotion. The function returns a `move` structure initialized with the specified parameters.
+- **Description**: Use this function to create a chess move that includes a promotion. This is necessary when a pawn reaches the opposite end of the board and is promoted to another piece type. Ensure that the `from` and `to` squares are valid board positions and that the `promotion` piece type is valid for a promotion (typically a queen, rook, bishop, or knight).
 - **Inputs**:
     - `from`: The starting square of the move. Must be a valid square on the chessboard.
     - `to`: The destination square of the move. Must be a valid square on the chessboard.
-    - `promotion`: The type of piece to promote to. Must be a valid piece type for promotion.
-- **Output**: A `move` structure initialized with the specified `from`, `to`, and `promotion` values.
+    - `promotion`: The type of piece to promote to. Must be a valid piece type for promotion, such as a queen, rook, bishop, or knight.
+- **Output**: Returns a `move` structure representing the move from the `from` square to the `to` square with the specified `promotion` piece type.
 - **See Also**: [`movePromote`](<../../src/chesslib/move.c.md#movepromote>)  (Implementation)
 
 
@@ -75,7 +75,7 @@ Compares two chess moves for equality.
 Converts a chess move to UCI notation.
 - **Description**: Use this function to get the UCI (Universal Chess Interface) notation for a given chess move. The function allocates memory for the resulting string, which the caller must free after use. It handles both regular moves and promotion moves, appending the appropriate promotion piece letter in lowercase if applicable. Ensure that the input move is valid and initialized before calling this function.
 - **Inputs**:
-    - `m`: A `move` structure representing the chess move to convert. It must be a valid and initialized move, with `from` and `to` squares specified. If the move involves a promotion, the `promotion` field must contain the appropriate piece type.
+    - `m`: A `move` structure representing the chess move to convert. It must be a valid and initialized move. The `promotion` field should be set if the move involves a pawn promotion.
 - **Output**: A dynamically allocated string containing the UCI notation of the move. The caller is responsible for freeing this memory.
 - **See Also**: [`moveGetUci`](<../../src/chesslib/move.c.md#movegetuci>)  (Implementation)
 
@@ -85,10 +85,10 @@ Converts a chess move to UCI notation.
 [View Source →](<../../../../../chesslib/include/chesslib/move.h#L25>)
 
 Converts a UCI string to a move structure.
-- **Description**: Use this function to convert a move described in UCI (Universal Chess Interface) notation into a `move` structure. The input string must be at least four characters long, representing the starting and ending squares in algebraic notation. An optional fifth character can specify a promotion piece. The function assumes the input string is valid and does not perform error checking on the input length or content. It returns a `move` structure with the parsed data.
+- **Description**: Use this function to convert a move described in UCI (Universal Chess Interface) notation into a `move` structure. The input string must be at least four characters long, representing the starting and ending squares in algebraic notation. An optional fifth character can specify a promotion piece. The function interprets this character to set the promotion field in the `move` structure. If the fifth character is not a valid promotion piece, the promotion field is set to `ptEmpty`. Ensure the input string is correctly formatted to avoid undefined behavior.
 - **Inputs**:
-    - `uci`: A pointer to a null-terminated string representing a move in UCI notation. The string must be at least four characters long, with the first two characters representing the starting square and the next two characters representing the ending square. An optional fifth character can specify a promotion piece ('n', 'b', 'r', 'q', 'k'). The caller retains ownership of the string.
-- **Output**: A `move` structure containing the parsed starting square, ending square, and promotion piece type. If the promotion character is not specified or is invalid, the promotion field is set to `ptEmpty`.
+    - `uci`: A string representing a move in UCI notation. It must be at least four characters long. The first two characters represent the starting square, and the next two represent the ending square. An optional fifth character can specify a promotion piece. The caller retains ownership of the string, and it must not be null.
+- **Output**: Returns a `move` structure with the `from` and `to` fields set based on the UCI string, and the `promotion` field set according to the optional fifth character.
 - **See Also**: [`moveFromUci`](<../../src/chesslib/move.c.md#movefromuci>)  (Implementation)
 
 

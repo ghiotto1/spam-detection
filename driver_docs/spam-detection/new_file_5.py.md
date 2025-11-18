@@ -3,11 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Data structures and functions for chess board management, game play, move handling, and piece operations.
+Prints a message indicating the creation of a new file.
 
-## Folders
-- **[chesslib](chesslib/README.md)**: Data structures and functions for chess board management, game play, move handling, and piece operations.
-
+# Purpose
+This code is a simple script that outputs the message "making a new file" to the standard output. It does not perform any file creation or manipulation operations. The script serves a narrow purpose, primarily for displaying a message to indicate the intention or action of creating a new file.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

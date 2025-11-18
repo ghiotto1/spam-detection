@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints "A sixth new file".
+Prints a message indicating the presence of new files.
 
 # Purpose
-This code is a simple script that outputs the string "A sixth new file" to the standard output. It provides narrow functionality, serving primarily as a demonstration or placeholder for printing a specific message. There are no variables, functions, or classes defined in this script, indicating its limited scope and purpose.
+This code is a simple script that outputs a message to the console. It uses the `print` function to display the string "more new files!! the best". The script provides narrow functionality, as it is designed solely to print this specific message when executed.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

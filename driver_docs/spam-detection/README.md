@@ -3,19 +3,19 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Data structures and functions for a C-based chess library, dummy Python scripts, and memory management in C.
+Data structures and functions for chess, flow management, test printing, and error-checked memory allocation.
 
 ## Folders
-- **[chesslib](chesslib/README.md)**: Data structures, functions, and components for a C-based chess library with build and test instructions.
+- **[chesslib](chesslib/README.md)**: Data structures, functions, and implementations for chess, with build tools and documentation.
+- **[kestra_lite](kestra_lite/README.md)**: Schedulers, scheduling contexts, and interfaces for managing and executing flows and triggers.
 
 ## Files
-- **[dummy1.py](dummy1.py.md)**: Prints "new file".
-- **[dummy2.py](dummy2.py.md)**: Prints a message indicating it is a different new file.
-- **[dummy3.py](dummy3.py.md)**: Prints 'new file'.
-- **[dummy5.py](dummy5.py.md)**: Prints "added a new file".
-- **[dummy6.py](dummy6.py.md)**: Prints "A sixth new file".
-- **[dummy7.py](dummy7.py.md)**: Prints the message "more new files".
-- **[xmalloc.c](xmalloc.c.md)**: Memory allocation and string manipulation functions that check results and handle errors.
+- **[new_file.py](new_file.py.md)**: Defines two functions that print messages indicating their creation and modification status.
+- **[new_file_2.py](new_file_2.py.md)**: Prints a message and defines a function to print a string multiple times.
+- **[new_file_3.py](new_file_3.py.md)**: Prints a message indicating the presence of new files.
+- **[new_file_5.py](new_file_5.py.md)**: Prints a message indicating the creation of a new file.
+- **[test_file.py](test_file.py.md)**: Prints 'this is a test_file'.
+- **[xmalloc.c](xmalloc.c.md)**: Memory allocation and string manipulation functions that check for errors and call fatalx on failure.
 - **[xmalloc.h](xmalloc.h.md)**: Memory allocation functions that check results and call fatal on error.
 
 ---
