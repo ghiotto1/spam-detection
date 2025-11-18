@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints 'new file'.
+Prints a message indicating the addition of a new test file.
 
 # Purpose
-This code is a simple script that outputs the string `'new file'` to the standard output. It uses the `print` function to display the message. The script provides narrow functionality, serving primarily as a basic demonstration or placeholder for further development.
+This code is a simple script that outputs the message "adding a new test file" to the standard output. It serves a narrow functionality, primarily for logging or indicating the action of adding a new test file. The script does not include any additional logic or functionality beyond printing this specific message.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

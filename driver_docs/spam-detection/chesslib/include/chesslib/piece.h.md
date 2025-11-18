@@ -3,24 +3,24 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Defines chess piece types, colors, and related functions.
+Defines chess piece types, colors, and related functions for type and color retrieval.
 
 # Purpose
-This code is a C header file that defines enumerations and functions for representing and manipulating chess pieces. The `pieceType` enumeration defines the types of chess pieces, such as `ptPawn` and `ptKing`. The `piece` enumeration includes specific pieces with color, like `pWPawn` for a white pawn and `pBKing` for a black king. The `pieceColor` enumeration specifies the color of the pieces, either `pcWhite` or `pcBlack`. The file also declares several functions: [`pieceGetType`](<#piecegettype>) and [`pieceGetColor`](<#piecegetcolor>) to retrieve the type and color of a piece, [`pieceTypeGetLetter`](<#piecetypegetletter>) and [`pieceGetLetter`](<#piecegetletter>) to get the character representation of a piece type or piece, and [`pieceMake`](<#piecemake>) to create a piece from a given type and color.
+This code is a C header file that defines enumerations and functions for handling chess pieces. The `pieceType` enumeration defines the types of chess pieces, such as `ptPawn` and `ptKing`. The `piece` enumeration includes specific pieces for both white and black, such as `pWPawn` and `pBKing`. The `pieceColor` enumeration specifies the color of the pieces, either `pcWhite` or `pcBlack`. The file also declares several functions: [`pieceGetType`](<#piecegettype>) and [`pieceGetColor`](<#piecegetcolor>) to retrieve the type and color of a piece, [`pieceTypeGetLetter`](<#piecetypegetletter>) and [`pieceGetLetter`](<#piecegetletter>) to get the character representation of a piece type or piece, and [`pieceMake`](<#piecemake>) to create a piece from a given type and color.
 # Data Structures
 
 ---
 ### pieceType
 - **Type**: ``enum``
 - **Members**:
-    - ``ptEmpty``: Represents an empty square or no piece.
+    - ``ptEmpty``: Represents an empty square on the chessboard.
     - ``ptPawn``: Represents a pawn piece.
     - ``ptKnight``: Represents a knight piece.
     - ``ptBishop``: Represents a bishop piece.
     - ``ptRook``: Represents a rook piece.
     - ``ptQueen``: Represents a queen piece.
     - ``ptKing``: Represents a king piece.
-- **Description**: Defines the types of chess pieces in a game, including empty squares, using enumerators for each piece type.
+- **Description**: Defines the types of chess pieces, including an empty square, used in a chess game.
 
 
 ---
@@ -59,11 +59,11 @@ This code is a C header file that defines enumerations and functions for represe
 ### pieceGetType<!-- {{#callable_declaration:pieceGetType}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/piece.h#L43>)
 
-Determines the type of a chess piece.
-- **Description**: Use this function to get the type of a chess piece from a given `piece` enumeration value. It converts the `piece` value to a `pieceType` value, which represents the type of the piece without regard to its color. This function is useful when you need to identify the type of a piece, such as pawn, knight, bishop, etc., from a combined piece and color enumeration. Ensure that the input is a valid `piece` enumeration value to avoid undefined behavior.
+Converts a `piece` to its corresponding `pieceType`.
+- **Description**: Use this function to determine the type of a chess piece from its `piece` enumeration value. This function is useful when you need to identify the type of a piece without regard to its color. It is important to ensure that the input is a valid `piece` enumeration value to avoid undefined behavior.
 - **Inputs**:
-    - `p`: A `piece` enumeration value representing a chess piece. Valid values are from the `piece` enum, including both white and black pieces. The function does not handle invalid `piece` values and expects a valid input.
-- **Output**: Returns a `pieceType` enumeration value corresponding to the type of the input `piece`, such as `ptPawn`, `ptKnight`, etc.
+    - `p`: A `piece` enumeration value representing a chess piece. Valid values are from the `piece` enum, including both white and black pieces. The function does not handle invalid `piece` values.
+- **Output**: Returns the `pieceType` corresponding to the input `piece`, which represents the type of the chess piece without color information.
 - **See Also**: [`pieceGetType`](<../../src/chesslib/piece.c.md#piecegettype>)  (Implementation)
 
 
@@ -72,10 +72,10 @@ Determines the type of a chess piece.
 [View Source →](<../../../../../chesslib/include/chesslib/piece.h#L44>)
 
 Determines the color of a chess piece.
-- **Description**: Use this function to get the color of a given chess piece. It returns the color as `pcWhite` for white pieces, `pcBlack` for black pieces, and `pcNoColor` for pieces that do not have a color, such as `pEmpty`. This function is useful when you need to differentiate between white and black pieces or handle empty squares in a chess game.
+- **Description**: Use this function to find the color of a given chess piece. It returns the color as either white, black, or no color if the piece is not recognized. This function is useful when you need to differentiate between pieces of different colors in a chess game. Ensure that the input is a valid piece enumeration value to avoid unexpected results.
 - **Inputs**:
-    - `p`: A `piece` value representing a chess piece. Valid values range from `pEmpty` to `pBKing`. The function handles all valid `piece` values and returns `pcNoColor` for `pEmpty`.
-- **Output**: Returns a `pieceColor` value indicating the color of the piece: `pcWhite`, `pcBlack`, or `pcNoColor`.
+    - `p`: A chess piece represented by the `piece` enumeration. Valid values range from `pWPawn` to `pBKing`. If the value is outside this range, the function returns `pcNoColor`.
+- **Output**: Returns a `pieceColor` enumeration value: `pcWhite` for white pieces, `pcBlack` for black pieces, or `pcNoColor` if the piece is not recognized.
 - **See Also**: [`pieceGetColor`](<../../src/chesslib/piece.c.md#piecegetcolor>)  (Implementation)
 
 
@@ -84,10 +84,10 @@ Determines the color of a chess piece.
 [View Source →](<../../../../../chesslib/include/chesslib/piece.h#L45>)
 
 Returns the character representation of a chess piece type.
-- **Description**: Use this function to get the character that represents a specific chess piece type. This is useful for displaying or logging chess pieces in a human-readable format. The function expects a valid `pieceType` enumeration value as input. If the input is `ptEmpty`, the function returns a space character. For any other invalid input, the function returns a null character ('\0').
+- **Description**: Use this function to get the character that represents a specific chess piece type. This is useful for displaying or logging the piece type in a human-readable format. The function expects a valid `pieceType` enumeration value as input. If the input is not a valid `pieceType`, the function returns a null character ('\0').
 - **Inputs**:
-    - `pe`: A `pieceType` enumeration value representing the type of chess piece. Valid values are `ptEmpty`, `ptPawn`, `ptKnight`, `ptBishop`, `ptRook`, `ptQueen`, and `ptKing`. The function returns a space character for `ptEmpty` and a null character for invalid values.
-- **Output**: Returns a character representing the chess piece type: 'P' for pawn, 'N' for knight, 'B' for bishop, 'R' for rook, 'Q' for queen, 'K' for king, a space for `ptEmpty`, and '\0' for invalid inputs.
+    - `pe`: A `pieceType` enumeration value representing the type of chess piece. Valid values are `ptEmpty`, `ptPawn`, `ptKnight`, `ptBishop`, `ptRook`, `ptQueen`, and `ptKing`. If the value is not valid, the function returns a null character ('\0').
+- **Output**: Returns a character representing the chess piece type: 'P' for pawn, 'N' for knight, 'B' for bishop, 'R' for rook, 'Q' for queen, 'K' for king, and ' ' for empty. Returns '\0' for invalid input.
 - **See Also**: [`pieceTypeGetLetter`](<../../src/chesslib/piece.c.md#piecetypegetletter>)  (Implementation)
 
 
@@ -96,10 +96,10 @@ Returns the character representation of a chess piece type.
 [View Source →](<../../../../../chesslib/include/chesslib/piece.h#L46>)
 
 Returns the character representation of a chess piece.
-- **Description**: Use this function to get the character that represents a chess piece, based on its type and color. The function returns an uppercase letter for white pieces and a lowercase letter for black pieces. It is important to ensure that the input piece is valid and corresponds to a defined piece type and color.
+- **Description**: Use this function to get the character that represents a given chess piece. The function returns an uppercase letter for white pieces and a lowercase letter for black pieces. It is important to ensure that the input piece is valid and corresponds to a defined piece type and color.
 - **Inputs**:
-    - `p`: A `piece` value representing a chess piece. It must be a valid piece enumeration value, such as `pWPawn` or `pBKing`. Invalid values can lead to undefined behavior.
-- **Output**: A character representing the piece, with uppercase for white pieces and lowercase for black pieces.
+    - `p`: A `piece` enumeration value representing a chess piece. The value must correspond to a valid piece type and color. Invalid values may lead to undefined behavior.
+- **Output**: A character representing the chess piece, with case indicating the piece's color (uppercase for white, lowercase for black).
 - **See Also**: [`pieceGetLetter`](<../../src/chesslib/piece.c.md#piecegetletter>)  (Implementation)
 
 
@@ -108,10 +108,10 @@ Returns the character representation of a chess piece.
 [View Source →](<../../../../../chesslib/include/chesslib/piece.h#L47>)
 
 Creates a chess piece with a specified type and color.
-- **Description**: Use this function to create a chess piece by specifying its type and color. The function returns a piece of the specified type and color if the color is valid. If the color is not valid, or if the type is not recognized, the function returns `pEmpty`. This function is useful for initializing or modifying chess pieces in a game. Ensure that the color is either `pcWhite` or `pcBlack` before calling this function.
+- **Description**: Use this function to create a chess piece by specifying its type and color. The function returns a piece of the specified type and color if the inputs are valid. If the color is not `pcWhite` or `pcBlack`, or if the type is not a valid chess piece type, the function returns `pEmpty`. This function is useful for initializing or modifying chess pieces in a chess game application.
 - **Inputs**:
-    - `type`: Specifies the type of the chess piece. Must be one of the values from the `pieceType` enumeration, such as `ptKing`, `ptQueen`, etc. If the type is not recognized, the function returns `pEmpty`.
-    - `color`: Specifies the color of the chess piece. Must be either `pcWhite` or `pcBlack`. If the color is not valid, the function returns `pEmpty`.
+    - `type`: Specifies the type of the chess piece. Must be one of the valid `pieceType` values such as `ptKing`, `ptQueen`, etc. If an invalid type is provided, the function returns `pEmpty`.
+    - `color`: Specifies the color of the chess piece. Must be `pcWhite` or `pcBlack`. If an invalid color is provided, the function returns `pEmpty`.
 - **Output**: Returns a `piece` of the specified type and color, or `pEmpty` if the inputs are invalid.
 - **See Also**: [`pieceMake`](<../../src/chesslib/piece.c.md#piecemake>)  (Implementation)
 

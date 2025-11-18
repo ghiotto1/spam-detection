@@ -6,9 +6,9 @@
 Defines a chess board structure and functions for board initialization, manipulation, and state evaluation.
 
 # Purpose
-The code defines a C header file for managing a chess board within a chess game application. It provides structures and functions to represent and manipulate the state of a chess board. The `board` structure is the central component, containing an array of `piece` elements to represent the pieces on the board, the current player's color, the castling rights as a bitmask, the en passant target square, and counters for the half-move clock and move number. The header file includes functions for creating and initializing a board, either from scratch or from a Forsyth-Edwards Notation (FEN) string, which is a standard notation for describing a particular board position.
+This code defines a C header file for managing a chess board state. It provides structures and functions to initialize, manipulate, and evaluate chess board configurations. The `board` structure is central to this file, representing the state of a chess game, including the positions of pieces, the current player, castling rights, en passant targets, and move counters. The file includes constants for the initial board setup in Forsyth-Edwards Notation (FEN) and bitmask values for castling rights.
 
-The file also provides functions to set and get pieces on the board, generate possible moves, and check various board states such as whether a square is attacked, if a player is in check, or if there is insufficient material to continue the game. Additionally, it includes functions to play moves on the board, both by creating a new board state and by modifying the existing board in place. The file defines utility functions to compare two boards for equality and to convert a board state back into a FEN string. The header file is intended to be included in other parts of the application, providing a public API for board management in a chess game.
+The functions in this file allow for creating and initializing a board, either from scratch or from a FEN string. They also provide functionality to set and get pieces on the board, generate possible moves, and check for conditions such as check, checkmate, and insufficient material. Additionally, the file includes functions to play moves on the board, compare board states, and convert the board state back to a FEN string. This header file is intended to be used in conjunction with other components of a chess library, as indicated by the inclusion of headers like `chesslib/square.h`, `chesslib/piece.h`, and `chesslib/movelist.h`.
 # Imports and Dependencies
 
 ---
@@ -39,9 +39,9 @@ The file also provides functions to set and get pieces on the board, generate po
 [View Source →](<../../../../../chesslib/include/chesslib/board.h#L31>)
 
 Allocates and initializes a chess board to the starting position.
-- **Description**: Use this function to create a new chess board initialized to the standard starting position. The function allocates memory for the board structure and sets up the pieces and game state according to the initial FEN string. The caller is responsible for freeing the allocated memory when the board is no longer needed. This function is useful for starting a new game of chess with the default setup.
+- **Description**: Use this function to create a new chess board initialized to the standard starting position. The function allocates memory for the board structure and sets up the pieces according to the initial FEN string. It is important to free the returned pointer when it is no longer needed to avoid memory leaks. The function returns a null pointer if the board cannot be created, indicating a failure in allocation or initialization.
 - **Inputs**: None
-- **Output**: Returns a pointer to a newly allocated `board` structure initialized to the starting position, or `NULL` if the allocation fails.
+- **Output**: A pointer to a newly allocated `board` structure initialized to the starting position, or null if the creation fails.
 - **See Also**: [`boardCreate`](<../../src/chesslib/board.c.md#boardcreate>)  (Implementation)
 
 
@@ -50,10 +50,10 @@ Allocates and initializes a chess board to the starting position.
 [View Source →](<../../../../../chesslib/include/chesslib/board.h#L32>)
 
 Allocates and initializes a chess board from a FEN string.
-- **Description**: Use this function to create a new chess board initialized to a specific position described by a FEN (Forsyth-Edwards Notation) string. The function allocates memory for a new `board` structure and attempts to initialize it using the provided FEN string. If the initialization fails, the function returns `NULL` and frees any allocated memory. Ensure to free the returned `board` pointer when it is no longer needed to avoid memory leaks.
+- **Description**: Use this function to create a new chess board initialized to a specific position described by a FEN (Forsyth-Edwards Notation) string. The function allocates memory for a new `board` structure and initializes it based on the provided FEN string. If the FEN string is invalid or initialization fails, the function returns `NULL`. The caller is responsible for freeing the allocated memory when it is no longer needed. This function is useful for setting up a board to a specific state for analysis or gameplay.
 - **Inputs**:
-    - `fen`: A null-terminated string in Forsyth-Edwards Notation (FEN) format that describes a specific chess board position. The string must be valid and correctly formatted; otherwise, the function will return `NULL`.
-- **Output**: A pointer to a newly allocated `board` structure initialized to the position described by the FEN string, or `NULL` if the initialization fails.
+    - `fen`: A null-terminated string representing the board position in FEN format. The string must be valid and correctly formatted according to FEN specifications. If the string is invalid, the function returns `NULL`. The caller retains ownership of the string.
+- **Output**: A pointer to a newly allocated `board` structure initialized to the position described by the FEN string, or `NULL` if initialization fails.
 - **See Also**: [`boardCreateFromFen`](<../../src/chesslib/board.c.md#boardcreatefromfen>)  (Implementation)
 
 
@@ -62,9 +62,9 @@ Allocates and initializes a chess board from a FEN string.
 [View Source →](<../../../../../chesslib/include/chesslib/board.h#L35>)
 
 Initializes a chess board to the standard starting position.
-- **Description**: Use this function to set up a chess board to the initial standard position for a new game. This function modifies the provided `board` structure directly and does not allocate new memory. Ensure that the `board` pointer is valid and points to an existing `board` structure before calling this function. This function is useful when you want to reset a board to the starting position without creating a new board instance.
+- **Description**: Use this function to set up a chess board to the standard initial position for a new game. This function modifies the provided `board` structure directly and does not allocate new memory. Ensure that the `board` pointer is valid and points to an existing `board` structure before calling this function. This function is useful when you want to reset a board to the starting position without creating a new board instance.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure that must not be null. The function modifies this structure to represent the initial chess position. The caller retains ownership of the `board` structure.
+    - `b`: A pointer to a `board` structure that will be initialized. Must not be null and must point to a valid `board` structure. The function does not check for null pointers, so passing a null pointer will result in undefined behavior.
 - **Output**: None
 - **See Also**: [`boardInitInPlace`](<../../src/chesslib/board.c.md#boardinitinplace>)  (Implementation)
 
@@ -74,11 +74,11 @@ Initializes a chess board to the standard starting position.
 [View Source →](<../../../../../chesslib/include/chesslib/board.h#L36>)
 
 Initializes a chess board from a FEN string.
-- **Description**: Use this function to set up a chess board with a specific position described by a FEN (Forsyth-Edwards Notation) string. It modifies the given board in place and returns 0 on success or 1 on failure. The function expects a valid FEN string that includes piece placement, active color, castling availability, en passant target square, halfmove clock, and fullmove number. If the FEN string is invalid or contains errors, the function returns 1 and does not modify the board. Ensure the board is properly allocated before calling this function.
+- **Description**: Use this function to set up a chess board with a specific position described by a FEN (Forsyth-Edwards Notation) string. It modifies the given board in place to reflect the position, player turn, castling rights, en passant target square, half-move clock, and full move number as specified in the FEN string. The function returns 0 on success and 1 on failure, with error messages printed to standard error for invalid FEN strings. Ensure the board is properly allocated before calling this function.
 - **Inputs**:
     - `b`: A pointer to a `board` structure that will be initialized. Must not be null and must point to a valid, allocated `board` structure.
-    - `fen`: A pointer to a null-terminated string containing the FEN representation of the chess position. Must not be null. The string must be correctly formatted according to FEN standards.
-- **Output**: Returns 0 if the board is successfully initialized from the FEN string, or 1 if an error occurs in parsing the FEN string.
+    - `fen`: A null-terminated string containing the FEN representation of the chess position. Must not be null. The function expects a valid FEN string; otherwise, it returns 1 and prints an error message.
+- **Output**: Returns 0 if the board is successfully initialized from the FEN string, or 1 if an error occurs due to an invalid FEN string.
 - **See Also**: [`boardInitFromFenInPlace`](<../../src/chesslib/board.c.md#boardinitfromfeninplace>)  (Implementation)
 
 
@@ -87,11 +87,11 @@ Initializes a chess board from a FEN string.
 [View Source →](<../../../../../chesslib/include/chesslib/board.h#L38>)
 
 Sets a piece on a specified square of the board.
-- **Description**: Use this function to place a chess piece on a specific square of the board. The function requires a valid board pointer, a square identifier, and a piece to place. Ensure that the board is properly initialized before calling this function. The function does not perform any validation on the square or piece, so it is the caller's responsibility to provide valid inputs.
+- **Description**: Use this function to place a chess piece on a specific square of the board. This function modifies the board by setting the given piece at the specified square. Ensure that the board is properly initialized before calling this function. The function does not perform any validation on the square or piece, so the caller must ensure that the square is within valid bounds and the piece is a valid chess piece.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure where the piece will be placed. Must not be null and must point to a valid, initialized board.
-    - `s`: A `sq` type representing the square on the board where the piece will be placed. Must be a valid square identifier.
-    - `p`: A `piece` type representing the chess piece to place on the specified square. Must be a valid piece.
+    - `b`: A pointer to a `board` structure where the piece will be set. Must not be null and must point to a valid, initialized board.
+    - `s`: A `sq` value representing the square on the board where the piece will be placed. The caller must ensure this is a valid square index.
+    - `p`: A `piece` value representing the chess piece to place on the board. The caller must ensure this is a valid piece.
 - **Output**: None
 - **See Also**: [`boardSetPiece`](<../../src/chesslib/board.c.md#boardsetpiece>)  (Implementation)
 
@@ -101,10 +101,10 @@ Sets a piece on a specified square of the board.
 [View Source →](<../../../../../chesslib/include/chesslib/board.h#L39>)
 
 Retrieves the piece located at a specified square on the board.
-- **Description**: Use this function to get the piece that is currently located at a specific square on a chess board. This function requires a valid board and a square as inputs. It is important to ensure that the square is within the valid range of the board, as the function does not perform range checking. The function returns the piece located at the specified square, which can be used for further game logic or display purposes.
+- **Description**: Use this function to get the piece that is currently located at a specific square on a chess board. This function is useful when you need to check the state of a particular square, such as determining if it is occupied and by which piece. Ensure that the board is properly initialized before calling this function to avoid undefined behavior.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure. This must not be null and must point to a valid, initialized board.
-    - `s`: A `sq` type representing the square on the board. The square must be within the valid range of the board (0 to 63).
+    - `b`: A pointer to a `board` structure. This must not be null and should point to a valid, initialized board.
+    - `s`: A `sq` type representing the square on the board from which to retrieve the piece. The square must be within the valid range of the board (0 to 63).
 - **Output**: Returns the `piece` located at the specified square on the board.
 - **See Also**: [`boardGetPiece`](<../../src/chesslib/board.c.md#boardgetpiece>)  (Implementation)
 
@@ -116,8 +116,8 @@ Retrieves the piece located at a specified square on the board.
 Generates all legal moves for the current player on the board.
 - **Description**: Use this function to obtain a list of all possible legal moves for the current player on a given chess board. It considers the current state of the board, including the positions of all pieces and the castling rights. The function excludes moves that would place the current player's king in check. Ensure that the board is properly initialized before calling this function. The returned move list must be freed by the caller to avoid memory leaks.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure representing the current state of the chess game. Must not be null. The board should be initialized and represent a valid game state. The function does not modify the board.
-- **Output**: A pointer to a `moveList` structure containing all legal moves for the current player. The caller is responsible for freeing this list. Returns an empty list if no legal moves are available.
+    - `b`: A pointer to a `board` structure representing the current state of the chess game. Must not be null. The board should be initialized and represent a valid game state.
+- **Output**: A pointer to a `moveList` containing all legal moves for the current player. The caller is responsible for freeing this list.
 - **See Also**: [`boardGenerateMoves`](<../../src/chesslib/board.c.md#boardgeneratemoves>)  (Implementation)
 
 
@@ -126,12 +126,12 @@ Generates all legal moves for the current player on the board.
 [View Source →](<../../../../../chesslib/include/chesslib/board.h#L43>)
 
 Checks if a square is attacked by a specified color.
-- **Description**: Use this function to determine if a specific square on the chess board is under attack by any piece of a given color. This function is useful for evaluating threats and planning defensive or offensive strategies. Ensure that the board is properly initialized before calling this function. The function does not modify the board or any of its components.
+- **Description**: Use this function to determine if a specific square on the chess board is under attack by any piece of a given color. This function is useful for evaluating threats and making strategic decisions in a chess game. Ensure that the board is properly initialized before calling this function. The function iterates over all pieces of the specified color and checks if any can move to the target square. It returns a non-zero value if the square is attacked, and zero if it is not.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure representing the current state of the chess board. Must not be null.
-    - `s`: The square to check for attacks, represented by the `sq` type. Must be a valid square on the board.
-    - `attacker`: The color of the pieces to check for attacks, represented by the `pieceColor` type. Must be a valid color (e.g., white or black).
-- **Output**: Returns 1 if the square is attacked by the specified color, otherwise returns 0.
+    - `b`: A pointer to a `board` structure representing the current state of the chess board. Must not be null and must point to a valid, initialized board.
+    - `s`: The target square to check for attacks. Must be a valid square on the board.
+    - `attacker`: The color of the pieces to check for attacks. Must be a valid `pieceColor` value representing either white or black.
+- **Output**: Returns a non-zero value if the square is attacked by the specified color, otherwise returns zero.
 - **See Also**: [`boardIsSquareAttacked`](<../../src/chesslib/board.c.md#boardissquareattacked>)  (Implementation)
 
 
@@ -140,9 +140,9 @@ Checks if a square is attacked by a specified color.
 [View Source →](<../../../../../chesslib/include/chesslib/board.h#L44>)
 
 Checks if the current player is in check.
-- **Description**: Use this function to determine if the current player on the given chess board is in check. This function is useful in scenarios where you need to validate the safety of the current player's king. It must be called with a valid `board` pointer that represents the current state of the chess game. Ensure that the board is properly initialized before calling this function to avoid undefined behavior.
+- **Description**: Use this function to determine if the player whose turn it is to move is currently in check. This function is useful in chess game logic to validate moves and enforce game rules. It must be called with a valid `board` pointer that represents the current state of the game. Ensure that the board is properly initialized before calling this function to avoid undefined behavior.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure representing the current state of the chess game. The pointer must not be null, and the board must be properly initialized before use.
+    - `b`: A pointer to a `board` structure representing the current state of the chess game. The pointer must not be null, and the board must be initialized before use. If the pointer is invalid, the behavior is undefined.
 - **Output**: Returns a non-zero value if the current player is in check, otherwise returns zero.
 - **See Also**: [`boardIsInCheck`](<../../src/chesslib/board.c.md#boardisincheck>)  (Implementation)
 
@@ -152,10 +152,10 @@ Checks if the current player is in check.
 [View Source →](<../../../../../chesslib/include/chesslib/board.h#L45>)
 
 Checks if a player's king is in check on the board.
-- **Description**: Use this function to determine if the specified player's king is currently in check on the given chess board. This function is useful for validating game states and ensuring that moves do not leave the player's king in check. It requires a valid board structure and a player color to function correctly. The function does not modify the board or any other state.
+- **Description**: Use this function to determine if the specified player's king is currently in check on the given chess board. This function is useful for validating game states and ensuring that moves do not leave the player's king in check. It requires a valid board and a player color as inputs. The function does not modify the board or any other state.
 - **Inputs**:
     - `b`: A pointer to a `board` structure representing the current state of the chess game. Must not be null. The caller retains ownership.
-    - `player`: A `pieceColor` value indicating the player whose king's check status is being queried. Valid values are `pcWhite` or `pcBlack`.
+    - `player`: A `pieceColor` value indicating the player whose king's check status is to be determined. Valid values are `pcWhite` or `pcBlack`. Invalid values result in undefined behavior.
 - **Output**: Returns 1 if the player's king is in check, otherwise returns 0.
 - **See Also**: [`boardIsPlayerInCheck`](<../../src/chesslib/board.c.md#boardisplayerincheck>)  (Implementation)
 
@@ -164,11 +164,11 @@ Checks if a player's king is in check on the board.
 ### boardIsInsufficientMaterial<!-- {{#callable_declaration:boardIsInsufficientMaterial}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/board.h#L47>)
 
-Checks if a chess board has insufficient material for a checkmate.
-- **Description**: Use this function to determine if the current state of a chess board lacks sufficient material to achieve a checkmate. This function is useful for identifying draw conditions in a chess game. It assumes that the board is correctly initialized and contains valid chess pieces. The function does not modify the board or any of its components.
+Checks if a chess board has insufficient material to win.
+- **Description**: Use this function to determine if the current state of a chess board has insufficient material for either player to win. This function is useful for detecting draw conditions based on material. It assumes a standard chess board setup and checks for scenarios where only kings are present, or where only kings and minor pieces (knights or bishops) are present. The function does not handle complex draw conditions beyond these scenarios.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure representing the current state of the chess game. Must not be null. The board should be properly initialized before calling this function.
-- **Output**: Returns 1 if the board has insufficient material for a checkmate, otherwise returns 0.
+    - `b`: A pointer to a `board` structure representing the current state of the chess board. Must not be null. The function reads the board state to determine material sufficiency.
+- **Output**: Returns 1 if the board has insufficient material to win, otherwise returns 0.
 - **See Also**: [`boardIsInsufficientMaterial`](<../../src/chesslib/board.c.md#boardisinsufficientmaterial>)  (Implementation)
 
 
@@ -177,11 +177,11 @@ Checks if a chess board has insufficient material for a checkmate.
 [View Source →](<../../../../../chesslib/include/chesslib/board.h#L50>)
 
 Returns a new board with the specified move applied.
-- **Description**: Use this function to create a new board state by applying a move to an existing board. It allocates memory for a new board, copies the current board state, and applies the move to the new board. The caller is responsible for freeing the memory allocated for the new board. This function is useful when you need to preserve the original board state while exploring possible moves.
+- **Description**: Use this function to create a new board state by applying a move to an existing board. It allocates memory for a new board, copies the current board state, and applies the move to the new board. Ensure to free the returned board when it is no longer needed to avoid memory leaks. This function is useful when you need to preserve the original board state while exploring possible moves.
 - **Inputs**:
-    - `b`: A pointer to the current board state. Must not be null. The function does not modify the board pointed to by this parameter.
+    - `b`: A pointer to the current board from which to create a new board with the move applied. Must not be null.
     - `m`: The move to apply to the board. Must be a valid move for the current board state.
-- **Output**: A pointer to a new board with the move applied. The caller must free this board to avoid memory leaks.
+- **Output**: A pointer to a new board with the move applied. The caller is responsible for freeing this board.
 - **See Also**: [`boardPlayMove`](<../../src/chesslib/board.c.md#boardplaymove>)  (Implementation)
 
 
@@ -189,11 +189,11 @@ Returns a new board with the specified move applied.
 ### boardPlayMoveInPlace<!-- {{#callable_declaration:boardPlayMoveInPlace}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/board.h#L52>)
 
-Plays a move on the board, modifying it in place.
-- **Description**: Use this function to apply a move to a chess board, updating the board's state directly. This function modifies the board in place, reflecting the move's effects such as piece movement, castling rights, en passant targets, and player turn changes. Ensure the board is properly initialized before calling this function. The function does not return a value, so verify the board's state after execution to confirm the move's success.
+Executes a move on a chess board, updating its state.
+- **Description**: Use this function to apply a move to a chess board, modifying the board's state directly. It updates the board's move number, half-move clock, castling rights, en passant target, and switches the current player. Ensure the board is properly initialized before calling this function. The function handles special moves like castling and en passant, and resets the half-move clock for pawn moves or captures. It does not return a value, and the caller must manage the board's memory.
 - **Inputs**:
     - `b`: A pointer to a `board` structure representing the current state of the chess game. Must not be null and must point to a valid, initialized board.
-    - `m`: A `move` structure representing the move to be played. The move must be valid within the context of the current board state.
+    - `m`: A `move` structure representing the move to execute. Must be a valid move within the context of the current board state.
 - **Output**: None
 - **See Also**: [`boardPlayMoveInPlace`](<../../src/chesslib/board.c.md#boardplaymoveinplace>)  (Implementation)
 
@@ -203,11 +203,11 @@ Plays a move on the board, modifying it in place.
 [View Source →](<../../../../../chesslib/include/chesslib/board.h#L55>)
 
 Checks if two boards are equal in all aspects.
-- **Description**: Use this function to determine if two `board` structures represent the same game state. It compares all relevant attributes of the boards, including the current player, castle state, en passant target square, half-move clock, move number, and the arrangement of pieces on the board. This function is useful when you need to verify that two boards are identical in every detail. Ensure that both `board` pointers are valid and initialized before calling this function.
+- **Description**: Use this function to determine if two `board` structures represent the same game state, including the current player, castle state, en passant target, half-move clock, move number, and piece positions. This function is useful for comparing two boards to ensure they are identical in every detail. It returns a non-zero value if the boards are equal and zero if they are not. Ensure that both `board` pointers are valid and initialized before calling this function.
 - **Inputs**:
-    - `b1`: A pointer to the first `board` structure to compare. Must not be null and must point to a valid, initialized `board`.
-    - `b2`: A pointer to the second `board` structure to compare. Must not be null and must point to a valid, initialized `board`.
-- **Output**: Returns `1` if the boards are equal in all aspects, otherwise returns `0`.
+    - `b1`: A pointer to the first `board` structure to compare. Must not be null and must be initialized.
+    - `b2`: A pointer to the second `board` structure to compare. Must not be null and must be initialized.
+- **Output**: Returns 1 if the boards are equal in all aspects, otherwise returns 0.
 - **See Also**: [`boardEq`](<../../src/chesslib/board.c.md#boardeq>)  (Implementation)
 
 
@@ -216,11 +216,11 @@ Checks if two boards are equal in all aspects.
 [View Source →](<../../../../../chesslib/include/chesslib/board.h#L57>)
 
 Checks if two boards are equal without considering counters and filtering the en passant target square.
-- **Description**: Use this function to compare two chess boards for equality, ignoring move counters and filtering the en passant target square. This function is useful when you need to determine if two board states are equivalent in terms of piece positions, current player, and castling rights, but not in terms of move history or en passant targets that are not valid. Ensure that both board pointers are valid and initialized before calling this function.
+- **Description**: Use this function to compare two chess boards to determine if they are equal in terms of player turn, castle state, and piece positions, while ignoring move counters and filtering en passant target squares. This function is useful when you need to check board equality without considering the full game state, such as when comparing positions for repetition detection. Ensure that both board pointers are valid and initialized before calling this function.
 - **Inputs**:
     - `b1`: A pointer to the first board to compare. Must not be null and must point to a valid, initialized board structure.
     - `b2`: A pointer to the second board to compare. Must not be null and must point to a valid, initialized board structure.
-- **Output**: Returns 1 if the boards are considered equal under the specified conditions, otherwise returns 0.
+- **Output**: Returns 1 if the boards are considered equal under the specified conditions, or 0 if they are not.
 - **See Also**: [`boardEqContext`](<../../src/chesslib/board.c.md#boardeqcontext>)  (Implementation)
 
 
@@ -229,7 +229,7 @@ Checks if two boards are equal without considering counters and filtering the en
 [View Source →](<../../../../../chesslib/include/chesslib/board.h#L59>)
 
 Converts a chess board state to a FEN string.
-- **Description**: Use this function to get a FEN (Forsyth-Edwards Notation) string representation of the current state of a chess board. This function allocates memory for the FEN string, which the caller must free after use. It includes information about piece positions, current player, castling availability, en passant target square, half-move clock, and full move number. Ensure that the input board is properly initialized before calling this function.
+- **Description**: Use this function to get a string representation of the current state of a chess board in Forsyth-Edwards Notation (FEN). This function allocates memory for the FEN string, which the caller must free after use. It captures the positions of pieces, the current player, castling availability, en passant target square, half-move clock, and full move number. Ensure that the input board is properly initialized before calling this function.
 - **Inputs**:
     - `b`: A pointer to a `board` structure representing the current state of the chess game. Must not be null and should be properly initialized before use.
 - **Output**: A dynamically allocated string containing the FEN representation of the board. The caller is responsible for freeing this memory.
