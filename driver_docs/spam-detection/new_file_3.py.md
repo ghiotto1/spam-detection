@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints the message "more new files".
+Prints a message indicating the presence of new files.
 
 # Purpose
-This code is a simple script that outputs the string "more new files" to the standard output. It uses the `print` function, which is a built-in Python function for displaying text. The script provides narrow functionality, as it performs a single action without any additional logic or complexity.
+This code is a simple script that outputs a message to the console. It uses the `print` function to display the string "more new files!! the best". The script provides narrow functionality, as it is designed solely to print this specific message when executed.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

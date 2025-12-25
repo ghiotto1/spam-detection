@@ -3,7 +3,7 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Data structures and functions for chess board management, game play, and move handling.
+Data structures and functions for chess board management, game play, move handling, and piece operations.
 
 
 ## Files
@@ -12,9 +12,9 @@ Data structures and functions for chess board management, game play, and move ha
 - **[chess.h](chess.h.md)**: Defines data structures and functions for managing and playing a chess game, including move validation.
 - **[move.h](move.h.md)**: Defines structures and functions for chess moves, including UCI notation conversion.
 - **[movelist.h](movelist.h.md)**: Defines data structures and functions for managing a list of chess moves.
-- **[piece.h](piece.h.md)**: Defines chess piece types, colors, and related functions.
+- **[piece.h](piece.h.md)**: Defines chess piece types, colors, and related functions for type and color retrieval.
 - **[piecemoves.h](piecemoves.h.md)**: Defines functions to generate potential move lists for chess pieces, including leapers and riders.
-- **[square.h](square.h.md)**: Defines a square struct for chess with functions for creation, conversion, and comparison.
+- **[square.h](square.h.md)**: Defines a square struct and functions for chessboard square operations, including creation and comparison.
 - **[squareset.h](squareset.h.md)**: Defines a 64-bit square set for chessboard states with functions to set and get square values.
 
 ---

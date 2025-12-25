@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements movement logic for chess pieces, including pawns, knights, bishops, rooks, queens, and kings.
+Implements chess piece movement logic, including specific move generation for each piece type.
 
 # Purpose
-The code defines functions for determining the possible moves of chess pieces on a chessboard. It includes functions for each type of chess piece: pawns, knights, bishops, rooks, queens, and kings. The functions calculate valid moves based on the current position of a piece and the rules of chess, such as movement patterns and capturing logic. The code uses helper functions like [`canMoveHere`](<#canmovehere>) to check if a move is valid, considering the presence of other pieces and their colors.
+The code defines functions for determining the possible moves of chess pieces on a chessboard. It includes functions for each type of chess piece: pawns, knights, bishops, rooks, queens, and kings. The functions calculate valid moves based on the current position of a piece, the type of piece, and the state of the board. The code uses helper functions such as [`canMoveHere`](<#canmovehere>) to check if a move is valid, considering the presence of other pieces and their colors. The code also handles special cases like pawn promotions and en passant captures.
 
-The code is organized into functions that generate move lists for each piece type. For example, [`pmGetPawnMoves`](<#pmgetpawnmoves>) handles pawn movement, including forward moves, captures, and promotions. The [`pmLeaperMoveList`](<#pmleapermovelist>) and [`pmRiderMoveList`](<#pmridermovelist>) functions are used to handle the movement logic for leaping and sliding pieces, respectively. The code uses arrays to define movement directions for each piece type, such as `knightOffsets` for knights and `bishopOffsets` for bishops. The functions return a `moveList`, which is a collection of possible moves for a given piece from its current position.
+The code is part of a chess library, as indicated by the inclusion of the header file `chesslib/piecemoves.h`. It provides specific functionality for generating move lists for different chess pieces, which can be used by other parts of a chess program to evaluate possible moves and game states. The functions return a `moveList`, which is a collection of possible moves for a given piece from a specific position. The code avoids circular dependencies by implementing these functions in a separate file rather than in `move.c`.
 # Imports and Dependencies
 
 ---
@@ -21,7 +21,7 @@ The code is organized into functions that generate move lists for each piece typ
 ### knightOffsets
 - **Type**: `int8_t[8][2]`
 - **Description**: Defines the possible move offsets for a knight in a chess game. Each pair of integers represents a relative move in terms of file and rank on the chessboard.
-- **Use**: Used to calculate the potential moves a knight can make from a given position on the board.
+- **Use**: Used in the `pmGetKnightMoves` function to generate possible moves for a knight.
 
 
 ---
@@ -34,14 +34,14 @@ The code is organized into functions that generate move lists for each piece typ
 ---
 ### rookOffsets
 - **Type**: `int8_t[4][2]`
-- **Description**: Defines the directional offsets for a rook's movement on a chessboard. Each pair of integers represents a direction in which a rook can move: vertically or horizontally.
-- **Use**: Used in the `pmGetRookMoves` function to determine possible moves for a rook.
+- **Description**: Defines the directional offsets for a rook's movement on a chessboard. Each pair of integers represents a possible direction the rook can move in terms of file and rank changes.
+- **Use**: Used in the `pmGetRookMoves` function to determine all possible moves for a rook on the board.
 
 
 ---
 ### royalOffsets
-- **Type**: `int8_t[8][2]`
-- **Description**: `royalOffsets` is a two-dimensional array that defines the possible movement directions for the queen and king in a chess game. Each sub-array contains two integers representing the change in file and rank for a move.
+- **Type**: `int8_t`
+- **Description**: An 8x2 array of signed 8-bit integers that represents the possible movement offsets for the queen and king pieces in a chess game. Each pair of integers in the array corresponds to a direction in which these pieces can move on the chessboard.
 - **Use**: Used to determine the movement directions for the queen and king pieces in the `pmGetQueenMoves` and `pmGetKingMoves` functions.
 
 
@@ -60,7 +60,8 @@ Determines if a move to a specified square is possible based on the presence and
     - Retrieve the piece located at square `s` on the board `b` using [`boardGetPiece`](<board.c.md#boardgetpiece>) function.
     - Check if the retrieved piece is `pEmpty`, indicating the square is empty; if so, return 1 (true).
     - If the square is not empty, get the color of the piece using [`pieceGetColor`](<piece.c.md#piecegetcolor>).
-    - Compare the color of the piece on the square with `ourColor`; return 1 (true) if they are different, otherwise return 0 (false).
+    - Compare the color of the piece on the square with `ourColor`.
+    - Return 1 (true) if the colors are different, indicating the move is possible; otherwise, return 0 (false).
 - **Output**: Returns an integer value: 1 if the move is possible (the square is empty or occupied by an opponent's piece), or 0 if the square is occupied by a piece of the same color.
 - **Functions Called**:
     - [`boardGetPiece`](<board.c.md#boardgetpiece>)
@@ -71,22 +72,22 @@ Determines if a move to a specified square is possible based on the presence and
 ### pmLeaperMoveList<!-- {{#callable:pmLeaperMoveList}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/piecemoves.c#L26>)
 
-Generates a list of valid moves for a leaper piece from a given position on a chess board.
+Generates a list of valid moves for a leaper piece on a chessboard based on its movement directions.
 - **Inputs**:
-    - `b`: A pointer to the `board` structure representing the current state of the chess board.
+    - `b`: A pointer to the `board` structure representing the current state of the chessboard.
     - `s`: The `sq` structure representing the current position of the piece on the board.
     - `pt`: The `pieceType` indicating the type of the piece for which moves are being generated.
-    - `dirs`: A 2D array of integers representing the possible directions the piece can move.
-    - `numDirs`: The number of directions available in the `dirs` array.
+    - `dirs`: A 2D array of integers representing the possible movement directions for the piece.
+    - `numDirs`: The number of movement directions provided in the `dirs` array.
 - **Logic and Control Flow**:
     - Create a new `moveList` to store possible moves.
     - Retrieve the piece at the given square `s` on the board `b`.
     - Check if the piece type matches the specified `pieceType` `pt`; if not, return the empty move list.
-    - Determine the color of the piece at the square `s`.
+    - Determine the color of the piece at square `s`.
     - Iterate over each direction in the `dirs` array.
     - Calculate the new square by adding the direction offsets to the current square `s`.
     - Check if the new square is within the bounds of the board (1 to 8 for both file and rank).
-    - If the new square is valid and can be moved to (using [`canMoveHere`](<#canmovehere>)), add the move to the `moveList`.
+    - If the new square is valid and can be moved to (no same-color piece), add the move to the `moveList`.
     - Return the populated `moveList` with all valid moves.
 - **Output**: A pointer to a `moveList` containing all valid moves for the leaper piece from the given position.
 - **Functions Called**:
@@ -107,21 +108,22 @@ Generates a list of possible moves for a rider-type chess piece from a given pos
 - **Inputs**:
     - `b`: A pointer to the `board` structure representing the current state of the chessboard.
     - `s`: The `sq` structure representing the current square of the piece on the board.
-    - `pt`: The `pieceType` enumeration value representing the type of the piece (e.g., bishop, rook, queen).
+    - `pt`: The `pieceType` enumeration value representing the type of the piece to move.
     - `dirs`: A 2D array of integers representing the possible movement directions for the piece.
     - `numDirs`: The number of directions in the `dirs` array.
 - **Logic and Control Flow**:
-    - Create a new `moveList` to store possible moves.
-    - Retrieve the piece at the given square `s` on the board `b`.
-    - Check if the piece type matches the specified `pieceType` `pt`; if not, return the empty move list.
-    - Determine the color of the piece to ensure moves do not capture pieces of the same color.
-    - Iterate over each direction in the `dirs` array.
-    - For each direction, repeatedly move the piece in that direction until it goes off the board or encounters another piece.
-    - If the new square is within the board limits, check if the piece can move there using [`canMoveHere`](<#canmovehere>).
-    - Add the move to the list if it is valid.
-    - Stop further movement in the current direction if a piece is encountered (capturing or blocked).
-    - Return the list of valid moves.
-- **Output**: A pointer to a `moveList` containing all valid moves for the piece from the given square.
+    - Create a new move list using `moveListCreate()`.
+    - Get the piece at the square `s` using `boardGetPiece(b, s)`.
+    - Check if the piece type matches `pt`; if not, return the empty move list.
+    - Get the color of the piece using `pieceGetColor(p)`.
+    - Iterate over each direction in `dirs` using a loop.
+    - For each direction, update the square `newSq` by adding the direction offsets to the current square `s`.
+    - Check if `newSq` is within the board boundaries; if not, break the loop for that direction.
+    - Get the piece at `newSq` using `boardGetPiece(b, newSq)`.
+    - Check if the piece can move to `newSq` using `canMoveHere(b, newSq, color)`; if true, add the move to the list using `moveListAdd(list, moveSq(s, newSq))`.
+    - If `newSq` contains a piece (not `pEmpty`), break the loop for that direction.
+    - Return the move list.
+- **Output**: A pointer to a `moveList` structure containing all valid moves for the piece from the given square.
 - **Functions Called**:
     - [`moveListCreate`](<movelist.c.md#movelistcreate>)
     - [`boardGetPiece`](<board.c.md#boardgetpiece>)
@@ -142,9 +144,9 @@ Adds a pawn move to the move list, including promotion moves if applicable.
     - ``oldSq``: The starting square of the pawn.
     - ``newSq``: The destination square of the pawn.
 - **Logic and Control Flow**:
-    - Check if the move results in a promotion by verifying if `newSq.rank` is 1 or 8.
-    - If it is a promotion, add moves for promoting the pawn to a queen, rook, bishop, and knight to the move list using [`moveListAdd`](<movelist.c.md#movelistadd>) and [`movePromote`](<move.c.md#movepromote>).
-    - If it is not a promotion, add a regular move from `oldSq` to `newSq` to the move list using [`moveListAdd`](<movelist.c.md#movelistadd>) and [`moveSq`](<move.c.md#movesq>).
+    - Check if the destination square `newSq` is on the first or eighth rank, indicating a promotion opportunity.
+    - If promotion is possible, add moves to the list for promoting the pawn to a queen, rook, bishop, and knight.
+    - If promotion is not possible, add a regular move from `oldSq` to `newSq` to the list.
 - **Output**: No return value; the function modifies the `moveList` pointed to by `list`.
 - **Functions Called**:
     - [`moveListAdd`](<movelist.c.md#movelistadd>)
@@ -162,13 +164,13 @@ Generates a list of all possible legal moves for a pawn located at a given squar
     - `s`: The `sq` structure representing the current position of the pawn on the board.
 - **Logic and Control Flow**:
     - Create an empty move list using `moveListCreate()`.
-    - Retrieve the piece at square `s` using `boardGetPiece(b, s)` and check if it is a pawn using `pieceGetType(p)`. If not, return the empty move list.
-    - Determine the pawn's color using `pieceGetColor(p)` and set `delta` to 1 for white pawns and -1 for black pawns.
-    - Calculate the square directly in front of the pawn (`newSq`) and check if it is empty using `boardGetPiece(b, newSq)`. If empty, add the move to the list using `addPawnMoveToMoveList(list, s, newSq)`.
-    - Check if the pawn can move two squares forward (if it is on its starting rank) and if the square two ranks ahead is empty, add this move to the list.
-    - For captures, check the diagonally adjacent squares (`s.file - 1` and `s.file + 1`) for opponent pieces or en passant targets and add these moves to the list if valid.
-    - Return the populated move list.
-- **Output**: A pointer to a `moveList` structure containing all legal moves for the pawn at the given square.
+    - Retrieve the piece at square `s` using `boardGetPiece(b, s)` and check if it is a pawn; if not, return the empty move list.
+    - Determine the pawn's color and set `delta` to 1 for white pawns and -1 for black pawns.
+    - Calculate the square directly in front of the pawn (`newSq`) and check if it is empty; if so, add this move to the list.
+    - Check if the pawn is in its initial position and can move two squares forward; if so, add this move to the list if the path is clear.
+    - Check for possible captures to the left and right of the pawn's current position; add these moves to the list if they are valid captures or en passant targets.
+    - Return the list of possible moves.
+- **Output**: A pointer to a `moveList` structure containing all possible legal moves for the pawn at the given square.
 - **Functions Called**:
     - [`moveListCreate`](<movelist.c.md#movelistcreate>)
     - [`boardGetPiece`](<board.c.md#boardgetpiece>)
@@ -214,14 +216,13 @@ Determines potential attack squares for a pawn on a chessboard.
 ### pmGetKnightMoves<!-- {{#callable:pmGetKnightMoves}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/piecemoves.c#L197>)
 
-Generates a list of all possible moves for a knight from a given position on a chessboard.
+Generates a list of valid moves for a knight piece on a chessboard from a given position.
 - **Inputs**:
     - `b`: A pointer to the `board` structure representing the current state of the chessboard.
     - `s`: The `sq` structure representing the current position of the knight on the board.
 - **Logic and Control Flow**:
-    - Calls the [`pmLeaperMoveList`](<#pmleapermovelist>) function with the board, current square, piece type `ptKnight`, `knightOffsets` array, and the number of directions (8) as arguments.
-    - The [`pmLeaperMoveList`](<#pmleapermovelist>) function generates a list of valid moves for the knight based on its movement pattern and the current board state.
-- **Output**: A pointer to a `moveList` structure containing all valid moves for the knight from the given position.
+    - Calls the [`pmLeaperMoveList`](<#pmleapermovelist>) function with the board, current position, piece type `ptKnight`, `knightOffsets` array, and the number of directions (8).
+- **Output**: A pointer to a `moveList` structure containing all possible moves for the knight from the given position.
 - **Functions Called**:
     - [`pmLeaperMoveList`](<#pmleapermovelist>)
 
@@ -237,9 +238,6 @@ Generates a list of all possible moves for a bishop on a chessboard from a given
 - **Logic and Control Flow**:
     - Calls the [`pmRiderMoveList`](<#pmridermovelist>) function with the board, position, piece type `ptBishop`, direction offsets `bishopOffsets`, and the number of directions `4`.
     - The [`pmRiderMoveList`](<#pmridermovelist>) function calculates all possible moves for the bishop by iterating over the diagonal directions specified in `bishopOffsets`.
-    - The function checks each square in the diagonal directions until it reaches the edge of the board or another piece.
-    - If the square is empty or contains an opponent's piece, the move is added to the move list.
-    - If the square contains a piece, the iteration in that direction stops.
 - **Output**: Returns a pointer to a `moveList` structure containing all valid moves for the bishop from the given position.
 - **Functions Called**:
     - [`pmRiderMoveList`](<#pmridermovelist>)
@@ -255,7 +253,7 @@ Generates a list of all possible moves for a rook on a given chess board from a 
     - `s`: The `sq` structure representing the square from which the rook will move.
 - **Logic and Control Flow**:
     - Calls the [`pmRiderMoveList`](<#pmridermovelist>) function with the board `b`, square `s`, piece type `ptRook`, direction offsets `rookOffsets`, and number of directions `4`.
-- **Output**: A pointer to a `moveList` structure containing all valid moves for the rook from the specified square.
+- **Output**: Returns a pointer to a `moveList` structure containing all valid moves for a rook from the specified square `s` on the board `b`.
 - **Functions Called**:
     - [`pmRiderMoveList`](<#pmridermovelist>)
 
@@ -271,9 +269,9 @@ Generates a list of all possible moves for a queen on a chessboard from a given 
 - **Logic and Control Flow**:
     - Calls the [`pmRiderMoveList`](<#pmridermovelist>) function with the board, position, piece type `ptQueen`, direction offsets `royalOffsets`, and number of directions `8`.
     - The [`pmRiderMoveList`](<#pmridermovelist>) function calculates all possible moves for the queen by iterating over each direction in `royalOffsets` and moving in that direction until it reaches the edge of the board or another piece.
-    - If the move is valid (either the square is empty or contains an opponent's piece), it adds the move to the move list.
-    - Stops further movement in a direction if a piece is encountered.
-- **Output**: Returns a pointer to a `moveList` structure containing all valid moves for the queen from the given position.
+    - If the square is occupied by a piece of the same color, the move is not added to the list.
+    - If the square is occupied by an opponent's piece, the move is added to the list and the iteration in that direction stops.
+- **Output**: A pointer to a `moveList` structure containing all possible moves for the queen from the given position.
 - **Functions Called**:
     - [`pmRiderMoveList`](<#pmridermovelist>)
 
@@ -284,12 +282,12 @@ Generates a list of all possible moves for a queen on a chessboard from a given 
 
 Generates a list of all possible moves for a king piece from a given square on a chess board.
 - **Inputs**:
-    - ``b``: A pointer to the `board` structure representing the current state of the chess board.
-    - ``s``: The `sq` structure representing the current position of the king on the board.
+    - `b`: A pointer to the `board` structure representing the current state of the chess board.
+    - `s`: The `sq` structure representing the current position of the king on the board.
 - **Logic and Control Flow**:
     - Calls the [`pmLeaperMoveList`](<#pmleapermovelist>) function with the board, square, piece type `ptKing`, direction offsets `royalOffsets`, and number of directions `8`.
-    - The [`pmLeaperMoveList`](<#pmleapermovelist>) function generates a list of valid moves for the king based on its leaping movement pattern.
-- **Output**: Returns a pointer to a `moveList` structure containing all valid moves for the king from the specified square.
+    - The [`pmLeaperMoveList`](<#pmleapermovelist>) function generates moves for leaping pieces like the king, using the provided direction offsets.
+- **Output**: A pointer to a `moveList` structure containing all valid moves for the king from the specified square.
 - **Functions Called**:
     - [`pmLeaperMoveList`](<#pmleapermovelist>)
 

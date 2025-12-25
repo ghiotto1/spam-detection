@@ -6,7 +6,7 @@
 Defines functions to generate potential move lists for chess pieces, including leapers and riders.
 
 # Purpose
-This C header file defines functions related to generating potential moves for chess pieces on a board. It includes functions for both leapers and riders, which are types of chess pieces that move in specific patterns. The [`pmLeaperMoveList`](<#pmleapermovelist>) function generates a list of potential moves for leaper pieces, such as knights, based on given directional offsets. The [`pmRiderMoveList`](<#pmridermovelist>) function does the same for rider pieces, like bishops and rooks, which can move multiple squares in a direction until they encounter an obstacle. Additionally, the file provides specific functions to generate potential moves for each type of chess piece, including pawns, knights, bishops, rooks, queens, and kings. The pawn has a special function, [`pmGetPawnAttacks`](<#pmgetpawnattacks>), to handle its unique attack pattern. These functions return a `moveList` of potential moves, which may include moves that leave the player in check.
+This C header file defines functions related to generating potential moves for chess pieces on a board. It includes functions for both leapers, which move to specific squares based on given offsets, and riders, which continue moving in a direction until they encounter an obstacle. The file provides specific functions to generate move lists for each type of chess piece, such as pawns, knights, bishops, rooks, queens, and kings. Additionally, it includes a specialized function for calculating pawn attack moves. The header file avoids circular dependencies by not being included in `move.h`, and it relies on the `board` and `movelist` structures from the `chesslib` library.
 # Imports and Dependencies
 
 ---
@@ -21,14 +21,14 @@ This C header file defines functions related to generating potential moves for c
 [View Source →](<../../../../../chesslib/include/chesslib/piecemoves.h#L19>)
 
 Generates a list of potential moves for a leaper piece on a chessboard.
-- **Description**: Use this function to determine all possible moves for a leaper piece from a given position on a chessboard. A leaper can move to specific squares defined by directional offsets. The function requires a valid board state, the current position of the piece, the type of the piece, and an array of directional offsets. It returns a list of potential moves, which may include moves that leave the player in check. Ensure the piece at the given position matches the specified type before calling this function.
+- **Description**: Use this function to determine all possible moves for a leaper piece from a given position on a chessboard. A leaper can move to specific squares defined by directional offsets. The function requires a valid board, a starting square, a piece type, an array of directional offsets, and the number of directions. It returns a list of potential moves, which may include moves that leave the player in check. Ensure the piece at the starting square matches the specified piece type before calling this function.
 - **Inputs**:
     - `b`: A pointer to a `board` structure representing the current state of the chessboard. Must not be null.
-    - `s`: A `sq` structure representing the current position of the piece on the board. Must be a valid square on the board.
-    - `pt`: A `pieceType` indicating the type of the piece for which moves are being generated. Must match the type of the piece at the given position.
-    - `dirs`: A 2D array of integers representing directional offsets for the leaper's movement. Each element is a tuple of two integers indicating file and rank offsets.
+    - `s`: A `sq` structure representing the starting square of the piece. Must be a valid square on the board.
+    - `pt`: A `pieceType` indicating the type of piece for which to generate moves. The piece at the starting square must match this type.
+    - `dirs`: A 2D array of integers representing directional offsets for the leaper's movement. Each pair of integers defines a possible move direction.
     - `numDirs`: A `size_t` value indicating the number of directional offsets provided in `dirs`. Must be greater than zero.
-- **Output**: A pointer to a `moveList` containing potential moves for the leaper piece. The list may be empty if no valid moves are found.
+- **Output**: Returns a pointer to a `moveList` containing potential moves for the leaper piece. The list may be empty if no valid moves are found.
 - **See Also**: [`pmLeaperMoveList`](<../../src/chesslib/piecemoves.c.md#pmleapermovelist>)  (Implementation)
 
 
@@ -36,15 +36,15 @@ Generates a list of potential moves for a leaper piece on a chessboard.
 ### pmRiderMoveList<!-- {{#callable_declaration:pmRiderMoveList}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/piecemoves.h#L21>)
 
-Generates a list of potential moves for a rider piece on a chessboard.
-- **Description**: Use this function to obtain a list of all potential moves for a rider piece, such as a rook, bishop, or queen, from a given position on a chessboard. The function considers the piece's type and color, and it uses the specified directional offsets to determine valid moves. It stops generating moves in a direction when it encounters another piece or the edge of the board. The function does not check if the moves leave the player in check, so additional validation may be necessary.
+Generates potential moves for a rider piece on a chessboard.
+- **Description**: Use this function to get a list of all potential moves for a rider piece, such as a rook or bishop, from a given position on the board. The function considers the piece's ability to move in specified directions until it encounters another piece or the edge of the board. It is important to ensure that the piece at the starting square matches the specified piece type. The function does not check if the moves leave the player in check.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure representing the current state of the chessboard. Must not be null.
-    - `s`: A `sq` structure representing the starting square of the piece. Must be a valid square on the board.
-    - `pt`: A `pieceType` value representing the type of the piece for which to generate moves. Must match the type of the piece at the starting square.
-    - `dirs`: A 2D array of integers representing the directional offsets for the piece's movement. Each element is a tuple of two integers indicating file and rank offsets. Must not be null.
-    - `numDirs`: A `size_t` value indicating the number of directional offsets provided in `dirs`. Must be greater than zero.
-- **Output**: Returns a pointer to a `moveList` containing potential moves for the rider piece. The list may be empty if no valid moves are found.
+    - `b`: A pointer to the `board` structure representing the current state of the chessboard. Must not be null.
+    - `s`: The starting square (`sq`) from which to calculate potential moves. Must be a valid square on the board.
+    - `pt`: The type of the piece (`pieceType`) for which to generate moves. Must match the type of the piece at the starting square.
+    - `dirs`: An array of direction offsets (`int8_t dirs[][2]`) that define the possible movement directions for the piece. Each direction is a pair of integers representing file and rank offsets.
+    - `numDirs`: The number of direction pairs in the `dirs` array (`size_t`). Must be greater than zero.
+- **Output**: A pointer to a `moveList` containing potential moves for the rider piece. The list may be empty if no valid moves are found.
 - **See Also**: [`pmRiderMoveList`](<../../src/chesslib/piecemoves.c.md#pmridermovelist>)  (Implementation)
 
 
@@ -53,11 +53,11 @@ Generates a list of potential moves for a rider piece on a chessboard.
 [View Source →](<../../../../../chesslib/include/chesslib/piecemoves.h#L24>)
 
 Generates a list of potential moves for a pawn on a chessboard.
-- **Description**: Use this function to obtain all possible moves for a pawn located at a specific square on a given chessboard. It considers standard pawn movement rules, including forward moves, double moves from the initial position, and captures, including en passant. The function does not validate if the moves leave the player in check, so additional validation is necessary for complete move legality. Ensure the board and square are correctly initialized before calling this function.
+- **Description**: Use this function to get all possible moves for a pawn located at a specific square on a given chessboard. It considers standard pawn movement rules, including forward moves, double moves from the initial position, and captures, including en passant. The function does not validate if the moves leave the player in check, so additional validation is necessary for complete move legality. Ensure the board and square are correctly initialized before calling this function.
 - **Inputs**:
     - `b`: A pointer to a `board` structure representing the current state of the chessboard. Must not be null. The function reads from this board to determine the pawn's possible moves.
     - `s`: A `sq` structure representing the square where the pawn is located. Must be a valid square on the board. If the square does not contain a pawn, the function returns an empty move list.
-- **Output**: A pointer to a `moveList` structure containing potential moves for the pawn. The list may be empty if no valid moves are available.
+- **Output**: Returns a pointer to a `moveList` structure containing potential moves for the pawn. The list may be empty if no valid moves are available.
 - **See Also**: [`pmGetPawnMoves`](<../../src/chesslib/piecemoves.c.md#pmgetpawnmoves>)  (Implementation)
 
 
@@ -66,11 +66,11 @@ Generates a list of potential moves for a pawn on a chessboard.
 [View Source →](<../../../../../chesslib/include/chesslib/piecemoves.h#L25>)
 
 Generates potential knight moves from a given board position.
-- **Description**: Use this function to obtain a list of all potential moves for a knight piece from a specified position on the chess board. This function is useful when you need to evaluate possible knight moves without considering whether these moves leave the player in check. It is important to ensure that the board is properly initialized before calling this function. The function returns a list of potential moves, which may include moves that are not legal in the current game state.
+- **Description**: Use this function to obtain a list of all potential moves for a knight piece from a specified position on the chess board. This function calculates moves based on the knight's unique movement pattern, which includes all possible L-shaped moves. The function does not consider whether these moves leave the current player in check, so additional validation is necessary to ensure the legality of the moves in the context of the game. Ensure that the board is properly initialized before calling this function.
 - **Inputs**:
     - `b`: A pointer to a `board` structure representing the current state of the chess board. Must not be null. The caller retains ownership.
-    - `s`: A `sq` value representing the square from which the knight moves are to be generated. Must be a valid square on the board.
-- **Output**: Returns a pointer to a `moveList` containing potential knight moves from the specified square. The caller is responsible for managing the memory of the returned list.
+    - `s`: A `sq` value representing the square from which the knight will move. Must be a valid square on the board.
+- **Output**: Returns a pointer to a `moveList` structure containing potential knight moves. The caller is responsible for managing the memory of the returned list.
 - **See Also**: [`pmGetKnightMoves`](<../../src/chesslib/piecemoves.c.md#pmgetknightmoves>)  (Implementation)
 
 
@@ -79,11 +79,11 @@ Generates potential knight moves from a given board position.
 [View Source →](<../../../../../chesslib/include/chesslib/piecemoves.h#L26>)
 
 Generates potential bishop moves from a given board position.
-- **Description**: Use this function to obtain a list of all potential moves for a bishop located at a specific square on a chess board. This function calculates moves based on the bishop's ability to move diagonally any number of squares until it encounters another piece. The resulting move list may include moves that place the player's king in check, so additional validation is necessary to ensure moves are legal in the context of the game.
+- **Description**: Use this function to obtain a list of all potential moves for a bishop located at a specific square on the chessboard. This function calculates moves based on the bishop's ability to move diagonally any number of squares until it encounters another piece. The function does not consider whether the moves leave the player in check, so additional validation is necessary to ensure the legality of the moves in the context of the game.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure representing the current state of the chess game. Must not be null. The function reads from this board to determine valid moves.
-    - `s`: A `sq` value representing the square on the board where the bishop is located. Must be a valid square within the board's boundaries.
-- **Output**: Returns a pointer to a `moveList` structure containing potential moves for the bishop. The caller is responsible for managing the memory of the returned move list.
+    - `b`: A pointer to a `board` structure representing the current state of the chessboard. Must not be null. The function reads from this board to determine the bishop's potential moves.
+    - `s`: A `sq` value representing the square on the board where the bishop is currently located. Must be a valid square on the board.
+- **Output**: Returns a pointer to a `moveList` structure containing potential moves for the bishop. The caller is responsible for managing the memory of the returned `moveList`.
 - **See Also**: [`pmGetBishopMoves`](<../../src/chesslib/piecemoves.c.md#pmgetbishopmoves>)  (Implementation)
 
 
@@ -91,12 +91,12 @@ Generates potential bishop moves from a given board position.
 ### pmGetRookMoves<!-- {{#callable_declaration:pmGetRookMoves}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/piecemoves.h#L27>)
 
-Generates a list of potential rook moves from a given square.
-- **Description**: Use this function to obtain all potential moves for a rook located on a specific square of the chessboard. It calculates moves based on the standard movement rules for a rook, which can move any number of squares along a row or column until it encounters another piece. The function does not consider whether the moves leave the current player in check, so additional validation is necessary to ensure moves are legal in the context of the game.
+Generates potential rook moves from a given position on the board.
+- **Description**: Use this function to obtain a list of all potential moves for a rook located at a specific square on a chess board. This function is useful when you need to determine possible rook movements without considering whether these moves would leave the player in check. It is important to note that the returned move list may include moves that are not legal in the current game state, as it does not account for checks.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure representing the current state of the chessboard. Must not be null.
-    - `s`: A `sq` value representing the square on the board from which to calculate rook moves. Must be a valid square on the board.
-- **Output**: Returns a pointer to a `moveList` structure containing potential moves for the rook. The caller is responsible for managing the memory of the returned list.
+    - `b`: A pointer to a `board` structure representing the current state of the chess board. Must not be null.
+    - `s`: A `sq` value representing the square on the board where the rook is located. Must be a valid square on the board.
+- **Output**: Returns a pointer to a `moveList` containing potential moves for the rook from the specified square. The caller is responsible for managing the memory of the returned move list.
 - **See Also**: [`pmGetRookMoves`](<../../src/chesslib/piecemoves.c.md#pmgetrookmoves>)  (Implementation)
 
 
@@ -105,11 +105,11 @@ Generates a list of potential rook moves from a given square.
 [View Source →](<../../../../../chesslib/include/chesslib/piecemoves.h#L28>)
 
 Generates potential queen moves from a given board position.
-- **Description**: Use this function to obtain a list of all potential moves for a queen located at a specific square on the chess board. This function calculates moves based on the queen's ability to move any number of squares along a rank, file, or diagonal, until it encounters another piece. The resulting move list may include moves that leave the player in check, so additional validation is necessary to ensure moves are legal in the context of the game.
+- **Description**: Use this function to obtain a list of all potential moves for a queen from a specified position on the chess board. This function is useful when you need to evaluate possible queen moves without considering whether these moves leave the player in check. It is important to note that the returned move list may include moves that are not legal in the context of the current game state, as it does not account for checks.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure representing the current state of the chess game. Must not be null.
-    - `s`: A `sq` value representing the square on the board where the queen is located. Must be a valid square within the board's boundaries.
-- **Output**: Returns a pointer to a `moveList` structure containing potential moves for the queen. The caller is responsible for managing the memory of the returned move list.
+    - `b`: A pointer to a `board` structure representing the current state of the chess game. Must not be null. The function reads from this board to determine possible moves.
+    - `s`: A `sq` value representing the square from which to calculate the queen's potential moves. Must be a valid square on the board.
+- **Output**: Returns a pointer to a `moveList` structure containing potential moves for the queen from the specified square. The caller is responsible for managing the memory of the returned move list.
 - **See Also**: [`pmGetQueenMoves`](<../../src/chesslib/piecemoves.c.md#pmgetqueenmoves>)  (Implementation)
 
 
@@ -118,11 +118,11 @@ Generates potential queen moves from a given board position.
 [View Source →](<../../../../../chesslib/include/chesslib/piecemoves.h#L29>)
 
 Generates potential king moves from a given board position.
-- **Description**: Use this function to get a list of all potential moves for a king located at a specific square on a chess board. This function calculates moves based on the standard movement rules for a king, which can move one square in any direction. The function does not consider whether the moves leave the king in check, so additional validation is necessary to ensure the king's safety. Call this function when you need to evaluate possible king moves during a game.
+- **Description**: Use this function to get a list of all potential moves for a king piece from a specified position on the board. This function does not check if the moves leave the king in check, so additional validation is necessary to ensure the king's safety. It is important to call this function with a valid board and square position to avoid undefined behavior.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure representing the current state of the chess game. Must not be null. The function reads from this board to determine valid moves.
-    - `s`: A `sq` value representing the square where the king is currently located. Must be a valid square on the board. The function uses this to calculate potential moves.
-- **Output**: Returns a pointer to a `moveList` containing potential moves for the king from the given position. The caller is responsible for managing the memory of the returned list.
+    - `b`: A pointer to a `board` structure representing the current state of the chess game. Must not be null.
+    - `s`: A `sq` value representing the square from which to calculate the king's potential moves. Must be a valid square on the board.
+- **Output**: Returns a pointer to a `moveList` containing potential moves for the king from the specified square. The caller is responsible for managing the memory of the returned `moveList`.
 - **See Also**: [`pmGetKingMoves`](<../../src/chesslib/piecemoves.c.md#pmgetkingmoves>)  (Implementation)
 
 
@@ -130,12 +130,12 @@ Generates potential king moves from a given board position.
 ### pmGetPawnAttacks<!-- {{#callable_declaration:pmGetPawnAttacks}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/piecemoves.h#L32>)
 
-Generates a list of potential attack moves for a pawn on a chessboard.
-- **Description**: Use this function to get a list of potential attack moves for a pawn located at a specific square on a chessboard. The function checks if the piece at the given square is a pawn and calculates its possible attack moves based on its color. It considers diagonal moves to adjacent files, taking into account the boundaries of the board. The function returns a list of these potential moves, which may include moves that leave the player in check. Ensure that the board and square are valid before calling this function.
+Generates a list of potential pawn attack moves from a given square.
+- **Description**: Use this function to get a list of potential attack moves for a pawn located at a specific square on the board. The function checks if the piece at the given square is a pawn and, if so, calculates possible attack moves based on the pawn's color. It considers diagonal moves to adjacent squares in the forward direction, depending on the pawn's color. The function returns an empty list if the piece is not a pawn or if no valid attack moves are possible. This function does not validate if the moves leave the player in check.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure representing the current state of the chessboard. Must not be null. The function does not modify the board.
-    - `s`: A `sq` structure representing the square on the board where the pawn is located. The square must be within the valid range of the board.
-- **Output**: Returns a pointer to a `moveList` containing potential attack moves for the pawn. The list may be empty if no valid attacks are possible.
+    - `b`: A pointer to the `board` structure representing the current state of the chessboard. Must not be null. The function reads from this board to determine the position and type of pieces.
+    - `s`: A `sq` structure representing the square from which to calculate pawn attack moves. Must be a valid square on the board. The function assumes this square contains a piece, and it checks if the piece is a pawn.
+- **Output**: A pointer to a `moveList` structure containing potential pawn attack moves from the given square. The list is empty if the piece is not a pawn or if no valid attack moves are possible.
 - **See Also**: [`pmGetPawnAttacks`](<../../src/chesslib/piecemoves.c.md#pmgetpawnattacks>)  (Implementation)
 
 

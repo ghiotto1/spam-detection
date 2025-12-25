@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-MIT License for the software, permitting use, distribution, and modification with conditions.
+MIT License for the software, allowing free use, modification, and distribution.
 
 # Purpose
-The content is a software license known as the MIT License. It grants permission to any person who obtains a copy of the software and its documentation to use, copy, modify, merge, publish, distribute, sublicense, and sell copies of the software. The license requires that the copyright notice and permission notice are included in all copies or significant portions of the software. It also states that the software is provided "as is," without any warranties, and disclaims liability for any claims, damages, or other liabilities that may arise from the use of the software.
+The content is a software license known as the MIT License. It grants permission to any person who obtains a copy of the software and its documentation to use, copy, modify, merge, publish, distribute, sublicense, and sell copies of the software. The license requires that the copyright notice and permission notice are included in all copies or substantial portions of the software. It also states that the software is provided "as is," without any warranty, and disclaims any liability for damages or other issues that arise from using the software.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

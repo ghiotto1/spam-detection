@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Implements a chess board with functions for initialization, move generation, and FEN string handling.
+Chess board implementation with functions for board creation, move generation, and FEN string handling.
 
 # Purpose
-The code is a C implementation of a chess board management system. It provides functions to create and initialize a chess board, manage the state of the board, and generate legal moves. The code uses the Forsyth-Edwards Notation (FEN) to initialize and represent the board state, which includes the positions of pieces, the current player, castling availability, en passant target squares, and move counters. The functions [`boardCreate`](<#boardcreate>), [`boardCreateFromFen`](<#boardcreatefromfen>), and [`boardInitFromFenInPlace`](<#boardinitfromfeninplace>) are responsible for creating and initializing the board from a FEN string. The [`boardGenerateMoves`](<#boardgeneratemoves>) function generates a list of all legal moves for the current player, considering the rules of chess such as castling and en passant.
+The code is a C implementation of a chess board management system. It provides functions to create, initialize, and manipulate a chess board using the Forsyth-Edwards Notation (FEN) for setting up board positions. The code includes functions to create a board from a FEN string, initialize a board in place, and set or get pieces on the board. It also includes functions to generate legal moves, check if a square is attacked, and determine if a player is in check. The code handles special chess rules such as castling, en passant, and pawn promotion.
 
-The code also includes functions to check the state of the board, such as [`boardIsInCheck`](<#boardisincheck>), [`boardIsPlayerInCheck`](<#boardisplayerincheck>), and [`boardIsInsufficientMaterial`](<#boardisinsufficientmaterial>), which determine if a player is in check or if the game is a draw due to insufficient material. The [`boardPlayMove`](<#boardplaymove>) and [`boardPlayMoveInPlace`](<#boardplaymoveinplace>) functions apply a move to the board, updating the board state accordingly. The code defines public APIs for board manipulation and move generation, making it suitable for integration into a larger chess application. The functions [`boardEq`](<#boardeq>) and [`boardEqContext`](<#boardeqcontext>) provide mechanisms to compare board states, either fully or contextually, ignoring certain attributes like move counters. The code is part of a chess library, as indicated by the inclusion of headers such as `chesslib/board.h` and `chesslib/piecemoves.h`.
+The code defines several functions that interact with a `board` structure, which represents the state of a chess game. It includes functions to play moves on the board, check for insufficient material for a draw, and compare boards for equality. The code also provides a function to convert the board state back into a FEN string. This implementation is part of a larger chess library, as indicated by the inclusion of headers like `chesslib/board.h` and `chesslib/piecemoves.h`. The code is designed to be used as part of a chess engine or application that requires board state management and move generation.
 # Imports and Dependencies
 
 ---
@@ -42,10 +42,10 @@ Creates a new chess board initialized to the standard starting position using th
 
 Creates a new chess board from a given FEN string.
 - **Inputs**:
-    - `fen`: A string in Forsyth-Edwards Notation (FEN) that describes a specific board position.
+    - `fen`: A string in Forsyth-Edwards Notation (FEN) that represents the state of a chess game.
 - **Logic and Control Flow**:
     - Allocate memory for a new `board` structure and assign it to pointer `b`.
-    - Call [`boardInitFromFenInPlace`](<#boardinitfromfeninplace>) to initialize the board `b` using the provided FEN string.
+    - Call [`boardInitFromFenInPlace`](<#boardinitfromfeninplace>) to initialize the board `b` using the provided `fen` string.
     - If [`boardInitFromFenInPlace`](<#boardinitfromfeninplace>) returns a non-zero value, indicating an error, free the allocated memory for `b` and return `NULL`.
     - If initialization is successful, return the pointer `b` to the newly created board.
 - **Output**: A pointer to a `board` structure initialized with the given FEN string, or `NULL` if initialization fails.
@@ -62,7 +62,7 @@ Initializes a chess board to the standard starting position using the FEN string
     - `b`: A pointer to a `board` structure that will be initialized.
 - **Logic and Control Flow**:
     - Calls the function [`boardInitFromFenInPlace`](<#boardinitfromfeninplace>) with the board pointer `b` and the constant `INITIAL_FEN` to set up the board.
-- **Output**: No output is returned as the function modifies the board in place.
+- **Output**: No return value; the function modifies the board in place.
 - **Functions Called**:
     - [`boardInitFromFenInPlace`](<#boardinitfromfeninplace>)
 
@@ -71,20 +71,22 @@ Initializes a chess board to the standard starting position using the FEN string
 ### boardInitFromFenInPlace<!-- {{#callable:boardInitFromFenInPlace}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/board.c#L37>)
 
-Initializes a chess board from a FEN string, setting up pieces, player turn, castling rights, en passant target, and move counters.
+Initializes a chess board from a FEN string and updates the board state accordingly.
 - **Inputs**:
-    - ``b``: A pointer to a `board` structure where the function will initialize the board state.
-    - ``fen``: A constant character pointer to a FEN (Forsyth-Edwards Notation) string that describes the board setup.
+    - `b`: A pointer to a `board` structure that will be initialized.
+    - `fen`: A constant character pointer representing the FEN string to parse.
 - **Logic and Control Flow**:
     - Initialize `currSq` to the top-left square of the board (file 1, rank 8).
-    - Iterate over the FEN string to set up pieces on the board, handling numbers for empty squares, slashes for rank changes, and specific characters for different pieces.
-    - Check for errors in the FEN string format, such as misplaced slashes or characters beyond the end of a rank, and return 1 if any errors are found.
-    - After setting up pieces, check if the board setup ended correctly with rank 1 and file 9, returning 1 if not.
-    - Read the current player's turn from the FEN string and set `b->currentPlayer`, returning 1 if the character is not 'w' or 'b'.
-    - Parse the castling rights from the FEN string, updating `b->castleState` based on the presence of kings and rooks in their initial positions.
-    - Read the en passant target square from the FEN string, setting `b->epTarget` to `SQ_INVALID` if '-' is found or to the parsed square otherwise, returning 1 if the square is invalid.
-    - Parse the half move clock and full move count from the FEN string using `sscanf`.
-- **Output**: Returns 0 on successful initialization or 1 if an error occurs in parsing the FEN string.
+    - Iterate over the FEN string to read piece placement, updating `currSq` and setting pieces on the board using [`boardSetPiece`](<#boardsetpiece>).
+    - Handle numbers in the FEN string by skipping empty squares and updating `currSq`.
+    - Handle '/' characters to move to the next rank, checking for errors in rank positioning.
+    - Parse individual piece characters, determining color and type, and place them on the board.
+    - After reading pieces, check if the board setup ended correctly with `currSq` at file 9, rank 1.
+    - Parse the current player's turn ('w' or 'b') and update `b->currentPlayer`.
+    - Parse the castling availability section, updating `b->castleState` based on the presence of kings and rooks in their initial positions.
+    - Parse the en passant target square, updating `b->epTarget` or setting it to `SQ_INVALID` if not applicable.
+    - Parse the half move clock and full move count using `sscanf` and update `b->halfMoveClock` and `b->moveNumber`.
+- **Output**: Returns 0 on successful initialization, or 1 if an error occurs in parsing the FEN string.
 - **Functions Called**:
     - [`sqI`](<square.c.md#sqi>)
     - [`boardSetPiece`](<#boardsetpiece>)
@@ -119,8 +121,8 @@ Retrieves the chess piece located at a specific square on the board.
     - `s`: The `sq` type representing the square on the board from which to retrieve the piece.
 - **Logic and Control Flow**:
     - Call the function [`sqGetIndex`](<square.c.md#sqgetindex>) with the square `s` to get the index of the square on the board.
-    - Access the `pieces` array in the `board` structure `b` using the obtained index.
-    - Return the piece located at the specified index in the `pieces` array.
+    - Access the `pieces` array in the `board` structure `b` using the calculated index.
+    - Return the piece located at the specified index.
 - **Output**: Returns the `piece` located at the specified square on the board.
 - **Functions Called**:
     - [`sqGetIndex`](<square.c.md#sqgetindex>)
@@ -137,11 +139,11 @@ Generates a list of all legal moves for the current player on a chess board, inc
     - Create an empty `moveList` to store legal moves.
     - Iterate over each square on the board (64 squares total).
     - For each square, get the piece and check if it belongs to the current player.
-    - Determine the type of piece and generate possible moves using the appropriate function (e.g., [`pmGetPawnMoves`](<piecemoves.c.md#pmgetpawnmoves>) for pawns).
-    - For each generated move, simulate the move on a copy of the board and check if it results in the current player being in check.
-    - If the move does not result in a check, add it to the `moveList`.
-    - Check if castling is possible for the current player by verifying the positions of the king and rook, and ensuring the path is not attacked.
-    - Add valid castling moves to the `moveList`.
+    - Determine the type of piece and generate possible moves using the appropriate function for that piece type.
+    - For each generated move, simulate the move on a copy of the board and check if the current player is not in check after the move.
+    - If the move is legal (does not leave the player in check), add it to the `moveList`.
+    - Check if castling is possible for the current player by verifying the conditions for castling moves (both kingside and queenside).
+    - Add legal castling moves to the `moveList` if conditions are met.
     - Return the `moveList` containing all legal moves.
 - **Output**: A pointer to a `moveList` structure containing all legal moves for the current player, which must be freed after use.
 - **Functions Called**:
@@ -171,15 +173,15 @@ Generates a list of all legal moves for the current player on a chess board, inc
 
 Checks if a specific square on a chess board is attacked by any piece of a given color.
 - **Inputs**:
-    - ``b``: A pointer to the `board` structure representing the current state of the chess board.
-    - ``s``: The square (`sq`) to check for an attack.
-    - ``attacker``: The color (`pieceColor`) of the pieces that might be attacking the square.
+    - `b`: A pointer to the `board` structure representing the current state of the chess board.
+    - `s`: The `sq` structure representing the square to check for an attack.
+    - `attacker`: The `pieceColor` enumeration value representing the color of the attacking pieces to check against.
 - **Logic and Control Flow**:
-    - Iterates over all 64 squares on the board to find pieces of the specified `attacker` color.
-    - For each piece found, determines its type and retrieves its possible attack moves using the appropriate function ([`pmGetPawnAttacks`](<piecemoves.c.md#pmgetpawnattacks>), [`pmGetKnightMoves`](<piecemoves.c.md#pmgetknightmoves>), etc.).
-    - Checks if any of the possible moves for the piece attacks the specified square `s`.
-    - If an attack is found, frees the move list and returns `1` to indicate the square is attacked.
-    - If no attack is found after checking all pieces, returns `0` to indicate the square is not attacked.
+    - Iterates over all 64 squares on the board to find pieces of the specified attacker color.
+    - For each piece found, determines its type and retrieves its possible attack moves using the appropriate function for that piece type.
+    - Checks if any of the possible moves for the piece attack the specified square `s`.
+    - If a move attacks the square, returns 1 indicating the square is attacked.
+    - If no attacking move is found after checking all pieces, returns 0 indicating the square is not attacked.
 - **Output**: Returns `1` if the square is attacked by a piece of the specified color, otherwise returns `0`.
 - **Functions Called**:
     - [`sqIndex`](<square.c.md#sqindex>)
@@ -202,11 +204,11 @@ Checks if a specific square on a chess board is attacked by any piece of a given
 
 Checks if the current player on the board is in check.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure representing the current state of the chessboard.
+    - `b`: A pointer to a `board` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
     - Calls the function [`boardIsPlayerInCheck`](<#boardisplayerincheck>) with the board `b` and the current player `b->currentPlayer` as arguments.
     - Returns the result of [`boardIsPlayerInCheck`](<#boardisplayerincheck>), which indicates if the current player is in check.
-- **Output**: Returns a `uint8_t` value, where `1` indicates the current player is in check and `0` indicates they are not.
+- **Output**: Returns a `uint8_t` value, where `1` indicates the current player is in check, and `0` indicates they are not.
 - **Functions Called**:
     - [`boardIsPlayerInCheck`](<#boardisplayerincheck>)
 
@@ -215,16 +217,18 @@ Checks if the current player on the board is in check.
 ### boardIsPlayerInCheck<!-- {{#callable:boardIsPlayerInCheck}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/board.c#L430>)
 
-Checks if the player's king is in check on the given board.
+Checks if the specified player's king is in check on the given board.
 - **Inputs**:
     - `b`: A pointer to the `board` structure representing the current state of the chessboard.
-    - `player`: The `pieceColor` representing the player whose king is being checked for check status.
+    - `player`: The `pieceColor` enumeration value representing the player whose king is being checked (either `pcWhite` or `pcBlack`).
 - **Logic and Control Flow**:
-    - Determine the player's king piece (`pWKing` for white, `pBKing` for black) and the opponent's color.
-    - Iterate over all 64 squares of the board to find the player's king.
-    - If the king is found, check if the square is attacked by the opponent using [`boardIsSquareAttacked`](<#boardissquareattacked>).
+    - Determine the `royalPiece` as the king piece of the specified player (`pWKing` for white, `pBKing` for black).
+    - Determine the `otherColor` as the opposite color of the specified player (`pcBlack` for white, `pcWhite` for black).
+    - Iterate over all 64 squares of the board using a loop.
+    - For each square, check if the piece on the square is the `royalPiece`.
+    - If the `royalPiece` is found, check if the square is attacked by the `otherColor` using [`boardIsSquareAttacked`](<#boardissquareattacked>).
     - If the square is attacked, return 1 indicating the player is in check.
-    - If no attack is found on the king's square, return 0 indicating the player is not in check.
+    - If no square with the `royalPiece` is attacked, return 0 indicating the player is not in check.
 - **Output**: Returns `1` if the player's king is in check, otherwise returns `0`.
 - **Functions Called**:
     - [`sqIndex`](<square.c.md#sqindex>)
@@ -243,9 +247,9 @@ Determines if a chess board position has insufficient material to checkmate, res
     - Initialize counters for pieces, knights, bishops on dark squares, bishops on light squares, and kings for both colors.
     - Iterate over all 64 squares of the board to count the number of each type of piece.
     - If only kings are present, return 1 indicating a draw due to insufficient material.
-    - If there is one white king and one black king, check if the total number of pieces equals the sum of kings, knights, and bishops.
-    - If there are only kings and one minor piece (knight or bishop), return 1 indicating a draw.
-    - If there are only kings and bishops all on the same color, return 1 indicating a draw.
+    - If there is one white king and one black king, check for the presence of only minor pieces (knights and bishops).
+    - If there are only two kings and one minor piece, return 1 indicating a draw.
+    - If there are only two kings and bishops all on the same color, return 1 indicating a draw.
     - If none of the conditions for insufficient material are met, return 0.
 - **Output**: Returns `1` if the board position is a draw due to insufficient material, otherwise returns `0`.
 - **Functions Called**:
@@ -259,13 +263,13 @@ Determines if a chess board position has insufficient material to checkmate, res
 ### boardPlayMove<!-- {{#callable:boardPlayMove}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/board.c#L509>)
 
-Creates a new board by copying the current board and applying a specified move.
+Creates a new board by copying an existing board and applying a move to it.
 - **Inputs**:
-    - ``b``: A pointer to the current `board` structure that represents the current state of the chess game.
-    - ``m``: A `move` structure that specifies the move to be played on the board.
+    - ``b``: A pointer to the existing `board` structure that represents the current state of the chess game.
+    - ``m``: A `move` structure that represents the move to be applied to the board.
 - **Logic and Control Flow**:
     - Allocate memory for a new `board` structure and assign it to `newBoard`.
-    - Copy the contents of the current board `b` into `newBoard` using `memcpy`.
+    - Copy the contents of the existing board `b` into `newBoard` using `memcpy`.
     - Call [`boardPlayMoveInPlace`](<#boardplaymoveinplace>) to apply the move `m` to `newBoard`.
     - Return the pointer to the newly created `newBoard`.
 - **Output**: A pointer to a new `board` structure that represents the state of the board after the move `m` has been applied.
@@ -277,20 +281,20 @@ Creates a new board by copying the current board and applying a specified move.
 ### boardPlayMoveInPlace<!-- {{#callable:boardPlayMoveInPlace}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/board.c#L521>)
 
-Updates the board state by executing a given move, handling special cases like castling, en passant, and pawn promotion, and switches the current player.
+Updates the board state by executing a given move, handling special cases like castling, en passant, and pawn promotion.
 - **Inputs**:
     - `b`: A pointer to the `board` structure representing the current state of the chess game.
     - `m`: A `move` structure representing the move to be played on the board.
 - **Logic and Control Flow**:
     - If the current player is black, increment the move number.
-    - Determine the piece type at the move's starting square and update the half-move clock based on whether the move is irreversible (pawn move or capture).
-    - Check if the move is a castling move and update the board state accordingly, including moving the rook and updating the castling rights.
-    - If a rook moves or is captured, update the castling rights by clearing the appropriate flags.
+    - Determine the piece type at the move's starting square and update the half-move clock based on the move's reversibility.
+    - Check if the move is a castling move and update the board and castling rights accordingly.
+    - If a rook moves or is captured, update the castling rights.
     - Handle en passant captures by removing the captured pawn from the board.
     - Move the piece from the starting square to the destination square, handling pawn promotion if applicable.
-    - Set the en passant target square if a pawn moves two squares forward, otherwise invalidate the en passant target.
-    - Switch the current player from white to black or vice versa.
-- **Output**: No return value; the function modifies the board state in place.
+    - Set the en passant target square if a pawn moves two squares forward, otherwise invalidate it.
+    - Switch the current player to the other player.
+- **Output**: The function does not return a value; it modifies the board state in place.
 - **Functions Called**:
     - [`pieceGetType`](<piece.c.md#piecegettype>)
     - [`boardGetPiece`](<#boardgetpiece>)
@@ -314,7 +318,7 @@ Compares two chess boards to determine if they are fully equal.
     - Use [`sqEq`](<square.c.md#sqeq>) to compare `epTarget` of `b1` and `b2`; if they are not equal, return 0.
     - Check if `halfMoveClock` of `b1` and `b2` are different; if so, return 0.
     - Check if `moveNumber` of `b1` and `b2` are different; if so, return 0.
-    - Use `memcmp` to compare the memory of `b1` and `b2` for the first 64 `piece` elements; if they differ, return 0.
+    - Use `memcmp` to compare the memory of `b1` and `b2` for 64 pieces; if they differ, return 0.
     - If all checks pass, return 1.
 - **Output**: Returns `1` if the boards are fully equal, otherwise returns `0`.
 - **Functions Called**:
@@ -325,18 +329,18 @@ Compares two chess boards to determine if they are fully equal.
 ### boardEqContext<!-- {{#callable:boardEqContext}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/board.c#L631>)
 
-Compares two chess boards for contextual equality, ignoring move counters and filtering en passant target squares.
+Checks if two chess boards are contextually equal by comparing player turn, castling rights, piece positions, and valid en passant targets.
 - **Inputs**:
     - `b1`: Pointer to the first `board` structure to compare.
     - `b2`: Pointer to the second `board` structure to compare.
 - **Logic and Control Flow**:
-    - Check if the `currentPlayer` fields of `b1` and `b2` are equal; return 0 if not.
-    - Check if the `castleState` fields of `b1` and `b2` are equal; return 0 if not.
-    - Use `memcmp` to compare the first 64 pieces of `b1` and `b2`; return 0 if they differ.
-    - Filter the en passant target square for `b1` by checking if any pawns can attack it; set to `SQ_INVALID` if not.
-    - Filter the en passant target square for `b2` similarly.
-    - Compare the filtered en passant target squares of `b1` and `b2`; return 0 if they differ.
-    - Return 1 if all checks pass, indicating contextual equality.
+    - Check if the current player on `b1` is the same as on `b2`; if not, return 0.
+    - Check if the castling state on `b1` is the same as on `b2`; if not, return 0.
+    - Compare the memory of `b1` and `b2` for the first 64 pieces; if they differ, return 0.
+    - Filter the en passant target square for `b1` by checking if any pawns can attack it; if not, set it to `SQ_INVALID`.
+    - Filter the en passant target square for `b2` by checking if any pawns can attack it; if not, set it to `SQ_INVALID`.
+    - Compare the filtered en passant target squares of `b1` and `b2`; if they differ, return 0.
+    - If all checks pass, return 1.
 - **Output**: Returns `1` if the boards are contextually equal, otherwise returns `0`.
 - **Functions Called**:
     - [`sqEq`](<square.c.md#sqeq>)
@@ -355,15 +359,15 @@ Generates a FEN string representation of the current state of a chess board.
 - **Inputs**:
     - `b`: A pointer to a `board` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
-    - Initialize a buffer `buf` to store the FEN string and a pointer `c` to iterate over the buffer.
+    - Initialize a buffer `buf` to store the FEN string and a pointer `c` to traverse the buffer.
     - Iterate over each rank from 8 to 1 and each file from 1 to 8 to process the board pieces.
-    - For each square, check if it contains a piece; if so, append the piece's letter to the buffer, otherwise count the blank squares.
-    - After processing each rank, append the count of blank squares if any, and add a '/' separator if not the last rank.
+    - For each square, check if a piece is present; if so, append its letter to the buffer, otherwise count blank squares.
+    - After processing a rank, append the count of blank squares if any, and add a '/' if not the last rank.
     - Append the current player's turn ('w' for white, 'b' for black) to the buffer.
-    - Determine the castling availability and append the appropriate characters ('K', 'Q', 'k', 'q') or '-' if no castling is possible.
-    - Append the en passant target square or '-' if there is no target.
+    - Append the castling availability using 'K', 'Q', 'k', 'q', or '-' if no castling is possible.
+    - Append the en passant target square or '-' if there is none.
     - Use `sprintf` to append the half move clock and move number to the buffer.
-    - Calculate the length of the buffer, allocate memory for the FEN string, copy the buffer content to the allocated memory, and return the FEN string.
+    - Allocate memory for the FEN string, copy the buffer content to it, and return the FEN string.
 - **Output**: A dynamically allocated string containing the FEN representation of the board, which must be freed by the caller.
 - **Functions Called**:
     - [`sqI`](<square.c.md#sqi>)

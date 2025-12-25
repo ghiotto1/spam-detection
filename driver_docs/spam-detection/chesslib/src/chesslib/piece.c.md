@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for handling chess pieces, including type and color identification and letter representation.
+Implements functions for handling chess pieces, including type, color, and letter representation.
 
 # Purpose
-The code provides functionality for handling chess pieces within a chess library. It defines several functions that operate on a type `piece`, which represents a chess piece, and provides utilities to determine the type and color of a piece. The function [`pieceGetType`](<#piecegettype>) returns the type of a given piece, while [`pieceGetColor`](<#piecegetcolor>) returns the color. The function [`pieceTypeGetLetter`](<#piecetypegetletter>) maps a `pieceType` to its corresponding letter representation, such as 'P' for pawn or 'K' for king. The function [`pieceGetLetter`](<#piecegetletter>) returns the letter representation of a piece, converting it to lowercase if the piece is black.
+This code provides functionality for handling chess pieces within a chess library. It defines several functions that operate on a data type `piece`, which represents a chess piece. The functions include [`pieceGetType`](<#piecegettype>), which determines the type of a piece, and [`pieceGetColor`](<#piecegetcolor>), which identifies the color of a piece. The function [`pieceTypeGetLetter`](<#piecetypegetletter>) returns the character representation of a piece type, while [`pieceGetLetter`](<#piecegetletter>) provides the character representation of a piece, considering its color. The function [`pieceMake`](<#piecemake>) creates a piece based on a specified type and color.
 
-Additionally, the code includes a function [`pieceMake`](<#piecemake>) that constructs a `piece` based on a specified `pieceType` and `pieceColor`. It returns the appropriate piece constant for white or black pieces, or `pEmpty` if the color is invalid. The code relies on predefined constants and types such as `pWPawn`, `pBPawn`, `pcWhite`, `pcBlack`, and `pcNoColor`, which are likely defined in the included header file `chesslib/piece.h`. This module is part of a broader chess library, focusing on the representation and manipulation of individual chess pieces.
+The code is part of a broader chess library, as indicated by the inclusion of the header file `chesslib/piece.h`. It does not define public APIs or external interfaces directly but provides utility functions that are likely used internally within the library to manage and manipulate chess pieces. The code handles both white and black pieces and includes a mechanism to return an empty piece if an invalid color is specified. The use of enumerations or constants such as `pWPawn`, `pBPawn`, `ptPawn`, and `pcWhite` suggests that these are defined elsewhere, likely in the included header file.
 # Imports and Dependencies
 
 ---
@@ -26,10 +26,10 @@ Determines the type of a chess piece based on its enumeration value.
 - **Inputs**:
     - `p`: An enumeration value representing a chess piece, which can be a white or black piece.
 - **Logic and Control Flow**:
-    - Checks if the input `p` is greater than or equal to `pBPawn`.
-    - If true, adjusts `p` by subtracting `pBPawn` and adding 1 to normalize the value to a `pieceType`.
-    - Casts the adjusted or original `p` to `pieceType` and returns it.
-- **Output**: Returns the `pieceType` of the given chess piece.
+    - Check if `p` is greater than or equal to `pBPawn`.
+    - If true, adjust `p` by subtracting `pBPawn` and adding 1 to normalize it to a `pieceType`.
+    - Cast the adjusted or original `p` to `pieceType` and return it.
+- **Output**: Returns the `pieceType` of the given chess piece `p`.
 
 
 ---
@@ -65,7 +65,7 @@ Maps a `pieceType` to its corresponding letter representation in chess notation.
     - Return 'K' for `ptKing`.
     - Return a space character ' ' for `ptEmpty`.
     - Return 0 for any unrecognized `pieceType` value.
-- **Output**: A character representing the chess piece type, or 0 if the type is unrecognized.
+- **Output**: A `char` representing the letter associated with the given `pieceType`, or 0 if the type is unrecognized.
 
 
 ---
@@ -81,7 +81,7 @@ Returns the character representation of a chess piece, using lowercase for black
     - Check if the color of the piece is black by calling [`pieceGetColor`](<#piecegetcolor>) with `p`.
     - If the piece is black, convert the character to lowercase using `tolower`.
     - Return the character.
-- **Output**: A character representing the piece type, in lowercase if the piece is black.
+- **Output**: A character representing the type of the chess piece, in lowercase if the piece is black.
 - **Functions Called**:
     - [`pieceTypeGetLetter`](<#piecetypegetletter>)
     - [`pieceGetType`](<#piecegettype>)
@@ -94,14 +94,14 @@ Returns the character representation of a chess piece, using lowercase for black
 
 Creates a chess piece based on the specified type and color.
 - **Inputs**:
-    - `type`: The type of the chess piece, represented by the `pieceType` enumeration (e.g., `ptKing`, `ptQueen`).
-    - `color`: The color of the chess piece, represented by the `pieceColor` enumeration (e.g., `pcWhite`, `pcBlack`).
+    - `type`: The type of the chess piece, represented by the `pieceType` enumeration (e.g., `ptKing`, `ptQueen`, etc.).
+    - `color`: The color of the chess piece, represented by the `pieceColor` enumeration (`pcWhite` or `pcBlack`).
 - **Logic and Control Flow**:
     - Check if `color` is either `pcWhite` or `pcBlack`; if not, return `pEmpty`.
     - Use a `switch` statement to determine the `type` of the piece.
     - For each case in the `switch` statement, return the corresponding piece constant based on the `color`.
     - If `type` does not match any case, return `pEmpty`.
-- **Output**: Returns a `piece` constant representing the specified type and color, or `pEmpty` if the color is invalid or the type is unrecognized.
+- **Output**: A `piece` value representing the specified chess piece, or `pEmpty` if the input is invalid.
 
 
 

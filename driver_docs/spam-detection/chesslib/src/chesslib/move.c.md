@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for creating, comparing, and converting chess moves to and from UCI strings.
+Implements functions for chess move operations, including UCI string conversion and move comparison.
 
 # Purpose
-The code is a C implementation for handling chess moves, specifically focusing on creating, comparing, and converting moves to and from the Universal Chess Interface (UCI) format. It includes functions to create a move with or without a promotion using [`moveSq`](<#movesq>) and [`movePromote`](<#movepromote>), respectively. The [`moveEq`](<#moveeq>) function checks if two moves are equivalent by comparing their starting and ending squares and any promotion involved. The [`moveGetUci`](<#movegetuci>) function converts a move into a UCI string, which is a standard notation for representing chess moves, and allocates memory for this string. Conversely, [`moveFromUci`](<#movefromuci>) parses a UCI string to create a move, interpreting the string to determine the starting and ending squares and any promotion piece.
+The code provides functionality for handling chess moves within a chess application. It includes functions to create, compare, and convert chess moves to and from the Universal Chess Interface (UCI) format. The code defines several functions that operate on a `move` data structure, which includes fields for the starting square (`from`), the destination square (`to`), and an optional promotion piece type (`promotion`).
 
-The code relies on external components, such as the `chesslib/move.h` header, and functions like `sqEq`, `sqGetStr`, and `sqS`, which are likely defined elsewhere to handle square operations. The `pieceTypeGetLetter` function is used to get the character representation of a promotion piece. The code does not include error checking for the UCI string parsing, which is noted in the comments. This module is part of a broader chess library, providing specific functionality for move operations within a chess game.
+The [`moveSq`](<#movesq>) and [`movePromote`](<#movepromote>) functions create `move` objects, with [`movePromote`](<#movepromote>) allowing for the specification of a promotion piece. The [`moveEq`](<#moveeq>) function compares two `move` objects to determine if they are equivalent. The [`moveGetUci`](<#movegetuci>) function converts a `move` to a UCI string, which is a standard format for representing chess moves. Conversely, the [`moveFromUci`](<#movefromuci>) function parses a UCI string to create a `move` object. The code relies on external functions and types, such as `sqEq`, `sqGetStr`, and `pieceTypeGetLetter`, which are likely defined in the included `chesslib/move.h` header or other related files.
 # Imports and Dependencies
 
 ---
@@ -84,9 +84,9 @@ Converts a chess move into its UCI (Universal Chess Interface) string representa
     - Check if the move has a promotion piece.
     - If there is a promotion, convert the promotion piece to a lowercase letter and store it in `p[0]`, then allocate memory for a 6-character string.
     - If there is no promotion, allocate memory for a 5-character string.
-    - Use `sprintf` to format the move into the UCI string format, combining the string representations of the `from` and `to` squares with the promotion piece if applicable.
+    - Use `sprintf` to format the move into the UCI string format, combining the string representations of the `from` and `to` squares and the promotion piece if present.
     - Return the formatted UCI string.
-- **Output**: A dynamically allocated string representing the UCI format of the move, which must be freed by the caller.
+- **Output**: A dynamically allocated string representing the move in UCI format, which must be freed by the caller.
 - **Functions Called**:
     - [`pieceTypeGetLetter`](<piece.c.md#piecetypegetletter>)
     - [`sqGetStr`](<square.c.md#sqgetstr>)
@@ -98,14 +98,14 @@ Converts a chess move into its UCI (Universal Chess Interface) string representa
 
 Converts a UCI string into a `move` structure representing a chess move.
 - **Inputs**:
-    - `uci`: A string in UCI format representing a chess move, which includes the starting and ending squares and optionally a promotion piece.
+    - `uci`: A string in UCI format representing a chess move, which may include a promotion piece type.
 - **Logic and Control Flow**:
-    - Extracts the starting square from the first two characters of `uci` and stores it in `from`.
-    - Extracts the ending square from the next two characters of `uci` and stores it in `to`.
-    - Checks the fifth character of `uci` to determine if there is a promotion piece and assigns the corresponding `pieceType` to `promotion`.
-    - Creates a `move` structure `m` and assigns the converted starting and ending squares and promotion piece to it.
+    - Extracts the 'from' and 'to' positions from the `uci` string and stores them in `from` and `to` arrays respectively.
+    - Initializes a `promotion` variable to determine if the move includes a promotion piece type.
+    - Uses a `switch` statement to set the `promotion` variable based on the fifth character of the `uci` string, defaulting to `ptEmpty` if no valid promotion is specified.
+    - Creates a `move` structure `m`, setting its `from`, `to`, and `promotion` fields using the [`sqS`](<square.c.md#sqs>) function and the `promotion` variable.
     - Returns the `move` structure `m`.
-- **Output**: A `move` structure containing the starting square, ending square, and promotion piece (if any) derived from the UCI string.
+- **Output**: A `move` structure containing the `from` and `to` positions and the `promotion` piece type, if applicable.
 - **Functions Called**:
     - [`sqS`](<square.c.md#sqs>)
 
