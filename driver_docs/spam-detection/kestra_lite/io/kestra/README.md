@@ -3,10 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints "new file".
+Schedulers, interfaces, and classes for managing and executing flows and triggers.
 
-# Purpose
-This code is a simple script that outputs the string "new file" to the standard output. It uses the `print` function to display the message. The script provides narrow functionality, serving primarily as a basic demonstration or placeholder for further development.
+## Folders
+- **[core](core/README.md)**: Schedulers, interfaces, and classes for managing and executing flows and triggers.
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

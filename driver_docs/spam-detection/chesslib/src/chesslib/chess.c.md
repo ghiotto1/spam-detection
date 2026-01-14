@@ -6,9 +6,9 @@
 Chess game implementation with functions for game state management, move execution, and draw claims.
 
 # Purpose
-The code is a C implementation of a chess game, providing functionality to manage and manipulate the state of a chess game. It includes functions to create and initialize a chess game, either from the standard initial position or from a given FEN (Forsyth-Edwards Notation) string. The code manages the game state through a `chess` structure, which includes the board history, move history, current legal moves, and terminal state. The code also provides functions to play and undo moves, check the game's terminal state, and claim draws based on the 50-move rule or threefold repetition.
+The code is a C implementation of a chess game, providing functionality to manage and manipulate the state of a chess game. It includes functions to create and initialize a chess game, either from the standard initial position or from a given FEN (Forsyth-Edwards Notation) string. The code manages the game state through a `chess` structure, which includes the board history, move history, current legal moves, repetition count, and terminal state. The code provides functions to play and undo moves, check the game's terminal state, and claim draws based on the 50-move rule or threefold repetition.
 
-The implementation includes functions to retrieve various aspects of the game state, such as the current board, legal moves, and move history. It also provides utility functions to check if a player is in check, if a square is attacked, and to get the FEN representation of the current board. The code uses external libraries or modules, as indicated by the inclusion of `chesslib/chess.h` and `chesslib/move.h`, which likely define the `chess`, `board`, and `move` structures and related operations. The code is designed to be part of a larger chess application, providing core functionality for managing the state and rules of a chess game.
+The code interfaces with external components through the inclusion of headers `chesslib/chess.h` and `chesslib/move.h`, suggesting it is part of a larger library. It defines public APIs for interacting with the chess game, such as [`chessCreate`](<#chesscreate>), [`chessPlayMove`](<#chessplaymove>), and [`chessGetLegalMoves`](<#chessgetlegalmoves>). The code also includes utility functions to retrieve game information, such as the current board state, move history, and whether a player is in check. The implementation ensures memory management by allocating and freeing resources as needed, and it calculates game-specific fields like legal moves and terminal conditions.
 # Imports and Dependencies
 
 ---
@@ -23,12 +23,12 @@ The implementation includes functions to retrieve various aspects of the game st
 ### chessCreate<!-- {{#callable:chessCreate}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/chess.c#L11>)
 
-Creates a new chess game instance using the initial FEN string.
+Creates a new chess game instance initialized to the standard starting position.
 - **Inputs**: None
 - **Logic and Control Flow**:
-    - Calls the [`chessCreateFen`](<#chesscreatefen>) function with the `INITIAL_FEN` constant as an argument.
+    - Calls the [`chessCreateFen`](<#chesscreatefen>) function with the `INITIAL_FEN` constant to create a new chess game instance.
     - Returns the result of the [`chessCreateFen`](<#chesscreatefen>) function call.
-- **Output**: A pointer to a `chess` structure representing a new chess game instance, or `NULL` if initialization fails.
+- **Output**: A pointer to a `chess` structure representing a new chess game initialized to the standard starting position, or `NULL` if initialization fails.
 - **Functions Called**:
     - [`chessCreateFen`](<#chesscreatefen>)
 
@@ -37,15 +37,15 @@ Creates a new chess game instance using the initial FEN string.
 ### chessCreateFen<!-- {{#callable:chessCreateFen}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/chess.c#L16>)
 
-Creates a new chess game instance from a given FEN string.
+Creates a new `chess` object initialized with a given FEN string.
 - **Inputs**:
     - `fen`: A string representing the board position in Forsyth-Edwards Notation (FEN).
 - **Logic and Control Flow**:
-    - Allocate memory for a new `chess` structure and assign it to pointer `c`.
-    - Call [`chessInitFenInPlace`](<#chessinitfeninplace>) with `c` and `fen` to initialize the chess game state.
+    - Allocate memory for a new `chess` object `c`.
+    - Call [`chessInitFenInPlace`](<#chessinitfeninplace>) to initialize `c` with the FEN string `fen`.
     - If [`chessInitFenInPlace`](<#chessinitfeninplace>) returns a non-zero value, free the allocated memory for `c` and return `NULL`.
-    - If initialization is successful, return the pointer `c`.
-- **Output**: A pointer to a `chess` structure initialized with the given FEN string, or `NULL` if initialization fails.
+    - If initialization is successful, return the pointer to the `chess` object `c`.
+- **Output**: A pointer to a newly created `chess` object, or `NULL` if initialization fails.
 - **Functions Called**:
     - [`chessInitFenInPlace`](<#chessinitfeninplace>)
 
@@ -54,11 +54,11 @@ Creates a new chess game instance from a given FEN string.
 ### chessInitInPlace<!-- {{#callable:chessInitInPlace}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/chess.c#L29>)
 
-Initializes a `chess` structure with the initial chess position using the FEN string.
+Initializes a `chess` structure with the initial FEN string.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure that will be initialized.
+    - `c`: A pointer to a `chess` structure to initialize.
 - **Logic and Control Flow**:
-    - Calls the function [`chessInitFenInPlace`](<#chessinitfeninplace>) with the `chess` pointer `c` and the constant `INITIAL_FEN` to set up the initial chess position.
+    - Calls the [`chessInitFenInPlace`](<#chessinitfeninplace>) function with the `chess` pointer `c` and the `INITIAL_FEN` string to set up the chess board.
 - **Output**: No return value; the function initializes the `chess` structure in place.
 - **Functions Called**:
     - [`chessInitFenInPlace`](<#chessinitfeninplace>)
@@ -80,9 +80,9 @@ Initializes a `chess` structure with a board state from a FEN string and sets up
     - Set `c->currentLegalMoves` to `NULL`.
     - Set `c->repetitions` to `1`.
     - Set `c->terminal` to `tsOngoing`.
-    - Call [`chessCalculateFields`](<#chesscalculatefields>) to compute repetitions and terminal state.
+    - Call [`chessCalculateFields`](<#chesscalculatefields>) to calculate repetitions and terminal state.
     - Return `0` to indicate successful initialization.
-- **Output**: Returns `0` on successful initialization, or `1` if board creation from FEN fails.
+- **Output**: Returns `0` on successful initialization, or `1` if board creation fails.
 - **Functions Called**:
     - [`boardCreateFromFen`](<board.c.md#boardcreatefromfen>)
     - [`boardListCreate`](<boardlist.c.md#boardlistcreate>)
@@ -117,9 +117,9 @@ Retrieves the current board state from the chess game's board history.
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
-    - Accesses the `boardHistory` field of the `chess` structure `c`.
-    - Retrieves the `tail` node of the `boardHistory` linked list, which represents the most recent board state.
-    - Returns the `board` from the `tail` node.
+    - Accesses the `boardHistory` member of the `chess` structure `c`.
+    - Retrieves the `tail` node of the `boardHistory` linked list.
+    - Returns the `board` from the `tail` node, which represents the current board state.
 - **Output**: A pointer to a `board` structure representing the current board state of the chess game.
 
 
@@ -127,26 +127,26 @@ Retrieves the current board state from the chess game's board history.
 ### chessGetLegalMoves<!-- {{#callable:chessGetLegalMoves}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/chess.c#L68>)
 
-Retrieves the list of current legal moves for a chess game.
+Retrieves the list of current legal moves for the given chess game state.
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
-    - Accesses the `currentLegalMoves` field of the `chess` structure `c`.
-    - Returns the value of `currentLegalMoves`.
-- **Output**: A pointer to a `moveList` structure containing the current legal moves in the chess game.
+    - Accesses the `currentLegalMoves` member of the `chess` structure `c`.
+    - Returns the `currentLegalMoves` which is a pointer to a `moveList` structure.
+- **Output**: A pointer to a `moveList` structure containing the current legal moves for the chess game.
 
 
 ---
 ### chessGetTerminalState<!-- {{#callable:chessGetTerminalState}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/chess.c#L73>)
 
-Retrieves the terminal state of a chess game.
+Retrieves the current terminal state of a chess game.
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
     - Accesses the `terminal` field of the `chess` structure pointed to by `c`.
     - Returns the value of the `terminal` field.
-- **Output**: The function returns a `terminalState` value, which indicates the current terminal state of the chess game.
+- **Output**: The function returns a `terminalState` value, which indicates the current terminal state of the chess game (e.g., ongoing, checkmate, stalemate, etc.).
 
 
 ---
@@ -159,7 +159,7 @@ Retrieves the history of board states in a chess game.
 - **Logic and Control Flow**:
     - Accesses the `boardHistory` member of the `chess` structure `c`.
     - Returns the `boardHistory`, which is a list of board states.
-- **Output**: A pointer to a `boardList` structure that contains the history of board states.
+- **Output**: A pointer to a `boardList` structure containing the history of board states.
 
 
 ---
@@ -170,8 +170,8 @@ Retrieves the move history from a chess game instance.
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current state of a chess game.
 - **Logic and Control Flow**:
-    - Accesses the `moveHistory` member of the `chess` structure pointed to by `c`.
-    - Returns the `moveHistory` which is a list of moves made in the game.
+    - Accesses the `moveHistory` field of the `chess` structure `c`.
+    - Returns the `moveHistory` which is a pointer to a `moveList` structure.
 - **Output**: A pointer to a `moveList` structure containing the history of moves made in the chess game.
 
 
@@ -197,16 +197,13 @@ Executes a move in a chess game if the game is ongoing and the move is legal, up
     - ``c``: A pointer to a `chess` structure representing the current state of the chess game.
     - ``m``: A `move` structure representing the move to be played.
 - **Logic and Control Flow**:
-    - Check if the game is not in an ongoing state (`tsOngoing`); if not, return 1 to indicate failure.
+    - Check if the game is ongoing by verifying if `c->terminal` is `tsOngoing`; if not, return 1 to indicate failure.
     - Initialize a variable `found` to 0 to track if the move is legal.
-    - Iterate through the list of current legal moves (`c->currentLegalMoves`).
-    - For each move in the list, check if it matches the move `m` using [`moveEq`](<move.c.md#moveeq>).
-    - If a match is found, set `found` to 1 and break the loop.
+    - Iterate through the list of current legal moves (`c->currentLegalMoves`) to check if the move `m` is legal by comparing it with each move in the list using [`moveEq`](<move.c.md#moveeq>); if found, set `found` to 1 and break the loop.
     - If `found` is still 0 after the loop, return 1 to indicate the move is illegal.
-    - If the move is legal, use [`boardPlayMove`](<board.c.md#boardplaymove>) to apply the move to the current board and get a new board state.
-    - Add the new board state to the board history (`c->boardHistory`).
-    - Add the move to the move history (`c->moveHistory`).
-    - Recalculate the game fields using [`chessCalculateFields`](<#chesscalculatefields>) to update the game state.
+    - If the move is legal, use [`boardPlayMove`](<board.c.md#boardplaymove>) to apply the move `m` to the current board and obtain a new board state.
+    - Add the new board state to the board history (`c->boardHistory`) and the move to the move history (`c->moveHistory`).
+    - Call [`chessCalculateFields`](<#chesscalculatefields>) to update the game state, including legal moves and terminal state.
     - Return 0 to indicate the move was successfully played.
 - **Output**: Returns 0 if the move is successfully played, or 1 if the game is not ongoing or the move is illegal.
 - **Functions Called**:
@@ -222,16 +219,15 @@ Executes a move in a chess game if the game is ongoing and the move is legal, up
 ### chessUndo<!-- {{#callable:chessUndo}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/chess.c#L122>)
 
-Reverts the last move in a chess game if possible, updating the game state accordingly.
+Reverts the last move in a chess game, updating the game state accordingly.
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
-    - Check if there is only one board in the history, indicating no moves to undo; if so, return failure (1).
-    - Check if the game is in a terminal state due to a draw claim (threefold repetition or 50-move rule); if so, reset the terminal state to ongoing.
-    - If not in a draw-claimed terminal state, call [`boardListUndo`](<boardlist.c.md#boardlistundo>) to revert the last board state and [`moveListUndo`](<movelist.c.md#movelistundo>) to revert the last move.
-    - Call [`chessCalculateFields`](<#chesscalculatefields>) to update the game state, including legal moves and terminal conditions.
-    - Return success (0) after successfully undoing a move.
-- **Output**: Returns 0 if the undo operation is successful, or 1 if there are no moves to undo.
+    - Checks if there is only one board in the history, indicating no moves to undo, and returns failure if true.
+    - Checks if the game is in a terminal state due to a draw claim (threefold repetition or 50-move rule) and resets the terminal state to ongoing if true.
+    - If not in a draw claim state, calls [`boardListUndo`](<boardlist.c.md#boardlistundo>) to remove the last board state and [`moveListUndo`](<movelist.c.md#movelistundo>) to remove the last move from their respective histories.
+    - Calls [`chessCalculateFields`](<#chesscalculatefields>) to update the game state, including legal moves and terminal state, after undoing the move.
+- **Output**: Returns `0` on success (move undone) and `1` on failure (no move to undo).
 - **Functions Called**:
     - [`boardListUndo`](<boardlist.c.md#boardlistundo>)
     - [`moveListUndo`](<movelist.c.md#movelistundo>)
@@ -247,9 +243,9 @@ Retrieves the chess piece located at a specific square on the board.
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
     - `s`: A `sq` type representing the specific square on the chess board from which to retrieve the piece.
 - **Logic and Control Flow**:
-    - Calls [`chessGetBoard`](<#chessgetboard>) with the `chess` pointer `c` to get the current board.
-    - Calls [`boardGetPiece`](<board.c.md#boardgetpiece>) with the retrieved board and the square `s` to get the piece at that square.
-    - Returns the piece obtained from [`boardGetPiece`](<board.c.md#boardgetpiece>).
+    - Calls [`chessGetBoard`](<#chessgetboard>) with the `chess` pointer `c` to obtain the current board.
+    - Calls [`boardGetPiece`](<board.c.md#boardgetpiece>) with the obtained board and the square `s` to retrieve the piece at that square.
+    - Returns the piece retrieved from the specified square.
 - **Output**: Returns a `piece` type representing the chess piece located at the specified square `s` on the board.
 - **Functions Called**:
     - [`boardGetPiece`](<board.c.md#boardgetpiece>)
@@ -260,13 +256,13 @@ Retrieves the chess piece located at a specific square on the board.
 ### chessGetPlayer<!-- {{#callable:chessGetPlayer}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/chess.c#L149>)
 
-Returns the current player's color from the chess board.
+Returns the current player's color in a chess game.
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
-    - Call the function [`chessGetBoard`](<#chessgetboard>) with the input `c` to get the current board.
-    - Access the `currentPlayer` field from the returned board structure.
-- **Output**: The function returns a `pieceColor` value indicating the current player's color.
+    - Calls the [`chessGetBoard`](<#chessgetboard>) function with the `chess` pointer `c` to retrieve the current board state.
+    - Accesses the `currentPlayer` field from the returned board structure.
+- **Output**: The function returns a `pieceColor` value indicating the color of the current player.
 - **Functions Called**:
     - [`chessGetBoard`](<#chessgetboard>)
 
@@ -279,9 +275,9 @@ Retrieves the castling state from the current board of a chess game.
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
-    - Calls the function [`chessGetBoard`](<#chessgetboard>) with the input `c` to get the current board.
-    - Accesses the `castleState` attribute of the board returned by [`chessGetBoard`](<#chessgetboard>).
-    - Returns the value of `castleState`.
+    - Call the function [`chessGetBoard`](<#chessgetboard>) with the input `c` to get the current board.
+    - Access the `castleState` attribute of the board returned by [`chessGetBoard`](<#chessgetboard>).
+    - Return the `castleState` value.
 - **Output**: Returns an 8-bit unsigned integer representing the castling state of the current board.
 - **Functions Called**:
     - [`chessGetBoard`](<#chessgetboard>)
@@ -295,9 +291,9 @@ Retrieves the en passant target square from the current board state in a chess g
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
-    - Calls the function [`chessGetBoard`](<#chessgetboard>) with the input `c` to get the current board.
-    - Accesses the `epTarget` field of the board returned by [`chessGetBoard`](<#chessgetboard>).
-    - Returns the value of `epTarget`, which represents the en passant target square.
+    - Call the function [`chessGetBoard`](<#chessgetboard>) with the input `c` to get the current board.
+    - Access the `epTarget` field of the board returned by [`chessGetBoard`](<#chessgetboard>).
+    - Return the value of `epTarget`.
 - **Output**: The en passant target square (`sq`) from the current board state.
 - **Functions Called**:
     - [`chessGetBoard`](<#chessgetboard>)
@@ -307,14 +303,14 @@ Retrieves the en passant target square from the current board state in a chess g
 ### chessGetHalfMoveClock<!-- {{#callable:chessGetHalfMoveClock}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/chess.c#L164>)
 
-Retrieves the half-move clock from the current board of a chess game.
+Retrieves the half-move clock from the current board state in a chess game.
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
     - Call the function [`chessGetBoard`](<#chessgetboard>) with the input `c` to get the current board.
-    - Access the `halfMoveClock` field of the board returned by [`chessGetBoard`](<#chessgetboard>).
+    - Access the `halfMoveClock` field from the returned board structure.
     - Return the value of `halfMoveClock`.
-- **Output**: An unsigned integer representing the half-move clock of the current board.
+- **Output**: An unsigned integer representing the half-move clock of the current board state.
 - **Functions Called**:
     - [`chessGetBoard`](<#chessgetboard>)
 
@@ -323,12 +319,12 @@ Retrieves the half-move clock from the current board of a chess game.
 ### chessGetMoveNumber<!-- {{#callable:chessGetMoveNumber}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/chess.c#L169>)
 
-Retrieves the current move number from the chess game state.
+Retrieves the current move number from the chess board associated with the given chess game.
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
-    - Call the function [`chessGetBoard`](<#chessgetboard>) with the input `c` to get the current board state.
-    - Access the `moveNumber` field from the returned board structure.
+    - Call the function [`chessGetBoard`](<#chessgetboard>) with the input `c` to get the current board from the chess game.
+    - Access the `moveNumber` field from the board returned by [`chessGetBoard`](<#chessgetboard>).
     - Return the value of `moveNumber`.
 - **Output**: An unsigned integer representing the current move number in the chess game.
 - **Functions Called**:
@@ -339,14 +335,14 @@ Retrieves the current move number from the chess game state.
 ### chessGetMoveHistoryUci<!-- {{#callable:chessGetMoveHistoryUci}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/chess.c#L174>)
 
-Converts the move history of a chess game to a UCI (Universal Chess Interface) formatted string.
+Returns the move history of a chess game in UCI format.
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
-    - Call the function [`chessGetMoveHistory`](<#chessgetmovehistory>) with the input `c` to obtain the move history of the chess game.
-    - Pass the result to the function [`moveListGetUciString`](<movelist.c.md#movelistgetucistring>) to convert the move history into a UCI formatted string.
-    - Return the UCI formatted string.
-- **Output**: A pointer to a character string containing the UCI formatted move history of the chess game.
+    - Calls [`chessGetMoveHistory`](<#chessgetmovehistory>) with the `chess` pointer `c` to retrieve the move history as a `moveList` object.
+    - Passes the retrieved `moveList` to [`moveListGetUciString`](<movelist.c.md#movelistgetucistring>) to convert the move history into a UCI format string.
+    - Returns the UCI format string.
+- **Output**: A string representing the move history of the chess game in UCI format.
 - **Functions Called**:
     - [`moveListGetUciString`](<movelist.c.md#movelistgetucistring>)
     - [`chessGetMoveHistory`](<#chessgetmovehistory>)
@@ -361,9 +357,9 @@ Checks if the current player's king is in check on the chess board.
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
     - Call the function [`chessGetBoard`](<#chessgetboard>) with the input `c` to get the current board state.
-    - Call the function [`boardIsInCheck`](<board.c.md#boardisincheck>) with the board obtained from [`chessGetBoard`](<#chessgetboard>).
-    - Return the result of [`boardIsInCheck`](<board.c.md#boardisincheck>), which indicates if the king is in check.
-- **Output**: Returns a `uint8_t` value where 1 indicates the king is in check and 0 indicates it is not.
+    - Call the function [`boardIsInCheck`](<board.c.md#boardisincheck>) with the current board to determine if the king is in check.
+    - Return the result from [`boardIsInCheck`](<board.c.md#boardisincheck>).
+- **Output**: Returns a `uint8_t` value indicating if the king is in check (non-zero) or not (zero).
 - **Functions Called**:
     - [`boardIsInCheck`](<board.c.md#boardisincheck>)
     - [`chessGetBoard`](<#chessgetboard>)
@@ -373,10 +369,10 @@ Checks if the current player's king is in check on the chess board.
 ### chessIsSquareAttacked<!-- {{#callable:chessIsSquareAttacked}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/chess.c#L185>)
 
-Determines if a specific square on the chess board is attacked by the opponent's pieces.
+Determines if a specific square on the chessboard is attacked by the opponent's pieces.
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
-    - `s`: The square (`sq`) on the chess board to check for an attack.
+    - `s`: The square (`sq`) on the chessboard to check for attacks.
 - **Logic and Control Flow**:
     - Retrieve the current board from the `chess` structure using [`chessGetBoard`](<#chessgetboard>) function.
     - Determine the opponent's color based on the current player stored in the board.
@@ -397,8 +393,7 @@ Retrieves the FEN (Forsyth-Edwards Notation) string representation of the curren
 - **Logic and Control Flow**:
     - Calls the [`chessGetBoard`](<#chessgetboard>) function with the `chess` pointer `c` to obtain the current board.
     - Passes the obtained board to the [`boardGetFen`](<board.c.md#boardgetfen>) function to get the FEN string.
-    - Returns the FEN string obtained from [`boardGetFen`](<board.c.md#boardgetfen>).
-- **Output**: A pointer to a character string containing the FEN representation of the current board state.
+- **Output**: Returns a pointer to a character string containing the FEN representation of the current board state.
 - **Functions Called**:
     - [`boardGetFen`](<board.c.md#boardgetfen>)
     - [`chessGetBoard`](<#chessgetboard>)
@@ -408,14 +403,14 @@ Retrieves the FEN (Forsyth-Edwards Notation) string representation of the curren
 ### chessCanClaimDraw50<!-- {{#callable:chessCanClaimDraw50}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/chess.c#L196>)
 
-Checks if a chess game can claim a draw based on the 50-move rule.
+Checks if a player can claim a draw based on the 50-move rule in a chess game.
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
-    - Check if the game's terminal state is `tsOngoing`.
-    - Retrieve the `halfMoveClock` from the current board of the chess game.
-    - Check if the `halfMoveClock` is greater than or equal to 100.
-- **Output**: Returns `1` (true) if the game can claim a draw based on the 50-move rule, otherwise returns `0` (false).
+    - Check if the game is ongoing by verifying if `c->terminal` is equal to `tsOngoing`.
+    - Check if the `halfMoveClock` of the current board is greater than or equal to 100 using `chessGetBoard(c)->halfMoveClock >= 100`.
+    - Return the result of the logical AND operation between the two conditions.
+- **Output**: Returns a `uint8_t` value that is non-zero if a draw can be claimed under the 50-move rule, otherwise returns zero.
 - **Functions Called**:
     - [`chessGetBoard`](<#chessgetboard>)
 
@@ -429,9 +424,9 @@ Checks if a player can claim a draw due to threefold repetition in a chess game.
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
     - Check if the game is ongoing by evaluating if `c->terminal` is equal to `tsOngoing`.
-    - Check if the number of repetitions (`c->repetitions`) is greater than or equal to 3.
+    - Check if the number of repetitions of the current board state is 3 or more by evaluating if `c->repetitions` is greater than or equal to 3.
     - Return the result of the logical AND operation between the two conditions.
-- **Output**: Returns a `uint8_t` value indicating whether a draw can be claimed (1 if true, 0 if false).
+- **Output**: Returns a `uint8_t` value (1 if a draw can be claimed due to threefold repetition, 0 otherwise).
 
 
 ---
@@ -442,9 +437,9 @@ Claims a draw in a chess game if the 50-move rule conditions are met.
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
-    - Checks if a draw can be claimed using the [`chessCanClaimDraw50`](<#chesscanclaimdraw50>) function.
-    - If a draw can be claimed, sets the `terminal` state of the chess game to `tsDrawClaimed50MoveRule`.
-- **Output**: No output is returned; the function modifies the `terminal` state of the `chess` structure if the draw is claimed.
+    - Checks if a draw can be claimed using the 50-move rule by calling [`chessCanClaimDraw50`](<#chesscanclaimdraw50>) with the `chess` structure `c`.
+    - If [`chessCanClaimDraw50`](<#chesscanclaimdraw50>) returns true, sets the `terminal` state of the `chess` structure `c` to `tsDrawClaimed50MoveRule`.
+- **Output**: No return value; modifies the `terminal` state of the `chess` structure `c` if the draw is claimed.
 - **Functions Called**:
     - [`chessCanClaimDraw50`](<#chesscanclaimdraw50>)
 
@@ -453,13 +448,13 @@ Claims a draw in a chess game if the 50-move rule conditions are met.
 ### chessClaimDrawThreefold<!-- {{#callable:chessClaimDrawThreefold}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/chess.c#L212>)
 
-Sets the game state to a draw due to threefold repetition if the conditions are met.
+Claims a draw in a chess game due to threefold repetition if the conditions are met.
 - **Inputs**:
-    - `c`: A pointer to a `chess` structure representing the current state of the chess game.
+    - ``c``: A pointer to a `chess` structure representing the current state of the chess game.
 - **Logic and Control Flow**:
-    - Checks if a draw can be claimed due to threefold repetition by calling [`chessCanClaimDrawThreefold`](<#chesscanclaimdrawthreefold>) with the `chess` pointer `c`.
-    - If [`chessCanClaimDrawThreefold`](<#chesscanclaimdrawthreefold>) returns true, sets the `terminal` field of the `chess` structure to `tsDrawClaimedThreefold`.
-- **Output**: No return value; modifies the `terminal` field of the `chess` structure if a draw is claimed.
+    - Checks if a draw can be claimed due to threefold repetition by calling `chessCanClaimDrawThreefold(c)`.
+    - If the draw can be claimed, sets the `terminal` state of the chess game to `tsDrawClaimedThreefold`.
+- **Output**: No return value; modifies the `terminal` state of the `chess` structure if a draw is claimed.
 - **Functions Called**:
     - [`chessCanClaimDrawThreefold`](<#chesscanclaimdrawthreefold>)
 
@@ -472,15 +467,15 @@ Calculates the current state of a chess game, including repetitions, legal moves
 - **Inputs**:
     - `c`: A pointer to a `chess` structure representing the current game state.
 - **Logic and Control Flow**:
-    - Retrieve the current board from the chess game using [`chessGetBoard`](<#chessgetboard>) function.
+    - Retrieve the current board from the chess game `c`.
     - Initialize the repetition count to zero.
     - Iterate through the board history to count how many times the current board state has occurred.
     - Free the current list of legal moves if it exists.
-    - Generate a new list of legal moves for the current board state using [`boardGenerateMoves`](<board.c.md#boardgeneratemoves>).
-    - Check if there are no legal moves available; if so, determine if the game is in checkmate or stalemate and set the terminal state accordingly.
-    - If legal moves exist, check for draw conditions such as fivefold repetition, 75-move rule, or insufficient material, and set the terminal state accordingly.
-    - If none of the draw conditions are met and the terminal state is not a claimed draw, set the terminal state to ongoing.
-- **Output**: Updates the `chess` structure with the number of repetitions, the list of current legal moves, and the terminal state of the game.
+    - Generate and store the new list of legal moves for the current board.
+    - If there are no legal moves, check if the current player is in check to determine if the game is a checkmate or stalemate.
+    - If there are legal moves, check for draw conditions such as fivefold repetition, 75-move rule, or insufficient material.
+    - Set the terminal state to ongoing if no draw conditions are met.
+- **Output**: Updates the `chess` structure `c` with the current legal moves, repetition count, and terminal state.
 - **Functions Called**:
     - [`chessGetBoard`](<#chessgetboard>)
     - [`boardEqContext`](<board.c.md#boardeqcontext>)
