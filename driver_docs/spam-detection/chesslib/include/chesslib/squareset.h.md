@@ -6,7 +6,7 @@
 Defines a 64-bit square set for chessboard states with functions to set and get square values.
 
 # Purpose
-This header file defines a data structure and functions for managing a set of squares on a chessboard using a 64-bit integer. The `sqSet` type is a `uint64_t` that represents the state of each square on the board as either "on" or "off." The file includes function declarations for [`sqSetSet`](<#sqsetset>) and [`sqSetGet`](<#sqsetget>), which are used to set and retrieve the state of a specific square, respectively. The file also includes a `TODO` comment suggesting the addition of conditional typedefs for systems that do not support `uint64_t`, allowing them to use an alternative structure.
+The code is a C header file that defines a data structure and functions for managing a set of squares on a chessboard. It uses a 64-bit integer, `sqSet`, to represent the state of each square on the board as either "on" or "off." The file includes two function declarations: [`sqSetSet`](<#sqsetset>), which sets the state of a specific square in the `sqSet`, and [`sqSetGet`](<#sqsetget>), which retrieves the state of a specific square. The header file includes a directive to prevent multiple inclusions and imports the `square.h` file from the `chesslib` library, which likely contains definitions related to individual squares. There is a note to consider alternative data structures for systems that do not support `uint64_t`.
 # Imports and Dependencies
 
 ---
@@ -20,11 +20,11 @@ This header file defines a data structure and functions for managing a set of sq
 [View Source →](<../../../../../chesslib/include/chesslib/squareset.h#L14>)
 
 Sets the state of a square in a square set.
-- **Description**: Use this function to change the state of a specific square in a square set to either "on" or "off". This function does nothing if the square is invalid. Ensure that the square set pointer is valid and that the square is not `SQ_INVALID` before calling this function.
+- **Description**: Use this function to change the state of a specific square in a square set to either "on" or "off". The function requires a valid square identifier and a square set to modify. If the square identifier is invalid, the function does nothing. This function is useful for managing the state of squares on a chessboard, where each square can be independently toggled.
 - **Inputs**:
-    - `ss`: A pointer to a `sqSet` that represents the set of squares. Must not be null. The function modifies the square set based on the given square and value.
-    - `s`: The square to modify within the square set. Must not be `SQ_INVALID`. If `SQ_INVALID`, the function does nothing.
-    - `value`: A `uint8_t` value indicating the desired state of the square. Use a non-zero value to set the square "on" and zero to set it "off".
+    - `ss`: A pointer to a `sqSet` representing the set of squares. Must not be null. The function modifies the square set based on the given square and value.
+    - `s`: An `sq` representing the square to modify. Must be a valid square identifier. If it is invalid, the function does nothing.
+    - `value`: A `uint8_t` indicating the desired state of the square. Use a non-zero value to set the square "on" and zero to set it "off".
 - **Output**: None
 - **See Also**: [`sqSetSet`](<../../src/chesslib/squareset.c.md#sqsetset>)  (Implementation)
 
@@ -33,12 +33,12 @@ Sets the state of a square in a square set.
 ### sqSetGet<!-- {{#callable_declaration:sqSetGet}} -->
 [View Source →](<../../../../../chesslib/include/chesslib/squareset.h#L15>)
 
-Retrieves the state of a square in a square set.
-- **Description**: Use this function to check if a specific square in a square set is active or inactive. The function requires a valid square set and a valid square identifier. If the square identifier is invalid, the function returns 0. This function does not modify the square set or the square identifier.
+Gets the status of a square in a square set.
+- **Description**: Use this function to check if a specific square in a square set is active or inactive. The function requires a valid square set and a square identifier. It returns the status of the square as either active (1) or inactive (0). If the square identifier is invalid, the function returns 0. Ensure that the square set is properly initialized before calling this function.
 - **Inputs**:
-    - `ss`: A pointer to a `sqSet`, which is a 64-bit number representing the state of squares on a board. Must not be null.
-    - `s`: A `sq` representing the square to check. Must be a valid square identifier. If it is `SQ_INVALID`, the function returns 0.
-- **Output**: Returns 1 if the square is active in the set, or 0 if it is inactive or if the square identifier is invalid.
+    - `ss`: A pointer to a `sqSet`, which is a 64-bit number representing the status of squares on a board. Must not be null.
+    - `s`: A `sq` type representing the square to check. Must be a valid square identifier; otherwise, the function returns 0.
+- **Output**: Returns 1 if the square is active, 0 if it is inactive or if the square identifier is invalid.
 - **See Also**: [`sqSetGet`](<../../src/chesslib/squareset.c.md#sqsetget>)  (Implementation)
 
 
