@@ -3,17 +3,17 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Data structures, functions, and components for a C-based chess library with build and test instructions.
+Chess data structures, functions, implementations, build instructions, and version control settings.
 
 ## Folders
-- **[include](include/README.md)**: Data structures and functions for chess board management, game play, and move handling.
-- **[src](src/README.md)**: Implements chess game components and tests for a C-based chess implementation.
+- **[include](include/README.md)**: Chess data structures and functions for board, game, move, piece, and square management.
+- **[src](src/README.md)**: Chess board and game implementations, move and piece handling, and square management functions.
 
 ## Files
-- **[.gitignore](.gitignore.md)**: Specifies files and directories to ignore in version control, including executables and build artifacts.
-- **[LICENSE](LICENSE.md)**: MIT License for the software, permitting use, distribution, and modification with conditions.
-- **[Makefile](Makefile.md)**: Makefile for building a C-based chess library and test executable with platform-independent settings.
-- **[README.md](README.md.md)**: Instructions for building and testing a C-based chess library with example code and future plans.
+- **[.gitignore](.gitignore.md)**: Specifies files and directories to ignore in version control for the spam-detection project.
+- **[LICENSE](LICENSE.md)**: MIT License for the software, allowing free use, modification, and distribution.
+- **[Makefile](Makefile.md)**: Build instructions for a C-based chess library and test executable with platform-independent settings.
+- **[README.md](README.md.md)**: Instructions for building and testing a C-based chess library with example code and future development plans.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

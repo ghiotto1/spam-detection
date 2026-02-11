@@ -3,12 +3,12 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Functions for creating, comparing, and converting chess moves to and from UCI strings.
+Implements functions for creating, comparing, and converting chess moves to and from UCI strings.
 
 # Purpose
-The code is a C implementation for handling chess moves, specifically focusing on creating, comparing, and converting moves to and from the Universal Chess Interface (UCI) format. It includes functions to create a move with or without a promotion using [`moveSq`](<#movesq>) and [`movePromote`](<#movepromote>), respectively. The [`moveEq`](<#moveeq>) function checks if two moves are equivalent by comparing their starting and ending squares and any promotion involved. The [`moveGetUci`](<#movegetuci>) function converts a move into a UCI string, which is a standard notation for representing chess moves, and allocates memory for this string. Conversely, [`moveFromUci`](<#movefromuci>) parses a UCI string to create a move, interpreting the string to determine the starting and ending squares and any promotion piece.
+The code is a C implementation for handling chess moves, providing functions to create, compare, and convert chess moves to and from the Universal Chess Interface (UCI) format. It includes functions such as [`moveSq`](<#movesq>) and [`movePromote`](<#movepromote>) to create a move, with the latter allowing for the specification of a promotion piece. The [`moveEq`](<#moveeq>) function compares two moves to determine if they are equivalent. The [`moveGetUci`](<#movegetuci>) function converts a move into a UCI string, which is a standard notation for representing chess moves, and allocates memory for this string. Conversely, [`moveFromUci`](<#movefromuci>) parses a UCI string to create a move, though it lacks error checking for invalid input.
 
-The code relies on external components, such as the `chesslib/move.h` header, and functions like `sqEq`, `sqGetStr`, and `sqS`, which are likely defined elsewhere to handle square operations. The `pieceTypeGetLetter` function is used to get the character representation of a promotion piece. The code does not include error checking for the UCI string parsing, which is noted in the comments. This module is part of a broader chess library, providing specific functionality for move operations within a chess game.
+The code relies on external components, such as the `chesslib/move.h` header, and functions like `sqEq`, `sqGetStr`, and `sqS`, which are likely defined elsewhere to handle square operations. The `pieceTypeGetLetter` function is used to get the character representation of a promotion piece. The code is part of a broader chess library, focusing specifically on move operations and UCI string handling, and it is intended to be used as part of a larger chess application or library.
 # Imports and Dependencies
 
 ---
@@ -40,34 +40,34 @@ Creates a move from one square to another without promotion.
 ### movePromote<!-- {{#callable:movePromote}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/move.c#L17>)
 
-Creates a `move` structure with specified starting and ending squares and a promotion piece type.
+Creates a `move` structure with specified starting square, ending square, and promotion piece type.
 - **Inputs**:
     - `from`: The starting square of the move.
     - `to`: The ending square of the move.
     - `promotion`: The type of piece to promote to, if applicable.
 - **Logic and Control Flow**:
-    - Declare a `move` variable `m`.
+    - Initialize a `move` structure `m`.
     - Assign the `from` parameter to `m.from`.
     - Assign the `to` parameter to `m.to`.
     - Assign the `promotion` parameter to `m.promotion`.
     - Return the `move` structure `m`.
-- **Output**: A `move` structure initialized with the given `from`, `to`, and `promotion` values.
+- **Output**: A `move` structure containing the specified `from`, `to`, and `promotion` values.
 
 
 ---
 ### moveEq<!-- {{#callable:moveEq}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/move.c#L28>)
 
-Compares two chess moves to determine if they are identical in terms of starting square, ending square, and promotion piece.
+Compares two chess moves to determine if they are identical in terms of starting square, ending square, and promotion type.
 - **Inputs**:
     - `m1`: The first move to compare, represented as a `move` structure.
     - `m2`: The second move to compare, represented as a `move` structure.
 - **Logic and Control Flow**:
-    - Calls [`sqEq`](<square.c.md#sqeq>) to compare the `from` squares of `m1` and `m2` for equality.
-    - Calls [`sqEq`](<square.c.md#sqeq>) to compare the `to` squares of `m1` and `m2` for equality.
-    - Checks if the `promotion` fields of `m1` and `m2` are equal.
-    - Returns the logical AND of the three comparisons to indicate if the moves are identical.
-- **Output**: Returns a `uint8_t` value of 1 if the moves are identical, otherwise returns 0.
+    - Call [`sqEq`](<square.c.md#sqeq>) to compare the `from` squares of `m1` and `m2`.
+    - Call [`sqEq`](<square.c.md#sqeq>) to compare the `to` squares of `m1` and `m2`.
+    - Check if the `promotion` fields of `m1` and `m2` are equal.
+    - Return the logical AND of the three comparisons.
+- **Output**: Returns `1` (true) if both moves are identical in terms of starting square, ending square, and promotion type; otherwise, returns `0` (false).
 - **Functions Called**:
     - [`sqEq`](<square.c.md#sqeq>)
 
@@ -78,13 +78,12 @@ Compares two chess moves to determine if they are identical in terms of starting
 
 Converts a chess move into its UCI (Universal Chess Interface) string representation.
 - **Inputs**:
-    - `m`: A `move` structure containing the starting square (`from`), ending square (`to`), and optional promotion piece (`promotion`).
+    - `m`: A `move` structure containing the source square (`from`), destination square (`to`), and optional promotion piece (`promotion`).
 - **Logic and Control Flow**:
     - Initialize a character array `p` with two elements set to 0.
-    - Check if the move has a promotion piece.
-    - If there is a promotion, convert the promotion piece to a lowercase letter and store it in `p[0]`, then allocate memory for a 6-character string.
-    - If there is no promotion, allocate memory for a 5-character string.
-    - Use `sprintf` to format the move into the UCI string format, combining the string representations of the `from` and `to` squares with the promotion piece if applicable.
+    - Check if the move has a promotion piece; if so, convert the promotion piece to its lowercase letter and store it in `p[0]`.
+    - Allocate memory for the UCI string: 6 characters if there is a promotion, otherwise 5 characters.
+    - Use `sprintf` to format the UCI string by concatenating the string representations of the source square, destination square, and promotion piece (if any).
     - Return the formatted UCI string.
 - **Output**: A dynamically allocated string representing the UCI format of the move, which must be freed by the caller.
 - **Functions Called**:
@@ -103,9 +102,10 @@ Converts a UCI string into a `move` structure representing a chess move.
     - Extracts the starting square from the first two characters of `uci` and stores it in `from`.
     - Extracts the ending square from the next two characters of `uci` and stores it in `to`.
     - Checks the fifth character of `uci` to determine if there is a promotion piece and assigns the corresponding `pieceType` to `promotion`.
-    - Creates a `move` structure `m` and assigns the converted starting and ending squares and promotion piece to it.
+    - If the fifth character does not match any known promotion piece, assigns `ptEmpty` to `promotion`.
+    - Creates a `move` structure `m` with the starting square, ending square, and promotion piece.
     - Returns the `move` structure `m`.
-- **Output**: A `move` structure containing the starting square, ending square, and promotion piece (if any) derived from the UCI string.
+- **Output**: A `move` structure containing the starting square, ending square, and promotion piece type.
 - **Functions Called**:
     - [`sqS`](<square.c.md#sqs>)
 

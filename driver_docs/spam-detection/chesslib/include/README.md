@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Data structures and functions for chess board management, game play, and move handling.
+Chess data structures and functions for board, game, move, piece, and square management.
 
 ## Folders
-- **[chesslib](chesslib/README.md)**: Data structures and functions for chess board management, game play, and move handling.
+- **[chesslib](chesslib/README.md)**: Chess data structures and functions for board, game, move, piece, and square management.
 
 
 ---

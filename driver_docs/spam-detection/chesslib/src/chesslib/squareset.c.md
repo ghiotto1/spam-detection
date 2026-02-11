@@ -6,7 +6,7 @@
 Square set implementation for managing and accessing chessboard squares.
 
 # Purpose
-This code is a C implementation for managing a set of squares, likely in the context of a chess application. It includes two primary functions: [`sqSetSet`](<#sqsetset>) and [`sqSetGet`](<#sqsetget>). The [`sqSetSet`](<#sqsetset>) function modifies a square set by setting or clearing a bit at the position corresponding to a given square `s`, based on the `value` parameter. The [`sqSetGet`](<#sqsetget>) function retrieves the state of a specific square in the set, returning 1 if the square is set and 0 otherwise. The code uses bitwise operations to efficiently manage the state of squares, and it checks for invalid squares using the `sqEq` function.
+The code is a C source file that implements functions to manipulate a set of squares, likely for a chess application. It includes two primary functions: [`sqSetSet`](<#sqsetset>) and [`sqSetGet`](<#sqsetget>). The [`sqSetSet`](<#sqsetset>) function modifies a square set by setting or clearing a bit at the position corresponding to a given square `s`, based on the `value` parameter. The [`sqSetGet`](<#sqsetget>) function retrieves the value of a bit at the position corresponding to a given square `s` from the square set. Both functions check if the square `s` is valid using the `sqEq` function and the constant `SQ_INVALID`. The code relies on bitwise operations to efficiently manage the state of squares within a 64-bit integer.
 # Imports and Dependencies
 
 ---
@@ -20,17 +20,17 @@ This code is a C implementation for managing a set of squares, likely in the con
 ### sqSetSet<!-- {{#callable:sqSetSet}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/squareset.c#L10>)
 
-Sets or clears a bit in a square set based on the given square and value.
+Sets or clears a specific bit in a square set based on the given value.
 - **Inputs**:
     - `ss`: A pointer to a `sqSet` which represents a set of squares.
     - `s`: A `sq` value representing a specific square.
     - `value`: A `uint8_t` value indicating whether to set (1) or clear (0) the bit corresponding to the square `s`.
 - **Logic and Control Flow**:
     - Check if the square `s` is invalid using `sqEq(s, SQ_INVALID)`; if true, return immediately.
-    - Calculate the bit position for the square `s` using `sqGetIndex(s)` and shift `1` left by this index to get the bit mask.
-    - If `value` is non-zero, set the bit in `*ss` using the bitwise OR operation with the bit mask.
-    - If `value` is zero, clear the bit in `*ss` using the bitwise AND operation with the negated bit mask.
-- **Output**: No output is returned; the function modifies the `sqSet` pointed to by `ss`.
+    - Calculate the bit position for the square `s` using `sqGetIndex(s)` and shift `1` to that position to create a bitmask.
+    - If `value` is non-zero, set the bit in `*ss` using the bitwise OR operation with the bitmask.
+    - If `value` is zero, clear the bit in `*ss` using the bitwise AND operation with the negated bitmask.
+- **Output**: No output is returned as the function modifies the `sqSet` in place.
 - **Functions Called**:
     - [`sqEq`](<square.c.md#sqeq>)
     - [`sqGetIndex`](<square.c.md#sqgetindex>)
@@ -40,17 +40,17 @@ Sets or clears a bit in a square set based on the given square and value.
 ### sqSetGet<!-- {{#callable:sqSetGet}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/squareset.c#L23>)
 
-Retrieves the bit value at a specific index in a square set.
+Retrieves the bit value at the index corresponding to a square in a square set.
 - **Inputs**:
-    - `ss`: A pointer to a `sqSet` which represents a set of squares.
-    - `s`: A `sq` value representing a specific square to check within the set.
+    - `ss`: A pointer to a `sqSet`, which is a set of squares represented as a bitfield.
+    - `s`: A `sq` value representing a specific square to check within the square set.
 - **Logic and Control Flow**:
     - Check if the square `s` is equal to `SQ_INVALID` using [`sqEq`](<square.c.md#sqeq>); if true, return 0.
-    - Calculate the index of the square `s` using [`sqGetIndex`](<square.c.md#sqgetindex>).
+    - Calculate the index of the square `s` using `sqGetIndex(s)`.
     - Shift the bits of `*ss` right by the calculated index.
     - Perform a bitwise AND operation with 1 to isolate the bit at the specified index.
     - Return the result of the bitwise operation, which is either 0 or 1.
-- **Output**: Returns a `uint8_t` value of 0 or 1, indicating the presence or absence of the square `s` in the set.
+- **Output**: Returns a `uint8_t` value of 0 or 1, indicating whether the bit at the specified square index is set or not.
 - **Functions Called**:
     - [`sqEq`](<square.c.md#sqeq>)
     - [`sqGetIndex`](<square.c.md#sqgetindex>)

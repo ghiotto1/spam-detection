@@ -6,9 +6,9 @@
 Implements a linked list for managing chess boards, including creation, addition, retrieval, and removal.
 
 # Purpose
-The code implements a linked list data structure specifically designed to manage a collection of `board` objects, which are likely related to a chess application given the inclusion of the `chesslib/boardlist.h` header. The primary components of this implementation include functions for creating and managing a `boardList`, which is a singly linked list. The [`boardListCreate`](<#boardlistcreate>) function initializes a new list, while [`boardListNodeCreate`](<#boardlistnodecreate>) creates individual nodes that hold `board` objects. The [`boardListAdd`](<#boardlistadd>) function appends a new `board` to the end of the list, maintaining the list's order.
+The code implements a linked list structure specifically designed to manage a collection of `board` objects, which are likely related to a chess application given the inclusion of the `chesslib/boardlist.h` header. The primary data structure is `boardList`, which maintains a singly linked list of `boardListNode` elements. Each node contains a pointer to a `board` and a pointer to the next node in the list. The code provides functions to create a new list ([`boardListCreate`](<#boardlistcreate>)), add a new board to the list ([`boardListAdd`](<#boardlistadd>)), retrieve a board by its index ([`boardListGet`](<#boardlistget>)), remove the last board from the list ([`boardListUndo`](<#boardlistundo>)), and free the entire list ([`boardListFree`](<#boardlistfree>)).
 
-Additional functions provide access and management capabilities for the list. The [`boardListGet`](<#boardlistget>) function retrieves a `board` from a specified index in the list, while [`boardListUndo`](<#boardlistundo>) removes the last `board` from the list, effectively undoing the most recent addition. The [`boardListFree`](<#boardlistfree>) function deallocates all memory associated with the list, ensuring no memory leaks occur. This code is intended to be part of a larger application, as it does not define a `main` function and relies on external definitions from the `chesslib/boardlist.h` header.
+The `boardList` structure is initialized with a `head`, `tail`, and `size` to manage the list's state. The [`boardListAdd`](<#boardlistadd>) function appends a new node to the end of the list, updating the `tail` pointer and incrementing the `size`. The [`boardListGet`](<#boardlistget>) function traverses the list to return the board at a specified index. The [`boardListUndo`](<#boardlistundo>) function removes the last node, freeing its associated memory, and updates the list's `tail`. Finally, [`boardListFree`](<#boardlistfree>) deallocates all nodes and their associated boards, ensuring no memory leaks occur. This code is intended to be part of a larger application, likely providing a utility for managing a sequence of chess board states.
 # Imports and Dependencies
 
 ---
@@ -22,14 +22,14 @@ Additional functions provide access and management capabilities for the list. Th
 ### boardListCreate<!-- {{#callable:boardListCreate}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/boardlist.c#L10>)
 
-Allocates and initializes a new `boardList` structure.
+Initializes and returns a new `boardList` structure with default values.
 - **Inputs**: None
 - **Logic and Control Flow**:
     - Allocate memory for a `boardList` structure and assign it to the pointer `list`.
     - Set the `head` pointer of `list` to `NULL`, indicating an empty list.
     - Set the `tail` pointer of `list` to `NULL`, indicating no last element in the list.
-    - Initialize the `size` of the list to 0, indicating the list is empty.
-    - Return the pointer to the newly created `boardList`.
+    - Initialize the `size` of the list to `0`, indicating the list is empty.
+    - Return the pointer `list` to the newly created `boardList` structure.
 - **Output**: A pointer to a newly allocated and initialized `boardList` structure.
 
 
@@ -39,10 +39,10 @@ Allocates and initializes a new `boardList` structure.
 
 Creates a new `boardListNode` and initializes it with a given `board` pointer.
 - **Inputs**:
-    - `b`: A pointer to a `board` structure that the new node will contain.
+    - `b`: A pointer to a `board` structure that the new node will reference.
 - **Logic and Control Flow**:
     - Allocate memory for a new `boardListNode` using `malloc`.
-    - Assign the provided `board` pointer `b` to the `board` field of the new node.
+    - Assign the input `board` pointer `b` to the `board` field of the new node.
     - Set the `next` pointer of the new node to `NULL`.
     - Return the newly created `boardListNode`.
 - **Output**: A pointer to the newly created `boardListNode`.
@@ -52,17 +52,17 @@ Creates a new `boardListNode` and initializes it with a given `board` pointer.
 ### boardListAdd<!-- {{#callable:boardListAdd}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/boardlist.c#L30>)
 
-Adds a new board to the end of a linked list of boards.
+Adds a new `board` to the end of a `boardList`.
 - **Inputs**:
-    - `list`: A pointer to a `boardList` structure where the new board will be added.
-    - `b`: A pointer to a `board` structure that will be added to the list.
+    - `list`: A pointer to the `boardList` where the new `board` will be added.
+    - `b`: A pointer to the `board` to add to the `boardList`.
 - **Logic and Control Flow**:
-    - Create a new `boardListNode` using the [`boardListNodeCreate`](<#boardlistnodecreate>) function with the board `b`.
-    - Check if the `head` of the list is `NULL`, indicating the list is empty.
-    - If the list is empty, set both the `head` and `tail` of the list to the new node.
-    - If the list is not empty, set the `next` pointer of the current `tail` to the new node and update the `tail` to the new node.
-    - Increment the `size` of the list by 1.
-- **Output**: No return value; the function modifies the `boardList` structure in place.
+    - Create a new `boardListNode` using [`boardListNodeCreate`](<#boardlistnodecreate>) with the given `board` `b`.
+    - Check if the `head` of the `list` is `NULL`.
+    - If `head` is `NULL`, set both `head` and `tail` of the `list` to the new node.
+    - If `head` is not `NULL`, set the `next` pointer of the current `tail` to the new node and update the `tail` to the new node.
+    - Increment the `size` of the `list` by 1.
+- **Output**: No return value; the function modifies the `boardList` in place.
 - **Functions Called**:
     - [`boardListNodeCreate`](<#boardlistnodecreate>)
 
@@ -71,15 +71,15 @@ Adds a new board to the end of a linked list of boards.
 ### boardListGet<!-- {{#callable:boardListGet}} -->
 [View Source →](<../../../../../chesslib/src/chesslib/boardlist.c#L48>)
 
-Retrieves the `board` at a specified index from a `boardList`.
+Retrieves the `board` at a specified `index` from a `boardList`.
 - **Inputs**:
     - `list`: A pointer to a `boardList` from which to retrieve the `board`.
-    - `index`: An unsigned integer representing the position of the `board` to retrieve in the list.
+    - `index`: An unsigned integer representing the position of the `board` to retrieve from the list.
 - **Logic and Control Flow**:
-    - Initialize `currNode` to the head of the list.
+    - Initialize `currNode` to the head of the `boardList`.
     - Iterate through the list, moving `currNode` to the next node and decrementing `index` until `index` is zero.
     - Return the `board` from the `currNode`.
-- **Output**: Returns a pointer to the `board` at the specified index in the `boardList`.
+- **Output**: A pointer to the `board` at the specified `index` in the `boardList`.
 
 
 ---
@@ -88,14 +88,14 @@ Retrieves the `board` at a specified index from a `boardList`.
 
 Removes the last node from a singly linked list of boards and frees its memory.
 - **Inputs**:
-    - `list`: A pointer to a `boardList` structure, which represents a singly linked list of boards.
+    - `list`: A pointer to a `boardList` structure, which represents a singly linked list of board nodes.
 - **Logic and Control Flow**:
-    - Checks if the `list` is `NULL` or if the `list->head` is `NULL`; if so, returns immediately.
-    - If the list has only one node, frees the board and the node, then sets `list->head` and `list->tail` to `NULL`.
-    - If the list has more than one node, iterates through the list to find the last node and its predecessor.
-    - Frees the board and the last node, updates the predecessor's `next` pointer to `NULL`, and sets `list->tail` to the predecessor.
-    - Decrements the `list->size` by one.
-- **Output**: No return value; the function modifies the `boardList` in place.
+    - Check if `list` is `NULL` or if `list->head` is `NULL`; if so, return immediately as there is nothing to undo.
+    - If the list has only one node (`list->head->next` is `NULL`), free the board and the node, then set `list->head` and `list->tail` to `NULL`.
+    - If the list has more than one node, traverse the list to find the last node and its predecessor.
+    - Free the board and the last node, set the predecessor's `next` pointer to `NULL`, and update `list->tail` to point to the predecessor.
+    - Decrement the `list->size` by one.
+- **Output**: No return value; the function modifies the `boardList` in place by removing the last node and updating the list's size.
 
 
 ---
@@ -108,11 +108,9 @@ Deallocates all memory associated with a `boardList` and its nodes.
 - **Logic and Control Flow**:
     - Initialize `node` to the head of the list.
     - Enter a loop that continues while `node` is not NULL.
-    - Inside the loop, store the next node in `next`.
-    - Free the memory allocated for `node->board`.
-    - Free the memory allocated for `node`.
+    - Inside the loop, store the next node in `next`, free the `board` associated with the current `node`, and then free the `node` itself.
     - Set `node` to `next` to move to the next node in the list.
-    - After the loop, free the memory allocated for the `list` itself.
+    - After the loop, free the `list` itself.
 - **Output**: No return value; the function frees memory and does not return data.
 
 
