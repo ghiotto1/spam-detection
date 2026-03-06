@@ -3,20 +3,19 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Data structures and functions for a C-based chess library, dummy Python scripts, and memory management in C.
+Data structures and functions for chess management, scheduling interfaces for spam detection, and various Python scripts for message printing, with C files for memory allocation and error handling.
 
 ## Folders
-- **[chesslib](chesslib/README.md)**: Data structures, functions, and components for a C-based chess library with build and test instructions.
+- **[chesslib](chesslib/README.md)**: Data structures, functions, and implementations for chess management, build instructions, and documentation.
+- **[kestra_lite](kestra_lite/README.md)**: Scheduling interfaces and classes for managing execution and trigger contexts in spam detection.
 
 ## Files
-- **[dummy1.py](dummy1.py.md)**: Prints "new file".
-- **[dummy2.py](dummy2.py.md)**: Prints a message indicating it is a different new file.
-- **[dummy3.py](dummy3.py.md)**: Prints 'new file'.
-- **[dummy5.py](dummy5.py.md)**: Prints "added a new file".
-- **[dummy6.py](dummy6.py.md)**: Prints "A sixth new file".
-- **[dummy7.py](dummy7.py.md)**: Prints the message "more new files".
-- **[xmalloc.c](xmalloc.c.md)**: Memory allocation and string manipulation functions that check results and handle errors.
-- **[xmalloc.h](xmalloc.h.md)**: Memory allocation functions that check results and call fatal on error.
+- **[another_new_file.py](another_new_file.py.md)**: A function that prints a given string with a prefix message.
+- **[new_file_2.py](new_file_2.py.md)**: Prints the message 'this is another new file'.
+- **[new_file_3.py](new_file_3.py.md)**: Prints a message indicating the file's quality.
+- **[new_file_7.py](new_file_7.py.md)**: Prints the message "the bestest new file".
+- **[xmalloc.c](xmalloc.c.md)**: Memory allocation and string manipulation functions that check for errors and call fatalx on failure.
+- **[xmalloc.h](xmalloc.h.md)**: Memory allocation functions that check results and call fatal on error, ensuring no failure returns.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Chess board and game implementations, move and piece handling, and square management functions.
+Scheduling interfaces and classes for managing execution and trigger contexts in spam detection.
 
 ## Folders
-- **[chesslib](chesslib/README.md)**: Chess board and game implementations, move and piece handling, and square management functions.
+- **[io](io/README.md)**: Scheduling interfaces and classes for managing execution and trigger contexts in spam detection.
 
 
 ---
