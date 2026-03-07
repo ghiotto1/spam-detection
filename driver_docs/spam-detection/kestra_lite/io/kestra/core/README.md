@@ -3,10 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints "A sixth new file".
+Scheduling interfaces and classes for managing execution and trigger contexts in spam detection.
 
-# Purpose
-This code is a simple script that outputs the string "A sixth new file" to the standard output. It provides narrow functionality, serving primarily as a demonstration or placeholder for printing a specific message. There are no variables, functions, or classes defined in this script, indicating its limited scope and purpose.
+## Folders
+- **[schedulers](schedulers/README.md)**: Implements scheduling interfaces and classes for managing execution and trigger contexts in spam detection.
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

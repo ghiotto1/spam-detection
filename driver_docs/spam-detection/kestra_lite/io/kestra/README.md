@@ -3,10 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints 'new file'.
+Scheduling interfaces and classes for managing execution and trigger contexts in spam detection.
 
-# Purpose
-This code is a simple script that outputs the string `'new file'` to the standard output. It uses the `print` function to display the message. The script provides narrow functionality, serving primarily as a basic demonstration or placeholder for further development.
+## Folders
+- **[core](core/README.md)**: Scheduling interfaces and classes for managing execution and trigger contexts in spam detection.
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
