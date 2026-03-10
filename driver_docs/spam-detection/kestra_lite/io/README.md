@@ -3,10 +3,11 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints the message "more new files".
+Scheduling interfaces and classes for managing execution and trigger contexts in spam detection.
 
-# Purpose
-This code is a simple script that outputs the string "more new files" to the standard output. It uses the `print` function, which is a built-in Python function for displaying text. The script provides narrow functionality, as it performs a single action without any additional logic or complexity.
+## Folders
+- **[kestra](kestra/README.md)**: Scheduling interfaces and classes for managing execution and trigger contexts in spam detection.
+
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)

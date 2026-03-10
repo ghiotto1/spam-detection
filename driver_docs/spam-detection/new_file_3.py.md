@@ -3,10 +3,10 @@
 <!-- Manual edits may be overwritten on future commits. --------------------------->
 <!--------------------------------------------------------------------------------->
 
-Prints "new file".
+Prints a message indicating the file's quality.
 
 # Purpose
-This code is a simple script that outputs the string "new file" to the standard output. It uses the `print` function to display the message. The script provides narrow functionality, serving primarily as a basic demonstration or placeholder for further development.
+This code is a simple script that outputs a message to the console. When executed, it prints the string "this is the best new file yet!" to the standard output. The script does not take any input or perform any other operations. It serves a narrow functionality of displaying a predefined message.
 
 ---
 Made with ❤️ by [Driver](https://www.driver.ai/)
